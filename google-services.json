@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1074585703745",
+    "project_id": "syncmind-a7330",
+    "storage_bucket": "syncmind-a7330.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1074585703745:android:9c87e45f08c12c99707dc0",
+        "android_client_info": {
+          "package_name": "com.syncmind.syncmind"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA-oafhNRsj_iVle7OUT0tcCFN5T6nFvUI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
