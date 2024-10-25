@@ -1,21 +1,10 @@
-// Importar Firebase
-import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
-
-// Configuración de Firebase
-const firebaseConfig = {
-  apiKey: "TU_API_KEY",
-  authDomain: "TU_AUTH_DOMAIN",
-  projectId: "TU_PROJECT_ID",
-  storageBucket: "TU_STORAGE_BUCKET",
-  messagingSenderId: "TU_MESSAGING_SENDER_ID",
-  appId: "TU_APP_ID",
+// firebaseConfig.js
+export const firebaseConfig = {
+  apiKey: "AIzaSyA4TYhlZYtDIyNrdm2jgWFS4g4T0H2wchE",
+  authDomain: "syncmind-a7330.firebaseapp.com",
+  projectId: "syncmind-a7330",
+  storageBucket: "syncmind-a7330.appspot.com",
+  messagingSenderId: "1074585703745",
+  appId: "1:1074585703745:web:68d2c35a5fb3df3e707dc0",
+  measurementId: "G-NF2QYMKZ0Y"
 };
-
-// Inicializar Firebase
-const app = initializeApp(firebaseConfig);
-
-// Exportar servicios
-export const auth = getAuth(app);
-export const db = getFirestore(app);
