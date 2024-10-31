@@ -35,6 +35,5 @@ yarn-error.*
 *.tsbuildinfo
 
 # Ignorar el archivo de configuración de Firebase
-firebaseConfig.js
 package-lock.json
 package.json
