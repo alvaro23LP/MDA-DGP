@@ -5,6 +5,7 @@ import { getFirestore, collection, getDocs, addDoc } from 'firebase/firestore';
 import { initializeApp } from 'firebase/app';
 import { firebaseConfig } from './firebaseConfig';
 
+//Esto es una prueba de commit
 
 // Inicializa Firebase
 initializeApp(firebaseConfig);
