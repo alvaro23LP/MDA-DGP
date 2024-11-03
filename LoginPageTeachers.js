@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Image, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
+import { View, Text, TextInput, Image, StyleSheet, TouchableOpacity, Dimensions, Button } from 'react-native';
 import { getFirestore, collection, query, where, getDocs } from 'firebase/firestore';
 import { initializeApp } from 'firebase/app';
 import { firebaseConfig } from './firebaseConfig'; // Asegúrate de que la ruta sea correcta
@@ -83,6 +83,8 @@ export default function LoginPage({ navigation }) {
         <TouchableOpacity style={[styles.button, styles.backButton]} onPress={() => navigation.goBack()}>
           <Text style={styles.buttonText}>Volver</Text>
         </TouchableOpacity>
+        
+        <Button title="AvanzarPantalla" onPress={() => navigation.navigate('teachersMainScreen')} />
       </View>
     </View>
   );
