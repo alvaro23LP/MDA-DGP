@@ -6,6 +6,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import HomeScreen from './HomeScreen';
 import LoginPage from './LoginPageTeachers';
 import LoadingScreen from './LoadingScreen';
+import PasswordUser from './PasswordUser';
 
 const Stack = createStackNavigator();
 
@@ -32,12 +33,17 @@ export default function App() {
         <Stack.Screen
           name="Home"
           component={HomeScreen}
-          options={{ headerShown: false }}
+          //options={{ headerShown: false }}
         />
         <Stack.Screen
           name="Login"
           component={LoginPage}
           options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="LoginUser"
+          component={PasswordUser}
+          //options={{ title: 'Selecciona la Contraseña' }}
         />
       </Stack.Navigator>
     </NavigationContainer>
