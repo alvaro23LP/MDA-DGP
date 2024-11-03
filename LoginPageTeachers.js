@@ -4,6 +4,7 @@ import { getFirestore, collection, query, where, getDocs } from 'firebase/firest
 import { initializeApp } from 'firebase/app';
 import { firebaseConfig } from './firebaseConfig'; // Asegúrate de que la ruta sea correcta
 
+
 // Inicializa Firebase
 initializeApp(firebaseConfig);
 
@@ -58,6 +59,8 @@ export default function LoginPage({ navigation }) {
       />
       <Button title="Iniciar Sesión" onPress={handleLogin} />
       <Button title="Volver" onPress={() => navigation.goBack()} />
+      <Button title="AvanzarPantalla" onPress={() => navigation.navigate('teachersMainScreen')} />
+
     </View>
   );
 }

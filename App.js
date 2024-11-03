@@ -3,9 +3,11 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
 // PANTALLAS
+import TeachersMainScreen from './teachersMainScreen';
 import HomeScreen from './HomeScreen';
 import LoginPage from './LoginPageTeachers';
 import LoadingScreen from './LoadingScreen';
+import taskManagement from './taskManagement';
 
 const Stack = createStackNavigator();
 
@@ -39,6 +41,18 @@ export default function App() {
           component={LoginPage}
           options={{ headerShown: false }}
         />
+        <Stack.Screen 
+        name="teachersMainScreen" 
+        component={TeachersMainScreen}
+        options={{ headerLeft: () => null }}
+
+        />
+
+        <Stack.Screen
+          name="taskManagement"
+          component={taskManagement}
+        />
+
       </Stack.Navigator>
     </NavigationContainer>
   );
