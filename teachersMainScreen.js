@@ -43,7 +43,7 @@ export default function teachersMainScreen({navigation})
             <View style={styles.container}>
 
                 <TouchableOpacity style={styles.button}>
-                    <Text style={styles.textButton}> Gestion de Alumnos </Text>
+                    <Text style={styles.textButton} onPress={() => navigation.navigate('UsersManagement')}> Gestion de Alumnos </Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity style={styles.button}>

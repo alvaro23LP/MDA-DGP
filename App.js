@@ -8,6 +8,9 @@ import HomeScreen from './HomeScreen';
 import LoginPage from './LoginPageTeachers';
 import LoadingScreen from './LoadingScreen';
 import taskManagement from './taskManagement';
+import UsersManagement from './UsersManagement';
+import EditUser from './EditUser';
+import AddUser from './AddUser';
 
 const Stack = createStackNavigator();
 
@@ -51,6 +54,21 @@ export default function App() {
         <Stack.Screen
           name="taskManagement"
           component={taskManagement}
+        />
+
+        <Stack.Screen
+          name="UsersManagement"
+          component={UsersManagement}
+        />
+
+        <Stack.Screen
+          name="EditUser"
+          component={EditUser}
+        />
+
+        <Stack.Screen
+          name="AddUser"
+          component={AddUser}
         />
 
       </Stack.Navigator>
