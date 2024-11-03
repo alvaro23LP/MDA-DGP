@@ -5,8 +5,10 @@ export default function HomeScreen({ navigation }) {
   return (
     <View style={styles.container}>
 
-      {/* Boton login de profesores */}
       <Text style={styles.welcomeText}>Bienvenido a la pantalla principal</Text>
+
+
+      {/* Boton login de profesores */}
       <TouchableOpacity style={styles.loginButton} onPress={() => navigation.navigate('Login')} >
         <Text style={styles.buttonText}>Iniciar Sesión Administrador/Profesor</Text>
       </TouchableOpacity>
