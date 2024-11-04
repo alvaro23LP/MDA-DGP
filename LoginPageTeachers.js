@@ -1,8 +1,13 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, Alert, StyleSheet } from 'react-native';
+import { View, Text, TextInput, Image, StyleSheet, TouchableOpacity, Dimensions, Button } from 'react-native';
 import { getFirestore, collection, query, where, getDocs } from 'firebase/firestore';
 import { initializeApp } from 'firebase/app';
 import { firebaseConfig } from './firebaseConfig'; // Asegúrate de que la ruta sea correcta
+import logo from './images/Logo2-SinFondo.png';
+
+// Obtener el ancho de la pantalla
+const { height, width } = Dimensions.get('window');
+
 
 // Inicializa Firebase
 initializeApp(firebaseConfig);
@@ -10,54 +15,76 @@ initializeApp(firebaseConfig);
 export default function LoginPage({ navigation }) {
   const [nombre, setNombre] = useState('');
   const [contrasena, setContrasena] = useState('');
-  
+
   const db = getFirestore();
 
+  /////////////////////////////////////////////////////////////////
   const handleLogin = async () => {
-    if (nombre.trim() === '' || contrasena.trim() === '') {
-      Alert.alert('Error', 'Nombre y contraseña son obligatorios.');
+    // Verifica que los campos no estén vacíos
+    if (!nombre || !contrasena) {
+      alert('Por favor, complete todos los campos.');
       return;
     }
-
+  
     try {
+      // Crea una consulta para buscar el usuario en la colección "Profesores"
       const q = query(
         collection(db, 'Profesores'),
         where('nombre', '==', nombre),
-        where('contrasena', '==', contrasena)
+        where('contraseña', '==', contrasena)
       );
+  
       const querySnapshot = await getDocs(q);
-
+  
+      // Verifica si se encontró un documento que coincida
       if (!querySnapshot.empty) {
-        Alert.alert('Éxito', 'Inicio de sesión exitoso');
-        // Aquí puedes navegar a la siguiente pantalla después del inicio de sesión exitoso
-        navigation.navigate('HomeScreen'); // Cambia 'HomeScreen' al nombre de la pantalla que deseas navegar
+        alert('Inicio de sesión exitoso.');
+        navigation.navigate('teachersMainScreen');
       } else {
-        Alert.alert('Error', 'Nombre o contraseña incorrectos');
+        alert('Usuario o contraseña incorrectos.');
       }
     } catch (error) {
-      console.error('Error al iniciar sesión: ', error);
-      Alert.alert('Error', 'No se pudo iniciar sesión.');
+      console.error('Error al iniciar sesión:', error.message); // Asegúrate de acceder al mensaje de error como string
+      alert('Ocurrió un error al iniciar sesión. Inténtalo de nuevo.');
     }
+    
   };
+  
+   /////////////////////////////////////////////////////////////////
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Página de Inicio de Sesión</Text>
+
+      {/* Logo */}
+      <Image style={styles.logoImage} source={logo} />
+
+      <Text style={styles.title}>Iniciar Sesión</Text>
+
+      {/* INPUTS */}
       <TextInput
         style={styles.input}
-        placeholder="Ingresa tu nombre"
+        placeholder="Introduzca su usuario"
         value={nombre}
         onChangeText={setNombre}
       />
       <TextInput
         style={styles.input}
-        placeholder="Ingresa tu contraseña"
+        placeholder="Introduzca su contraseña"
         value={contrasena}
         onChangeText={setContrasena}
         secureTextEntry
       />
-      <Button title="Iniciar Sesión" onPress={handleLogin} />
-      <Button title="Volver" onPress={() => navigation.goBack()} />
+      
+      {/* BOTONES */}
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity style={[styles.button, styles.loginButton]} onPress={handleLogin}>
+          <Text style={styles.buttonText}>Iniciar</Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity style={[styles.button, styles.backButton]} onPress={() => navigation.goBack()}>
+          <Text style={styles.buttonText}>Volver</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -68,19 +95,61 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: 20,
-    backgroundColor: '#C0E8F1', // Cambia el color de fondo si lo deseas
+    backgroundColor: '#D9EFFF', 
   },
+
+  logoImage: {
+    position: 'absolute',
+    top: 50,
+    width: width*0.55,
+    height: undefined,
+    aspectRatio: 5,
+    marginBottom: 80, 
+  },
+
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 20,
+    marginBottom: height*0.05,
+    color: '#222', 
   },
+
   input: {
     height: 40,
-    borderColor: 'gray',
+    borderColor: '#888', 
     borderWidth: 1,
-    marginBottom: 20,
+    marginBottom: height*0.05,
     paddingHorizontal: 10,
-    width: '100%', // Ajusta el ancho al contenedor
+    width: '85%',
+    borderRadius: 2, 
+  },
+  buttonContainer: {
+    width: '100%',
+    alignItems: 'center',
+  },
+  button: {
+    paddingVertical: 10,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginBottom: height*0.03, 
+    borderRadius: 30, 
+    borderWidth: 1, 
+    borderColor: '#111',
+  },
+
+  loginButton: {
+    backgroundColor: '#FEF28A', 
+    width: '60%', 
+
+  },
+  backButton: {
+    backgroundColor: '#7CC3FD', 
+    width: '40%',
+  },
+
+  buttonText: {
+    color: '#000', // Color de texto blanco
+    fontWeight: 'bold',
+    fontSize: 16,
   },
 });

@@ -42,6 +42,7 @@ export default function HomeScreen({ navigation }) {
         </View>
       </View>
 
+      {/* Boton login de profesores */}
       <TouchableOpacity style={styles.loginButton} onPress={handleAdminLogin}>
         <Text style={styles.buttonText}>Iniciar Sesión Administrador/Profesor</Text>
       </TouchableOpacity>
