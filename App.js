@@ -7,6 +7,7 @@ import TeachersMainScreen from './teachersMainScreen';
 import HomeScreen from './HomeScreen';
 import LoginPage from './LoginPageTeachers';
 import LoadingScreen from './LoadingScreen';
+import PasswordUser from './PasswordUser';
 import taskManagement from './taskManagement';
 import UsersManagement from './UsersManagement';
 import EditUser from './EditUser';
@@ -37,18 +38,22 @@ export default function App() {
         <Stack.Screen
           name="Home"
           component={HomeScreen}
-          options={{ headerShown: false }}
+          //options={{ headerShown: false }}
         />
         <Stack.Screen
           name="Login"
           component={LoginPage}
           options={{ headerShown: false }}
         />
+        <Stack.Screen
+          name="LoginUser"
+          component={PasswordUser}
+          //options={{ title: 'Selecciona la Contraseña' }}
+        />
         <Stack.Screen 
         name="teachersMainScreen" 
         component={TeachersMainScreen}
         options={{ headerLeft: () => null }}
-
         />
 
         <Stack.Screen
