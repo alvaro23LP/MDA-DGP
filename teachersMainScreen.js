@@ -29,7 +29,7 @@ export default function teachersMainScreen({navigation})
                 onPress={() => navigation.navigate('Login')}
             >
                 <Text style={{color: '#fff', fontSize: scale(10), marginRight: scale(10)}}>Cerar Sesión</Text>
-                <Icon name="exit" size={scale(20)} color="#fff" /> {}
+                <Icon name="exit" size={scale(20)} color="#fff" /> 
             </TouchableOpacity>
             ),  
           

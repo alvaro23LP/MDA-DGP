@@ -30,8 +30,8 @@ export default function LoginPage({ navigation }) {
       // Crea una consulta para buscar el usuario en la colección "Profesores"
       const q = query(
         collection(db, 'Profesores'),
-        where('Usuario', '==', nombre),
-        where('Contraseña', '==', contrasena)
+        where('nombre', '==', nombre),
+        where('contraseña', '==', contrasena)
       );
   
       const querySnapshot = await getDocs(q);
@@ -39,14 +39,15 @@ export default function LoginPage({ navigation }) {
       // Verifica si se encontró un documento que coincida
       if (!querySnapshot.empty) {
         alert('Inicio de sesión exitoso.');
-        //navigation.navigate('Login')
+        navigation.navigate('teachersMainScreen');
       } else {
         alert('Usuario o contraseña incorrectos.');
       }
     } catch (error) {
-      console.error('Error al iniciar sesión:', error);
+      console.error('Error al iniciar sesión:', error.message); // Asegúrate de acceder al mensaje de error como string
       alert('Ocurrió un error al iniciar sesión. Inténtalo de nuevo.');
     }
+    
   };
   
    /////////////////////////////////////////////////////////////////
@@ -83,8 +84,6 @@ export default function LoginPage({ navigation }) {
         <TouchableOpacity style={[styles.button, styles.backButton]} onPress={() => navigation.goBack()}>
           <Text style={styles.buttonText}>Volver</Text>
         </TouchableOpacity>
-        
-        <Button title="AvanzarPantalla" onPress={() => navigation.navigate('teachersMainScreen')} />
       </View>
     </View>
   );
