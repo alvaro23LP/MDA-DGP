@@ -2,7 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert, ScrollView } from 'react-native';
 import { getFirestore, collection, addDoc } from 'firebase/firestore';
 import { initializeApp } from 'firebase/app';
-import { firebaseConfig } from './firebaseConfig'; // Asegúrate de que la ruta sea correcta
+import { firebaseConfig } from './firebaseConfig';
+import MultiSelect from 'react-native-multiple-select';
+import { Picker } from '@react-native-picker/picker';
+
 
 // Inicializa Firebase
 initializeApp(firebaseConfig);
@@ -10,84 +13,159 @@ initializeApp(firebaseConfig);
 export default function AddUser({ navigation }) {
   const [nombre, setNombre] = useState('');
   const [edad, setEdad] = useState('');
-  const [discapacidad, setDiscapacidad] = useState('');
-  const [ayudasNecesarias, setAyudas] = useState('');
-  const [contrasena, setContrasena] = useState('');
+  const [contrasena1, setContrasena1] = useState('0');
+  const [contrasena2, setContrasena2] = useState('0');
+  const [tipoDiscapacidad, setTipoDiscapacidad] = useState([]);
+  const [preferenciasVista, setPreferenciasVista] = useState([]);
+  const [fotoAvatar, setFotoAvatar] = useState(null);
 
+  const items = [
+    { id: 'Visual', name: 'Visual' },
+    { id: 'Auditiva', name: 'Auditiva' },
+    { id: 'Motriz', name: 'Motriz' },
+  ];
+
+  const preferenciasItems = [
+    { id: 'Normal', name: 'Normal' },
+    { id: 'Pictograma', name: 'Pictograma' },
+    { id: 'Sonido', name: 'Sonido' },
+    { id: 'Texto', name: 'Texto' },
+  ];
+  
   useEffect(() => {
     // Configura las opciones del encabezado
     navigation.setOptions({
-      title: 'Añadir usuario',  // Cambia el título
-      headerStyle: { backgroundColor: '#1565C0',  height: 80 }, // Color de fondo y tamaño del encabezado
-      headerTintColor: '#fff', // Color del texto
-      headerTitleStyle: { fontWeight: 'bold', fontSize: 35 }, // Estilo del título
+      title: 'Añadir usuario',
+      headerStyle: { backgroundColor: '#1565C0',  height: 80 },
+      headerTintColor: '#fff',
+      headerTitleStyle: { fontWeight: 'bold', fontSize: 35 },
     });
   }, [navigation]);
 
   const db = getFirestore();
 
+  const handleFileChange = async (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFotoAvatar(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleAddUser = async () => {
-    if (nombre === '' || edad === '' || discapacidad === '' || ayudasNecesarias === '') {
+    if (nombre === '' || edad === '' || tipoDiscapacidad.length === 0 || preferenciasVista.length === 0 || fotoAvatar === null) {
       Alert.alert('Error', 'Todos los campos son obligatorios');
       return;
     }
 
+    if (isNaN(edad)) {
+      Alert.alert('Error', 'La edad debe ser un número');
+      return;
+    }
+
+    const contrasenaVisual = [contrasena1, contrasena2];
+
     try {
-      await addDoc(collection(db, 'Usuarios'), {
+      await addDoc(collection(getFirestore(), 'Estudiantes'), {
         nombre,
         edad,
-        discapacidad,
-        ayudasNecesarias,
-        //contrasena,
+        tipoDiscapacidad,
+        preferenciasVista,
+        fotoAvatar,
+        agendaTareas: [],
+        historialTareas: [],
+        contrasenaVisual,
       });
       Alert.alert('Éxito', 'Alumno agregado exitosamente');
+      // Limpiar el formulario después de agregar el usuario
       setNombre('');
       setEdad('');
-      setDiscapacidad('');
-      setAyudas('');
-      setContrasena('');
-      navigation.navigate('UsersManagement'); // Navega a UsersManagement después de agregar el alumno
+      setTipoDiscapacidad([]);
+      setPreferenciasVista([]);
+      setContrasena1('0');
+      setContrasena2('0');
+      setFotoAvatar(null);
+
+      navigation.navigate('UsersManagement');
     } catch (error) {
-      console.error('Error al agregar el alumno: ', error);
       Alert.alert('Error', 'No se pudo agregar el alumno');
+      console.error('Error al agregar el alumno: ', error);
     }
   };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Agregar Alumno</Text>
       <TextInput
         style={styles.input}
         placeholder="Nombre"
         value={nombre}
         onChangeText={setNombre}
       />
-      <TextInput
+
+    <TextInput
         style={styles.input}
         placeholder="Edad"
         value={edad}
         onChangeText={setEdad}
-        keyboardType="numeric"
       />
-      <TextInput
-        style={styles.input}
-        placeholder="Discapacidad"
-        value={discapacidad}
-        onChangeText={setDiscapacidad}
+
+    <MultiSelect
+        items={items}
+        uniqueKey="id"
+        onSelectedItemsChange={selectedItems => setTipoDiscapacidad(selectedItems)}
+        selectedItems={tipoDiscapacidad}
+        selectText="Selecciona Discapacidades"
+        submitButtonText="Seleccionar"
+        styleDropdownMenuSubsection={styles.MultiSelect}
+        styleTextDropdown={{ color: '#000' }}
+        styleTextDropdownSelected={{ color: '#000' }}
+        submitButtonColor="#90EE90"
+        submitButtonTextColor="#000"
       />
-      <TextInput
-        style={styles.input}
-        placeholder="Ayudas Necesarias"
-        value={ayudasNecesarias}
-        onChangeText={setAyudas}
+      
+      <MultiSelect
+        items={preferenciasItems}
+        uniqueKey="id"
+        onSelectedItemsChange={selectedItems => setPreferenciasVista(selectedItems)}
+        selectedItems={preferenciasVista}
+        selectText="Selecciona Preferencias de Vista"
+        submitButtonText="Seleccionar"
+        styleDropdownMenuSubsection={styles.MultiSelect}
+        styleTextDropdown={{ color: '#000' }}
+        styleTextDropdownSelected={{ color: '#000' }}
+        submitButtonColor="#90EE90"
+        submitButtonTextColor="#000"
       />
-      <TextInput
-        style={[styles.input, styles.passwordInput]}
-        placeholder="Contraseña"
-        value={contrasena}
-        onChangeText={setContrasena}
-        secureTextEntry
-      />
+      <View style={styles.fileInputContainer}>
+        <input type="file" onChange={handleFileChange} style={styles.fileInput} />
+      </View>
+
+      <View style={styles.pickerContainer}>
+        <Text>Contraseña:</Text>
+        <Picker
+          selectedValue={contrasena1}
+          style={styles.picker}
+          onValueChange={(itemValue) => setContrasena1(itemValue)}
+        >
+          {[...Array(10).keys()].map((num) => (
+            <Picker.Item key={num} label={num.toString()} value={num.toString()} />
+          ))}
+        </Picker>
+        <Picker
+          selectedValue={contrasena2}
+          style={styles.picker}
+          onValueChange={(itemValue) => setContrasena2(itemValue)}
+        >
+          {[...Array(10).keys()].map((num) => (
+            <Picker.Item key={num} label={num.toString()} value={num.toString()} />
+          ))}
+        </Picker>
+      </View>
+
+    
       <Button title="Agregar Alumno" onPress={handleAddUser} />
     </ScrollView>
   );
@@ -95,26 +173,38 @@ export default function AddUser({ navigation }) {
 
 const styles = StyleSheet.create({
   container: {
-    flexGrow: 1,
-    justifyContent: 'flex-start', // Alinea el contenido al inicio
-    alignItems: 'center',
     padding: 20,
-    backgroundColor: '#D9EFFF', // Mismo color de fondo que en UsersManagement.js
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
   },
   input: {
-    width: '100%',
     height: 40,
     borderColor: 'gray',
     borderWidth: 1,
-    marginBottom: 20,
-    paddingHorizontal: 10,
+    marginBottom: 10,
+    paddingLeft: 8,
   },
-  passwordInput: {
-    backgroundColor: '#FFDDC1', // Color de fondo distinto para el campo de contraseña
+
+    MultiSelect: {
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 1,
+    paddingLeft: 8,
+  },
+  fileInputContainer: {
+    marginBottom: 20,
+  },
+  fileInput: {
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 1,
+    paddingLeft: 8,
+  },
+  pickerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  picker: {
+    height: 40,
+    width: 80,
   },
 });

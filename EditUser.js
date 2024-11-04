@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, Alert, ScrollView, Image, TouchableOpacity } from 'react-native';
 import { getFirestore, doc, getDoc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { initializeApp } from 'firebase/app';
-import { firebaseConfig } from './firebaseConfig'; // Asegúrate de que la ruta sea correcta
+import { firebaseConfig } from './firebaseConfig';
+import MultiSelect from 'react-native-multiple-select';
+import { Picker } from '@react-native-picker/picker';
 
 // Inicializa Firebase
 initializeApp(firebaseConfig);
@@ -12,10 +14,10 @@ export default function EditUser({ route, navigation }) {
   useEffect(() => {
     // Configura las opciones del encabezado
     navigation.setOptions({
-      title: 'Editar usuario',  // Cambia el título
-      headerStyle: { backgroundColor: '#1565C0',  height: 80 }, // Color de fondo y tamaño del encabezado
-      headerTintColor: '#fff', // Color del texto
-      headerTitleStyle: { fontWeight: 'bold', fontSize: 35 }, // Estilo del título
+      title: 'Editar usuario', 
+      headerStyle: { backgroundColor: '#1565C0',  height: 80 },
+      headerTintColor: '#fff',
+      headerTitleStyle: { fontWeight: 'bold', fontSize: 35 },
 
     });
   }, [navigation]);
@@ -23,9 +25,11 @@ export default function EditUser({ route, navigation }) {
   const { userId } = route.params;
   const [nombre, setNombre] = useState('');
   const [edad, setEdad] = useState('');
-  const [discapacidad, setDiscapacidad] = useState('');
-  const [ayudasNecesarias, setAyudasNecesarias] = useState('');
-  const [contrasena, setContrasena] = useState('');
+  const [contrasena1, setContrasena1] = useState('0');
+  const [contrasena2, setContrasena2] = useState('0');
+  const [tipoDiscapacidad, setTipoDiscapacidad] = useState([]);
+  const [preferenciasVista, setPreferenciasVista] = useState([]);
+  const [fotoAvatar, setFotoAvatar] = useState(null);
 
   const [originalData, setOriginalData] = useState({});
 
@@ -34,14 +38,16 @@ export default function EditUser({ route, navigation }) {
   useEffect(() => {
     const loadUserData = async () => {
       try {
-        const userDoc = await getDoc(doc(db, 'Usuarios', userId));
+        const userDoc = await getDoc(doc(db, 'Estudiantes', userId));
         if (userDoc.exists()) {
           const userData = userDoc.data();
           setNombre(userData.nombre);
           setEdad(userData.edad);
-          setDiscapacidad(userData.discapacidad);
-          setAyudasNecesarias(userData.ayudasNecesarias);
-          setContrasena(userData.contrasena);
+          setContrasena1(userData.contrasenaVisual[0]);
+          setContrasena2(userData.contrasenaVisual[1]);
+          setTipoDiscapacidad(userData.tipoDiscapacidad);
+          setPreferenciasVista(userData.preferenciasVista);
+          setFotoAvatar(userData.fotoAvatar);
           setOriginalData(userData);
         } else {
           Alert.alert('Error', 'No se encontró el usuario');
@@ -55,18 +61,37 @@ export default function EditUser({ route, navigation }) {
     loadUserData();
   }, [userId]);
 
+  const handleFileChange = async (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFotoAvatar(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleUpdateUser = async () => {
-    if (nombre === '' || edad === '' || discapacidad === '' || ayudasNecesarias === '' || contrasena === '') {
+    if (nombre === '' || edad === '' || tipoDiscapacidad.length === 0 || preferenciasVista.length === 0) {
       Alert.alert('Error', 'Todos los campos son obligatorios');
       return;
     }
-
     const updatedData = {};
+
     if (nombre !== originalData.nombre) updatedData.nombre = nombre;
+
     if (edad !== originalData.edad) updatedData.edad = edad;
-    if (discapacidad !== originalData.discapacidad) updatedData.discapacidad = discapacidad;
-    if (ayudasNecesarias !== originalData.ayudasNecesarias) updatedData.ayudasNecesarias = ayudasNecesarias;
-    if (contrasena !== originalData.contrasena) updatedData.contrasena = contrasena;
+
+    if (contrasena1 !== originalData.contrasenaVisual[0] || contrasena2 !== originalData.contrasenaVisual[1]) updatedData.contrasenaVisual = [contrasena1, contrasena2];
+
+    if (tipoDiscapacidad !== originalData.tipoDiscapacidad) updatedData.tipoDiscapacidad = tipoDiscapacidad;
+
+    if (preferenciasVista !== originalData.preferenciasVista) updatedData.preferenciasVista = preferenciasVista;
+
+    if (fotoAvatar !== originalData.fotoAvatar) updatedData.fotoAvatar = fotoAvatar;
+    
+
 
     if (Object.keys(updatedData).length === 0) {
       Alert.alert('Info', 'No se han realizado cambios');
@@ -74,9 +99,9 @@ export default function EditUser({ route, navigation }) {
     }
 
     try {
-      await updateDoc(doc(db, 'Usuarios', userId), updatedData);
+      await updateDoc(doc(db, 'Estudiantes', userId), updatedData);
       Alert.alert('Éxito', 'Alumno actualizado exitosamente');
-      navigation.navigate('UsersManagement'); // Navega a UsersManagement después de actualizar el alumno
+      navigation.navigate('UsersManagement');
     } catch (error) {
       console.error('Error al actualizar el alumno: ', error);
       Alert.alert('Error', 'No se pudo actualizar el alumno');
@@ -85,9 +110,9 @@ export default function EditUser({ route, navigation }) {
 
   const handleDeleteUser = async () => {
     try {
-      await deleteDoc(doc(db, 'Usuarios', userId));
+      await deleteDoc(doc(db, 'Estudiantes', userId));
       Alert.alert('Éxito', 'Alumno eliminado exitosamente');
-      navigation.navigate('UsersManagement'); // Navega a UsersManagement después de eliminar el alumno
+      navigation.navigate('UsersManagement');
     } catch (error) {
       console.error('Error al eliminar el alumno: ', error);
       Alert.alert('Error', 'No se pudo eliminar el alumno');
@@ -110,25 +135,69 @@ export default function EditUser({ route, navigation }) {
         onChangeText={setEdad}
         keyboardType="numeric"
       />
-      <TextInput
-        style={styles.input}
-        placeholder="Discapacidad"
-        value={discapacidad}
-        onChangeText={setDiscapacidad}
+
+      <MultiSelect
+        items={[
+          { id: 'Visual', name: 'Visual' },
+          { id: 'Auditiva', name: 'Auditiva' },
+          { id: 'Motriz', name: 'Motriz' },
+        ]}
+        uniqueKey="id"
+        onSelectedItemsChange={selectedItems => setTipoDiscapacidad(selectedItems)}
+        selectedItems={tipoDiscapacidad}
+        selectText="Selecciona Discapacidades"
+        submitButtonText="Seleccionar"
+        styleDropdownMenuSubsection={styles.MultiSelect}
+        styleTextDropdown={{ color: '#000' }}
+        styleTextDropdownSelected={{ color: '#000' }}
+        submitButtonColor="#90EE90"
+        submitButtonTextColor="#000"
       />
-      <TextInput
-        style={styles.input}
-        placeholder="Ayudas Necesarias"
-        value={ayudasNecesarias}
-        onChangeText={setAyudasNecesarias}
+      
+      <MultiSelect
+        items={[
+          { id: 'Normal', name: 'Normal' },
+          { id: 'Pictograma', name: 'Pictograma' },
+          { id: 'Sonido', name: 'Sonido' },
+          { id: 'Texto', name: 'Texto' },
+        ]}
+        uniqueKey="id"
+        onSelectedItemsChange={selectedItems => setPreferenciasVista(selectedItems)}
+        selectedItems={preferenciasVista}
+        selectText="Selecciona Preferencias de Vista"
+        submitButtonText="Seleccionar"
+        styleDropdownMenuSubsection={styles.MultiSelect}
+        styleTextDropdown={{ color: '#000' }}
+        styleTextDropdownSelected={{ color: '#000' }}
+        submitButtonColor="#90EE90"
+        submitButtonTextColor="#000"
       />
-      <TextInput
-        style={[styles.input, styles.passwordInput]}
-        placeholder="Contraseña"
-        value={contrasena}
-        onChangeText={setContrasena}
-        secureTextEntry
-      />
+
+      <View style={styles.fileInputContainer}>
+        <input type="file" onChange={handleFileChange} style={styles.fileInput} />
+      </View>
+
+      <View style={styles.pickerContainer}>
+        <Text>Contraseña:</Text>
+        <Picker
+          selectedValue={contrasena1}
+          style={styles.picker}
+          onValueChange={(itemValue) => setContrasena1(itemValue)}
+        >
+          {[...Array(10).keys()].map((num) => (
+            <Picker.Item key={num} label={num.toString()} value={num.toString()} />
+          ))}
+        </Picker>
+        <Picker
+          selectedValue={contrasena2}
+          style={styles.picker}
+          onValueChange={(itemValue) => setContrasena2(itemValue)}
+        >
+          {[...Array(10).keys()].map((num) => (
+            <Picker.Item key={num} label={num.toString()} value={num.toString()} />
+          ))}
+        </Picker>
+      </View>
       <Button title="Actualizar Alumno" onPress={handleUpdateUser} />
       <TouchableOpacity style={styles.deleteButton} onPress={handleDeleteUser}>
         <Text style={styles.deleteButtonText}>Eliminar Alumno</Text>
@@ -139,11 +208,7 @@ export default function EditUser({ route, navigation }) {
 
 const styles = StyleSheet.create({
   container: {
-    flexGrow: 1,
-    justifyContent: 'flex-start', // Alinea el contenido al inicio
-    alignItems: 'center',
     padding: 20,
-    backgroundColor: '#D9EFFF', // Mismo color de fondo que en UsersManagement.js
   },
   title: {
     fontSize: 24,
@@ -159,19 +224,43 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   passwordInput: {
-    backgroundColor: '#FFDDC1', // Color de fondo distinto para el campo de contraseña
+    backgroundColor: '#FFDDC1',
   },
   deleteButton: {
-    backgroundColor: 'red', // Fondo rojo para el botón de eliminar
-    padding: 10, // Reduce el padding para hacer el botón más pequeño
+    backgroundColor: 'red',
+    padding: 10,
     borderRadius: 5,
     marginTop: 20,
     alignItems: 'center',
-    alignSelf: 'flex-start', // Alinea el botón a la izquierda
+    alignSelf: 'flex-start',
   },
   deleteButtonText: {
-    color: '#fff', // Texto blanco
+    color: '#fff',
     fontSize: 18,
     fontWeight: 'bold',
+  },
+  MultiSelect: {
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 1,
+    paddingLeft: 8,
+  },
+  fileInputContainer: {
+    marginBottom: 20,
+  },
+  fileInput: {
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 1,
+    paddingLeft: 8,
+  },
+  pickerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 30,
+  },
+  picker: {
+    height: 50,
+    width: 100,
   },
 });

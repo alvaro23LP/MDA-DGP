@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import React, { useEffect, useState, useCallback } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, FlatList, Image } from 'react-native';
 import { getFirestore, collection, getDocs } from 'firebase/firestore';
 import { initializeApp } from 'firebase/app';
 import { firebaseConfig } from './firebaseConfig';
-import avatar from './images/avatar_1.png';
+import { useFocusEffect } from '@react-navigation/native';
 import editIcon from './images/edit.png';
 
 
@@ -15,35 +15,35 @@ export default function UsersManagement({ navigation }) {
   useEffect(() => {
     // Configura las opciones del encabezado
     navigation.setOptions({
-      title: 'Lista de usuarios',  // Cambia el título
-      headerStyle: { backgroundColor: '#1565C0',  height: 80 }, // Color de fondo y tamaño del encabezado
-      headerTintColor: '#fff', // Color del texto
-      headerTitleStyle: { fontWeight: 'bold', fontSize: 35 }, // Estilo del título
+      title: 'Lista de usuarios', 
+      headerStyle: { backgroundColor: '#1565C0',  height: 80 },
+      headerTintColor: '#fff',
+      headerTitleStyle: { fontWeight: 'bold', fontSize: 35 },
 
     });
   }, [navigation]);
 
   const [usuarios, setUsuarios] = useState([]);
-
-  const db = getFirestore();
   
   const getUsuarios = async () => {
     try {
-      const querySnapshot = await getDocs(collection(db, 'Usuarios'));
+      const db = getFirestore();
+      const querySnapshot = await getDocs(collection(db, 'Estudiantes'));
       const usuariosData = [];
       querySnapshot.forEach((doc) => {
         usuariosData.push({ id: doc.id, ...doc.data() });
       });
       setUsuarios(usuariosData);
-      console.log('Usuarios obtenidos:', usuariosData); // Log para verificar los datos obtenidos
     } catch (error) {
       console.error('Error al obtener los usuarios: ', error);
     }
   };
-
-  useEffect(() => {
-    getUsuarios();
-  }, []);
+  
+  useFocusEffect(
+    useCallback(() => {
+      getUsuarios();
+    }, [])
+  );
 
   return (
     <View style={styles.container}>
@@ -57,7 +57,8 @@ export default function UsersManagement({ navigation }) {
         keyExtractor={(item, index) => index.toString()}
         renderItem={({ item }) => (
           <View style={styles.userItem}>
-            <Image style={styles.avatar} source={avatar} />
+            <Image source={{ uri: item.fotoAvatar }} style={styles.avatar} />
+
             <Text style={styles.userText}>{item.nombre}</Text>
             <TouchableOpacity onPress={() => navigation.navigate('EditUser', { userId: item.id })}>
               <Image source={editIcon} style={styles.editIcon} />
@@ -81,13 +82,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#FFFFE0', // Amarillo claro
+    backgroundColor: '#FFFFE0', 
     padding: 15,
     borderRadius: 5,
     marginBottom: 20,
   },
   addButtonText: {
-    color: '#000', // Texto negro
+    color: '#000',
     fontSize: 18,
     fontWeight: 'bold',
   },
@@ -95,15 +96,15 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
-    textAlign: 'center', // Centra el texto
+    textAlign: 'center',
   },
   userItem: {
-    backgroundColor: '#ADD8E6', // Azul claro
+    backgroundColor: '#ADD8E6',
     padding: 20,
     marginVertical: 8,
-    borderRadius: 50, // Aumenta el valor para bordes más redondeados
-    flexDirection: 'row', // Alinea los elementos en fila
-    alignItems: 'center', // Centra verticalmente los elementos
+    borderRadius: 50,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   avatar: {
     width: 50,
@@ -112,7 +113,7 @@ const styles = StyleSheet.create({
     marginRight: 20,
   },
   userText: {
-    color: '#000', // Texto negro
+    color: '#000',
     fontSize: 18,
   },
   editIcon: {
