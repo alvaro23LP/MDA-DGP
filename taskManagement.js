@@ -11,7 +11,7 @@ const scale = (size) => (width < 375 ? size : size * (width / 375));
 
 
 
-export default function taskManagement({navigation})
+export default function TaskManagement({navigation})
 {
 
     useEffect(() => {
@@ -26,7 +26,7 @@ export default function taskManagement({navigation})
                 style={{ marginLeft: scale(20) }}
                 onPress={() => navigation.goBack()}
             >
-                <Icon name="arrow-back" size={scale(20)} color="#fff" /> {}
+                <Icon name="arrow-back" size={scale(20)} color="#fff" />
             </TouchableOpacity>
             ),
           

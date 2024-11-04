@@ -39,7 +39,7 @@ export default function LoginPage({ navigation }) {
       // Verifica si se encontró un documento que coincida
       if (!querySnapshot.empty) {
         alert('Inicio de sesión exitoso.');
-        navigation.navigate('teachersMainScreen');
+        navigation.navigate('TeachersMainScreen');
       } else {
         alert('Usuario o contraseña incorrectos.');
       }

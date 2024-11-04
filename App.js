@@ -8,7 +8,7 @@ import HomeScreen from './HomeScreen';
 import LoginPage from './LoginPageTeachers';
 import LoadingScreen from './LoadingScreen';
 import PasswordUser from './PasswordUser';
-import taskManagement from './taskManagement';
+import TaskManagement from './taskManagement';
 import UsersManagement from './UsersManagement';
 import EditUser from './EditUser';
 import AddUser from './AddUser';
@@ -51,14 +51,14 @@ export default function App() {
           //options={{ title: 'Selecciona la Contraseña' }}
         />
         <Stack.Screen 
-        name="teachersMainScreen" 
+        name="TeachersMainScreen" 
         component={TeachersMainScreen}
         options={{ headerLeft: () => null }}
         />
 
         <Stack.Screen
-          name="taskManagement"
-          component={taskManagement}
+          name="TaskManagement"
+          component={TaskManagement}
         />
 
         <Stack.Screen

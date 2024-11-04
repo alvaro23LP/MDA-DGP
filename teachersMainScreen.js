@@ -12,7 +12,7 @@ const scale = (size) => (width < 375 ? size : size * (width / 375));
 
 
 
-export default function teachersMainScreen({navigation})
+export default function TeachersMainScreen({navigation})
 {
 
     useEffect(() => {
@@ -47,7 +47,7 @@ export default function teachersMainScreen({navigation})
                 </TouchableOpacity>
 
                 <TouchableOpacity style={styles.button}>
-                    <Text style={styles.textButton} onPress={() => navigation.navigate('taskManagement')}> Gestion de Tareas </Text>
+                    <Text style={styles.textButton} onPress={() => navigation.navigate('TaskManagement')}> Gestion de Tareas </Text>
                 </TouchableOpacity>
             </View>
         </View>
