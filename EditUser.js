@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert, ScrollView, Image, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, Alert, ScrollView, TouchableOpacity } from 'react-native';
 import { getFirestore, doc, getDoc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { initializeApp } from 'firebase/app';
 import { firebaseConfig } from './firebaseConfig';
 import MultiSelect from 'react-native-multiple-select';
 import { Picker } from '@react-native-picker/picker';
+import { launchImageLibrary } from 'react-native-image-picker';
 
 // Inicializa Firebase
 initializeApp(firebaseConfig);
@@ -34,6 +36,8 @@ export default function EditUser({ route, navigation }) {
   const [originalData, setOriginalData] = useState({});
 
   const db = getFirestore();
+  const storage = getStorage();
+
 
   useEffect(() => {
     const loadUserData = async () => {
@@ -61,15 +65,27 @@ export default function EditUser({ route, navigation }) {
     loadUserData();
   }, [userId]);
 
-  const handleFileChange = async (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setFotoAvatar(reader.result);
-      };
-      reader.readAsDataURL(file);
-    }
+  const handleFileChange = async () => {
+    launchImageLibrary({}, async (response) => {
+      if (response.didCancel) {
+        console.log('User cancelled image picker');
+      } else if (response.error) {
+        console.log('ImagePicker Error: ', response.error);
+      } else {
+        const source = { uri: response.assets[0].uri };
+        setFotoAvatar(source.uri);
+
+        // Subir la imagen a Firebase Storage
+        const responseBlob = await fetch(source.uri);
+        const blob = await responseBlob.blob();
+        const storageRef = ref(storage, `avatars/${userId}`);
+        await uploadBytes(storageRef, blob);
+
+        // Obtener la URL de descarga de la imagen
+        const downloadURL = await getDownloadURL(storageRef);
+        setFotoAvatar(downloadURL);
+      }
+    });
   };
 
   const handleUpdateUser = async () => {
@@ -122,19 +138,25 @@ export default function EditUser({ route, navigation }) {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>Editar Alumno</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Nombre"
-        value={nombre}
-        onChangeText={setNombre}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Edad"
-        value={edad}
-        onChangeText={setEdad}
-        keyboardType="numeric"
-      />
+      <View style={styles.inputContainer}>
+        <Text style={styles.label}>Nombre</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Nombre"
+          value={nombre}
+          onChangeText={setNombre}
+        />
+      </View>
+      <View style={styles.inputContainer}>
+        <Text style={styles.label}>Edad</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Edad"
+          value={edad}
+          onChangeText={setEdad}
+          keyboardType="numeric"
+        />
+      </View>
 
       <MultiSelect
         items={[
@@ -173,11 +195,11 @@ export default function EditUser({ route, navigation }) {
         submitButtonTextColor="#000"
       />
 
-      <View style={styles.fileInputContainer}>
-        <input type="file" onChange={handleFileChange} style={styles.fileInput} />
-      </View>
+    <View style={styles.pickerContainer}>
+      <Button title="Select File"/>
+    </View>
 
-      <View style={styles.pickerContainer}>
+      <View style={styles.inputContainer}>
         <Text>Contraseña:</Text>
         <Picker
           selectedValue={contrasena1}
@@ -199,6 +221,7 @@ export default function EditUser({ route, navigation }) {
         </Picker>
       </View>
       <Button title="Actualizar Alumno" onPress={handleUpdateUser} />
+
       <TouchableOpacity style={styles.deleteButton} onPress={handleDeleteUser}>
         <Text style={styles.deleteButtonText}>Eliminar Alumno</Text>
       </TouchableOpacity>
@@ -208,23 +231,41 @@ export default function EditUser({ route, navigation }) {
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
     padding: 20,
+    backgroundColor: '#f5f5f5',
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
+    textAlign: 'center',
+  },
+  inputContainer: {
+    marginBottom: 20,
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 5,
   },
   input: {
-    width: '100%',
     height: 40,
     borderColor: 'gray',
     borderWidth: 1,
-    marginBottom: 20,
-    paddingHorizontal: 10,
+    borderRadius: 5,
+    paddingLeft: 8,
+    backgroundColor: '#fff',
   },
-  passwordInput: {
-    backgroundColor: '#FFDDC1',
+  fileInputContainer: {
+    marginBottom: 20,
+    alignSelf: 'flex-start',
+  },
+  MultiSelect: {
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 1,
+    paddingLeft: 8,
   },
   deleteButton: {
     backgroundColor: 'red',
@@ -239,28 +280,15 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
   },
-  MultiSelect: {
-    height: 40,
-    borderColor: 'gray',
-    borderWidth: 1,
-    paddingLeft: 8,
-  },
-  fileInputContainer: {
-    marginBottom: 20,
-  },
-  fileInput: {
-    height: 40,
-    borderColor: 'gray',
-    borderWidth: 1,
-    paddingLeft: 8,
-  },
   pickerContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 30,
+    marginBottom: 20,
   },
   picker: {
     height: 50,
-    width: 100,
+    width: '100%',
+    borderColor: 'gray',
+    borderWidth: 1,
+    borderRadius: 5,
+    backgroundColor: '#fff',
   },
 });

@@ -56,13 +56,29 @@ export default function AddUser({ navigation }) {
   };
 
   const handleAddUser = async () => {
-    if (nombre === '' || edad === '' || tipoDiscapacidad.length === 0 || preferenciasVista.length === 0 || fotoAvatar === null) {
-      Alert.alert('Error', 'Todos los campos son obligatorios');
+    if (nombre === ''){
+      alert('El nombre no puede estar vacío', '');
+      return;
+    }
+    else if (edad === ''){
+      alert('La edad no puede estar vacía', '');
+      return;
+    }
+    else if (tipoDiscapacidad.length === 0){
+      alert('Debes seleccionar al menos un tipo de discapacidad', '');
+      return;
+    }
+    else if (preferenciasVista.length === 0){
+      alert('Debes seleccionar al menos una preferencia de vista', '');
+      return;
+    }
+    else if (fotoAvatar === null){
+      alert('Debes seleccionar una foto de avatar', '');
       return;
     }
 
     if (isNaN(edad)) {
-      Alert.alert('Error', 'La edad debe ser un número');
+      alert('La edad debe ser un número', '');
       return;
     }
 
@@ -75,7 +91,6 @@ export default function AddUser({ navigation }) {
         tipoDiscapacidad,
         preferenciasVista,
         fotoAvatar,
-        agendaTareas: [],
         historialTareas: [],
         contrasenaVisual,
       });
