@@ -113,13 +113,17 @@ export default function AddUser({ navigation }) {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
+      <Text style={styles.label}>Nombre</Text>
+      <View style={styles.inputContainer}>
+
       <TextInput
         style={styles.input}
         placeholder="Nombre"
         value={nombre}
         onChangeText={setNombre}
       />
-
+       </View>
+    <Text style={styles.label}>Edad</Text>
     <TextInput
         style={styles.input}
         placeholder="Edad"
@@ -155,11 +159,11 @@ export default function AddUser({ navigation }) {
         submitButtonTextColor="#000"
       />
       <View style={styles.fileInputContainer}>
-        <input type="file" onChange={handleFileChange} style={styles.fileInput} />
+        <Button title="Select File"/>
       </View>
 
       <View style={styles.pickerContainer}>
-        <Text>Contraseña:</Text>
+      <Text style={styles.label}>Contraseña</Text>
         <Picker
           selectedValue={contrasena1}
           style={styles.picker}
@@ -188,7 +192,9 @@ export default function AddUser({ navigation }) {
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
     padding: 20,
+    backgroundColor: '#D9EFFF', 
   },
   input: {
     height: 40,
@@ -197,7 +203,6 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     paddingLeft: 8,
   },
-
     MultiSelect: {
     height: 40,
     borderColor: 'gray',
@@ -206,6 +211,8 @@ const styles = StyleSheet.create({
   },
   fileInputContainer: {
     marginBottom: 20,
+    marginTop: 20,
+    alignSelf: 'flex-start',
   },
   fileInput: {
     height: 40,
@@ -221,5 +228,13 @@ const styles = StyleSheet.create({
   picker: {
     height: 40,
     width: 80,
+  },
+  label: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 5,
+  },
+  inputContainer: {
+    marginBottom: 10,
   },
 });

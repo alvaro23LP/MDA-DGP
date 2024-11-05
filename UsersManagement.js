@@ -74,7 +74,7 @@ export default function UsersManagement({ navigation }) {
 const styles = StyleSheet.create({
   container: {
   flex: 1,
-  backgroundColor: '#fff',
+  backgroundColor: '#D9EFFF',
   padding: 20,
   overflow: 'hidden',
 },
@@ -86,6 +86,7 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 5,
     marginBottom: 20,
+    borderRadius: 50,
   },
   addButtonText: {
     color: '#000',
@@ -99,7 +100,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   userItem: {
-    backgroundColor: '#ADD8E6',
+    backgroundColor: '#87CEEB',
     padding: 20,
     marginVertical: 8,
     borderRadius: 50,

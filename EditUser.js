@@ -187,15 +187,10 @@ export default function EditUser({ route, navigation }) {
         onSelectedItemsChange={selectedItems => setPreferenciasVista(selectedItems)}
         selectedItems={preferenciasVista}
         selectText="Selecciona Preferencias de Vista"
-        submitButtonText="Seleccionar"
         styleDropdownMenuSubsection={styles.MultiSelect}
-        styleTextDropdown={{ color: '#000' }}
-        styleTextDropdownSelected={{ color: '#000' }}
-        submitButtonColor="#90EE90"
-        submitButtonTextColor="#000"
       />
 
-    <View style={styles.pickerContainer}>
+    <View style={styles.fileInputContainer}>
       <Button title="Select File"/>
     </View>
 
@@ -233,10 +228,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#D9EFFF', 
   },
   title: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: 'bold',
     marginBottom: 20,
     textAlign: 'center',
@@ -245,7 +240,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   label: {
-    fontSize: 16,
+    fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 5,
   },
@@ -256,9 +251,11 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     paddingLeft: 8,
     backgroundColor: '#fff',
+    fontSize: 20,
   },
   fileInputContainer: {
     marginBottom: 20,
+    marginTop: 20,
     alignSelf: 'flex-start',
   },
   MultiSelect: {
@@ -282,6 +279,8 @@ const styles = StyleSheet.create({
   },
   pickerContainer: {
     marginBottom: 20,
+    backgroundColor: '#D9EFFF',
+
   },
   picker: {
     height: 50,
@@ -289,6 +288,5 @@ const styles = StyleSheet.create({
     borderColor: 'gray',
     borderWidth: 1,
     borderRadius: 5,
-    backgroundColor: '#fff',
   },
 });
