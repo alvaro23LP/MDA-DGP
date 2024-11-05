@@ -1,48 +1,69 @@
-import React from 'react';
-import { useEffect } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, Text, View, TouchableOpacity, Image, ScrollView } from 'react-native';
+import { getFirestore, collection, getDocs } from 'firebase/firestore';
+import { initializeApp } from 'firebase/app';
+import { firebaseConfig } from './firebaseConfig';
 
-const userImages = [
-  require('./images/user1.png'),
-  require('./images/user2.png'),
-];
+// Inicializa Firebase
+initializeApp(firebaseConfig);
+const db = getFirestore();
 
 export default function HomeScreen({ navigation }) {
-  const handleStudentLogin = () => {
-    navigation.navigate('LoginUser');
+  const [students, setStudents] = useState([]);
+
+  useEffect(() => {
+    // Configura las opciones del encabezado
+    navigation.setOptions({
+      title: 'Inicio de sesión de usuario',
+      headerStyle: { backgroundColor: '#1565C0', height: 100 },
+      headerTintColor: '#fff',
+      headerTitleStyle: { fontWeight: 'bold', fontSize: 35 },
+    });
+
+    // Función para obtener todos los estudiantes
+    const fetchStudents = async () => {
+      try {
+        const studentsCollection = collection(db, 'Estudiantes');
+        const studentSnapshot = await getDocs(studentsCollection);
+        const studentsList = studentSnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setStudents(studentsList);
+      } catch (error) {
+        console.error('Error fetching students:', error);
+      }
+    };
+
+    fetchStudents();
+  }, [navigation]);
+
+  const handleStudentLogin = (studentId) => {
+    navigation.navigate('LoginUser', { studentId });
   };
 
   const handleAdminLogin = () => {
     navigation.navigate('Login');
   };
 
-  useEffect(() => {
-    // Configura las opciones del encabezado
-    navigation.setOptions({
-      title: 'Inicio de sesión de usuario',  // Cambia el título
-      headerStyle: { backgroundColor: '#1565C0',  height: 100 }, // Color de fondo y tamaño del encabezado
-      headerTintColor: '#fff', // Color del texto
-      headerTitleStyle: { fontWeight: 'bold', fontSize: 35 }, // Estilo del título
-
-    });
-  }, [navigation]);
-
   return (
     <View style={styles.container}>
       <Text style={styles.selectUserText}>Elige tu usuario</Text>
-      
-      {/* Contenedor para englobar todas las imágenes de usuarios */}
+
       <View style={styles.userContainer}>
-        <View style={styles.userGrid}>
-          {userImages.map((image, index) => (
-            <TouchableOpacity key={index} style={styles.userIcon} onPress={handleStudentLogin}>
-              <Image source={image} style={styles.userImage} />
+        <ScrollView contentContainerStyle={styles.userGrid}>
+          {students.map((student) => (
+            <TouchableOpacity
+              key={student.id}
+              style={styles.userIcon}
+              onPress={() => handleStudentLogin(student.id)}
+            >
+              <Image source={{ uri: student.fotoAvatar }} style={styles.userImage} />
             </TouchableOpacity>
           ))}
-        </View>
+        </ScrollView>
       </View>
 
-      {/* Boton login de profesores */}
       <TouchableOpacity style={styles.loginButton} onPress={handleAdminLogin}>
         <Text style={styles.buttonText}>Iniciar Sesión Administrador/Profesor</Text>
       </TouchableOpacity>
@@ -102,5 +123,5 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
-  },
+  },
 });

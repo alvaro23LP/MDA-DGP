@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, Image, Alert } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { getFirestore, doc, getDoc } from 'firebase/firestore';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import { getApp } from 'firebase/app';
 
 const fruitImages = {
   Uvas: require('./images/uvas.png'),
@@ -14,40 +16,78 @@ const fruitImages = {
   Aguacate: require('./images/aguacate.png'),
 };
 
+// Lista de opciones de frutas con sus respectivos IDs
 const fruitOptions = [
-  { id: 'Uvas', name: 'Uvas' },
-  { id: 'Pina', name: 'Pina' },
-  { id: 'Sandia', name: 'Sandia' },
-  { id: 'Fresa', name: 'Fresa' },
-  { id: 'Pera', name: 'Pera' },
-  { id: 'Manzana', name: 'Manzana' },
-  { id: 'Banana', name: 'Banana' },
-  { id: 'Papaya', name: 'Papaya' },
-  { id: 'Aguacate', name: 'Aguacate' },
+  { id: '0', name: 'Uvas' },
+  { id: '1', name: 'Pina' },
+  { id: '2', name: 'Sandia' },
+  { id: '3', name: 'Fresa' },
+  { id: '4', name: 'Pera' },
+  { id: '5', name: 'Manzana' },
+  { id: '6', name: 'Banana' },
+  { id: '7', name: 'Papaya' },
+  { id: '8', name: 'Aguacate' },
 ];
 
 export default function PasswordUser() {
   const navigation = useNavigation();
-  const [selectedFruits, setSelectedFruits] = useState([]);
+  const route = useRoute();
+  const { studentId } = route.params; // ID del estudiante pasado como parámetro
 
-  const handleFruitSelection = (fruitId) => {
-    if (selectedFruits.length < 2) {
-      setSelectedFruits([...selectedFruits, fruitId]);
-    }
-    if (selectedFruits.length === 1) {
-      Alert.alert('Contraseña seleccionada', `Frutas seleccionadas: ${[...selectedFruits, fruitId].join(', ')}`);
-      setSelectedFruits([]);
-    }
-  };
+  const [selectedFruits, setSelectedFruits] = useState([]);
+  const [password, setPassword] = useState([]); // Contraseña visual del estudiante
 
   useEffect(() => {
+    const fetchPassword = async () => {
+      const app = getApp();
+      const db = getFirestore(app);
+      try {
+        const studentRef = doc(db, 'Estudiantes', studentId);
+        const studentDoc = await getDoc(studentRef);
+        if (studentDoc.exists()) {
+          const studentData = studentDoc.data();
+          setPassword(studentData.contrasenaVisual); // Asigna la contraseña visual del estudiante
+          console.log('Contraseña visual cargada:', studentData.contrasenaVisual);
+        } else {
+          console.error('No se encontró el estudiante');
+        }
+      } catch (error) {
+        console.error('Error obteniendo la contraseña visual:', error);
+      }
+    };
+
+    fetchPassword();
+
     navigation.setOptions({
       title: 'Selecciona la contraseña',
       headerStyle: { backgroundColor: '#1565C0', height: 100 },
       headerTintColor: '#fff',
       headerTitleStyle: { fontWeight: 'bold', fontSize: 35 },
     });
-  }, [navigation]);
+  }, [navigation, studentId]);
+
+  const handleFruitSelection = (fruitId) => {
+    if (selectedFruits.length < 2) {
+      const newSelection = [...selectedFruits, fruitId];
+      setSelectedFruits(newSelection);
+
+      if (newSelection.length === 2) {
+        console.log('Contraseña almacenada:', password);
+        console.log('Frutas seleccionadas:', newSelection);
+
+        // Compara la selección del usuario con la contraseña almacenada, respetando el orden
+        if (
+          newSelection[0] === password[0] &&
+          newSelection[1] === password[1]
+        ) {
+          Alert.alert('¡Contraseña correcta!');
+        } else {
+          Alert.alert('Ups, contraseña incorrecta.');
+        }
+        setSelectedFruits([]); // Reinicia la selección
+      }
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -100,18 +140,17 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   fruitIcon: {
-    width: '30%', // Cada ícono ocupará el 30% del ancho del contenedor
-    aspectRatio: 1, // Mantener la relación de aspecto cuadrada
+    width: '30%',
+    aspectRatio: 1,
     backgroundColor: '#FFDDC1',
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 15,
     marginBottom: 10,
-    padding: 5, // Un poco de espacio dentro del ícono
   },
   fruitImage: {
-    width: '60%', // Cambiado a 60% para hacer la imagen más pequeña
-    height: '60%', // Cambiado a 60% para hacer la imagen más pequeña
-    borderRadius: 10,
-  },
+    width: '60%',
+    height: '60%',
+    borderRadius: 10,
+  },
 });
