@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert, ScrollView } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, Alert, ScrollView, TouchableOpacity } from 'react-native';
 import { getFirestore, collection, addDoc } from 'firebase/firestore';
 import { initializeApp } from 'firebase/app';
 import { firebaseConfig } from './firebaseConfig';
@@ -20,13 +20,14 @@ export default function AddUser({ navigation }) {
   const [fotoAvatar, setFotoAvatar] = useState(null);
 
   const items = [
+    { id: 'Por defecto', name: 'Por defecto' },
     { id: 'Visual', name: 'Visual' },
     { id: 'Auditiva', name: 'Auditiva' },
     { id: 'Motriz', name: 'Motriz' },
   ];
 
   const preferenciasItems = [
-    { id: 'Normal', name: 'Normal' },
+    { id: 'Por defecto', name: 'Por defecto' },
     { id: 'Pictograma', name: 'Pictograma' },
     { id: 'Sonido', name: 'Sonido' },
     { id: 'Texto', name: 'Texto' },
@@ -72,10 +73,6 @@ export default function AddUser({ navigation }) {
       alert('Debes seleccionar al menos una preferencia de vista', '');
       return;
     }
-    else if (fotoAvatar === null){
-      alert('Debes seleccionar una foto de avatar', '');
-      return;
-    }
 
     if (isNaN(edad)) {
       alert('La edad debe ser un número', '');
@@ -113,30 +110,34 @@ export default function AddUser({ navigation }) {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.label}>Nombre</Text>
       <View style={styles.inputContainer}>
+        <Text style={styles.label}>Nombre</Text>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Nombre"
-        value={nombre}
-        onChangeText={setNombre}
-      />
-       </View>
-    <Text style={styles.label}>Edad</Text>
-    <TextInput
-        style={styles.input}
-        placeholder="Edad"
-        value={edad}
-        onChangeText={setEdad}
-      />
+        <TextInput
+          style={styles.input}
+          placeholder="Nombre"
+          value={nombre}
+          onChangeText={setNombre}
+        />
+      </View>
 
+       <View style={styles.inputContainer}>
+        <Text style={styles.label}>Edad</Text>
+        <TextInput
+            style={styles.input}
+            placeholder="Edad"
+            value={edad}
+            onChangeText={setEdad}
+          />
+      </View>
+
+    <Text style={styles.label}>Limitación</Text>
     <MultiSelect
         items={items}
         uniqueKey="id"
         onSelectedItemsChange={selectedItems => setTipoDiscapacidad(selectedItems)}
         selectedItems={tipoDiscapacidad}
-        selectText="Selecciona Discapacidades"
+        selectText="Selecciona limitación"
         submitButtonText="Seleccionar"
         styleDropdownMenuSubsection={styles.MultiSelect}
         styleTextDropdown={{ color: '#000' }}
@@ -145,12 +146,13 @@ export default function AddUser({ navigation }) {
         submitButtonTextColor="#000"
       />
       
+      <Text style={styles.label}>Preferencia de vista</Text>
       <MultiSelect
         items={preferenciasItems}
         uniqueKey="id"
         onSelectedItemsChange={selectedItems => setPreferenciasVista(selectedItems)}
         selectedItems={preferenciasVista}
-        selectText="Selecciona Preferencias de Vista"
+        selectText="Selecciona Preferencias de vista"
         submitButtonText="Seleccionar"
         styleDropdownMenuSubsection={styles.MultiSelect}
         styleTextDropdown={{ color: '#000' }}
@@ -164,10 +166,11 @@ export default function AddUser({ navigation }) {
 
       <View style={styles.pickerContainer}>
       <Text style={styles.label}>Contraseña</Text>
-        <Picker
+      <Picker
           selectedValue={contrasena1}
           style={styles.picker}
           onValueChange={(itemValue) => setContrasena1(itemValue)}
+          itemStyle={styles.pickerItem} // Añade esta línea
         >
           {[...Array(10).keys()].map((num) => (
             <Picker.Item key={num} label={num.toString()} value={num.toString()} />
@@ -177,6 +180,7 @@ export default function AddUser({ navigation }) {
           selectedValue={contrasena2}
           style={styles.picker}
           onValueChange={(itemValue) => setContrasena2(itemValue)}
+          itemStyle={styles.pickerItem} // Añade esta línea
         >
           {[...Array(10).keys()].map((num) => (
             <Picker.Item key={num} label={num.toString()} value={num.toString()} />
@@ -184,8 +188,13 @@ export default function AddUser({ navigation }) {
         </Picker>
       </View>
 
-    
-      <Button title="Agregar Alumno" onPress={handleAddUser} />
+
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity style={styles.addButton} onPress={handleAddUser}>
+          <Text style={styles.addButtonText}>Aceptar</Text>
+        </TouchableOpacity>
+      </View>
+
     </ScrollView>
   );
 }
@@ -200,10 +209,12 @@ const styles = StyleSheet.create({
     height: 40,
     borderColor: 'gray',
     borderWidth: 1,
-    marginBottom: 10,
+    borderRadius: 5,
     paddingLeft: 8,
+    backgroundColor: '#fff',
+    fontSize: 20,
   },
-    MultiSelect: {
+  MultiSelect: {
     height: 40,
     borderColor: 'gray',
     borderWidth: 1,
@@ -227,7 +238,12 @@ const styles = StyleSheet.create({
   },
   picker: {
     height: 40,
-    width: 80,
+    width: 90,
+    backgroundColor: '#ffff',
+    marginHorizontal: 10,
+  },
+  pickerItem: {
+    color: '#000', // Asegúrate de que el color del texto sea visible
   },
   label: {
     fontSize: 20,
@@ -236,5 +252,20 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     marginBottom: 10,
+  },
+  buttonContainer: {
+    alignItems: 'center',
+    marginVertical: 20,
+  },
+  addButton: {
+    backgroundColor: '#FEF28A', 
+    paddingVertical: 15,
+    paddingHorizontal: 40,
+    borderRadius: 50,
+  },
+  addButtonText: {
+    color: '#000',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
