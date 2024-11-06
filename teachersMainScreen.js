@@ -39,7 +39,7 @@ export default function TeachersMainScreen({navigation})
 
     return(
 
-        <View style={{backgroundColor:'#C0E8F1', flex:1 }}>
+        <View style={{backgroundColor:'#D9EFFF', flex:1 }}>
             <View style={styles.container}>
 
                 <TouchableOpacity style={styles.button}>
@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
       justifyContent: 'center',
       alignItems: 'center',
 
-      backgroundColor: '#C0E8F1',
+      backgroundColor: '#D9EFFF',
       padding: 20,
       margin: 30,
       borderRadius: 10,

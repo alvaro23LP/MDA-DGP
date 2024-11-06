@@ -3,6 +3,7 @@ import { StyleSheet, Text, View, TouchableOpacity, Image, ScrollView } from 'rea
 import { getFirestore, collection, getDocs } from 'firebase/firestore';
 import { initializeApp } from 'firebase/app';
 import { firebaseConfig } from './firebaseConfig';
+import avatarIcon from './images/avatar_1.png';
 
 // Inicializa Firebase
 initializeApp(firebaseConfig);
@@ -58,7 +59,15 @@ export default function HomeScreen({ navigation }) {
               style={styles.userIcon}
               onPress={() => handleStudentLogin(student.id)}
             >
-              <Image source={{ uri: student.fotoAvatar }} style={styles.userImage} />
+              <Image 
+                source={
+                  student.fotoAvatar && typeof student.fotoAvatar === 'string'
+                    ? { uri: student.fotoAvatar }
+                    : require('./images/avatar_1.png')
+                }
+                style={styles.userImage}
+              />
+
             </TouchableOpacity>
           ))}
         </ScrollView>
@@ -77,13 +86,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#D9EFFF',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 20,
+    padding: 40,
   },
   selectUserText: {
     fontSize: 24,
     fontWeight: 'bold',
     color: '#000',
     marginBottom: 20,
+    marginTop: 100,
   },
   userContainer: {
     backgroundColor: '#FFFFFF',
@@ -112,8 +122,8 @@ const styles = StyleSheet.create({
   },
   loginButton: {
     position: 'absolute',
-    top: 20,
-    right: 20,
+    top: 15,
+    right: 15,
     backgroundColor: '#007AFF',
     paddingVertical: 10,
     paddingHorizontal: 15,
