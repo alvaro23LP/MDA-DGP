@@ -57,7 +57,7 @@ export default function UsersManagement({ navigation }) {
         keyExtractor={(item, index) => index.toString()}
         renderItem={({ item }) => (
           <View style={styles.userItem}>
-            <Image source={{ uri: item.fotoAvatar }} style={styles.avatar} />
+            {/* <Image source={{ uri: item.fotoAvatar }} style={styles.avatar} /> */}
 
             <Text style={styles.userText}>{item.nombre}</Text>
             <TouchableOpacity onPress={() => navigation.navigate('EditUser', { userId: item.id })}>
