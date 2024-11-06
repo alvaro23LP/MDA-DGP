@@ -1,20 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert, ScrollView, Image, TouchableOpacity } from 'react-native';
-import { getFirestore, doc, getDoc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { View, Text, TextInput, Button, StyleSheet, Alert, ScrollView, TouchableOpacity } from 'react-native';
+import { getFirestore, doc, getDoc, updateDoc } from 'firebase/firestore';
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { initializeApp } from 'firebase/app';
 import { firebaseConfig } from './firebaseConfig';
 import MultiSelect from 'react-native-multiple-select';
 import { Picker } from '@react-native-picker/picker';
+import { launchImageLibrary } from 'react-native-image-picker';
 
 // Inicializa Firebase
 initializeApp(firebaseConfig);
 
-export default function EditUser({ route, navigation }) {
+export default function EditUser({route, navigation }) {
 
   useEffect(() => {
     // Configura las opciones del encabezado
     navigation.setOptions({
-      title: 'Editar usuario', 
+      title: 'Editar alumno', 
       headerStyle: { backgroundColor: '#1565C0',  height: 80 },
       headerTintColor: '#fff',
       headerTitleStyle: { fontWeight: 'bold', fontSize: 35 },
@@ -34,6 +36,8 @@ export default function EditUser({ route, navigation }) {
   const [originalData, setOriginalData] = useState({});
 
   const db = getFirestore();
+  const storage = getStorage();
+
 
   useEffect(() => {
     const loadUserData = async () => {
@@ -61,15 +65,27 @@ export default function EditUser({ route, navigation }) {
     loadUserData();
   }, [userId]);
 
-  const handleFileChange = async (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setFotoAvatar(reader.result);
-      };
-      reader.readAsDataURL(file);
-    }
+  const handleFileChange = async () => {
+    launchImageLibrary({}, async (response) => {
+      if (response.didCancel) {
+        console.log('User cancelled image picker');
+      } else if (response.error) {
+        console.log('ImagePicker Error: ', response.error);
+      } else {
+        const source = { uri: response.assets[0].uri };
+        setFotoAvatar(source.uri);
+
+        // Subir la imagen a Firebase Storage
+        const responseBlob = await fetch(source.uri);
+        const blob = await responseBlob.blob();
+        const storageRef = ref(storage, `avatars/${userId}`);
+        await uploadBytes(storageRef, blob);
+
+        // Obtener la URL de descarga de la imagen
+        const downloadURL = await getDownloadURL(storageRef);
+        setFotoAvatar(downloadURL);
+      }
+    });
   };
 
   const handleUpdateUser = async () => {
@@ -108,36 +124,32 @@ export default function EditUser({ route, navigation }) {
     }
   };
 
-  const handleDeleteUser = async () => {
-    try {
-      await deleteDoc(doc(db, 'Estudiantes', userId));
-      Alert.alert('Éxito', 'Alumno eliminado exitosamente');
-      navigation.navigate('UsersManagement');
-    } catch (error) {
-      console.error('Error al eliminar el alumno: ', error);
-      Alert.alert('Error', 'No se pudo eliminar el alumno');
-    }
-  };
-
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Editar Alumno</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Nombre"
-        value={nombre}
-        onChangeText={setNombre}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Edad"
-        value={edad}
-        onChangeText={setEdad}
-        keyboardType="numeric"
-      />
-
+      <View style={styles.inputContainer}>
+        <Text style={styles.label}>Nombre</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Nombre"
+          value={nombre}
+          onChangeText={setNombre}
+        />
+      </View>
+      <View style={styles.inputContainer}>
+        <Text style={styles.label}>Edad</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Edad"
+          value={edad}
+          onChangeText={setEdad}
+          keyboardType="numeric"
+        />
+      </View>
+      
+      <Text style={styles.label}>Limitación</Text>
       <MultiSelect
         items={[
+          { id: 'Por defecto', name: 'Por defecto' },
           { id: 'Visual', name: 'Visual' },
           { id: 'Auditiva', name: 'Auditiva' },
           { id: 'Motriz', name: 'Motriz' },
@@ -145,7 +157,7 @@ export default function EditUser({ route, navigation }) {
         uniqueKey="id"
         onSelectedItemsChange={selectedItems => setTipoDiscapacidad(selectedItems)}
         selectedItems={tipoDiscapacidad}
-        selectText="Selecciona Discapacidades"
+        selectText="Selecciona limitaciones"
         submitButtonText="Seleccionar"
         styleDropdownMenuSubsection={styles.MultiSelect}
         styleTextDropdown={{ color: '#000' }}
@@ -153,10 +165,11 @@ export default function EditUser({ route, navigation }) {
         submitButtonColor="#90EE90"
         submitButtonTextColor="#000"
       />
-      
+
+      <Text style={styles.label}>Preferencia de vista</Text>
       <MultiSelect
         items={[
-          { id: 'Normal', name: 'Normal' },
+          { id: 'Por defecto', name: 'Por defecto' },
           { id: 'Pictograma', name: 'Pictograma' },
           { id: 'Sonido', name: 'Sonido' },
           { id: 'Texto', name: 'Texto' },
@@ -165,7 +178,6 @@ export default function EditUser({ route, navigation }) {
         onSelectedItemsChange={selectedItems => setPreferenciasVista(selectedItems)}
         selectedItems={preferenciasVista}
         selectText="Selecciona Preferencias de Vista"
-        submitButtonText="Seleccionar"
         styleDropdownMenuSubsection={styles.MultiSelect}
         styleTextDropdown={{ color: '#000' }}
         styleTextDropdownSelected={{ color: '#000' }}
@@ -173,12 +185,12 @@ export default function EditUser({ route, navigation }) {
         submitButtonTextColor="#000"
       />
 
-      <View style={styles.fileInputContainer}>
-        <input type="file" onChange={handleFileChange} style={styles.fileInput} />
-      </View>
+    <View style={styles.fileInputContainer}>
+      <Button title="Select File"/>
+    </View>
 
       <View style={styles.pickerContainer}>
-        <Text>Contraseña:</Text>
+      <Text style={styles.label}>Contraseña</Text>
         <Picker
           selectedValue={contrasena1}
           style={styles.picker}
@@ -198,46 +210,50 @@ export default function EditUser({ route, navigation }) {
           ))}
         </Picker>
       </View>
-      <Button title="Actualizar Alumno" onPress={handleUpdateUser} />
-      <TouchableOpacity style={styles.deleteButton} onPress={handleDeleteUser}>
-        <Text style={styles.deleteButtonText}>Eliminar Alumno</Text>
-      </TouchableOpacity>
+
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity style={styles.updateButton} onPress={handleUpdateUser}>
+          <Text style={styles.updateButtonText}>Aceptar</Text>
+        </TouchableOpacity>
+      </View>
+      
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
     padding: 20,
+    backgroundColor: '#D9EFFF', 
   },
   title: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: 'bold',
     marginBottom: 20,
+    textAlign: 'center',
+  },
+  inputContainer: {
+    marginBottom: 20,
+  },
+  label: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 5,
   },
   input: {
-    width: '100%',
     height: 40,
     borderColor: 'gray',
     borderWidth: 1,
-    marginBottom: 20,
-    paddingHorizontal: 10,
-  },
-  passwordInput: {
-    backgroundColor: '#FFDDC1',
-  },
-  deleteButton: {
-    backgroundColor: 'red',
-    padding: 10,
     borderRadius: 5,
-    marginTop: 20,
-    alignItems: 'center',
-    alignSelf: 'flex-start',
+    paddingLeft: 8,
+    backgroundColor: '#fff',
+    fontSize: 20,
   },
-  deleteButtonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
+  fileInputContainer: {
+    marginBottom: 20,
+    marginTop: 20,
+    alignSelf: 'flex-start',
   },
   MultiSelect: {
     height: 40,
@@ -245,22 +261,30 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     paddingLeft: 8,
   },
-  fileInputContainer: {
-    marginBottom: 20,
+  buttonContainer: {
+    alignItems: 'center',
+    marginVertical: 20,
   },
-  fileInput: {
-    height: 40,
-    borderColor: 'gray',
-    borderWidth: 1,
-    paddingLeft: 8,
+  updateButton: {
+    backgroundColor: '#FEF28A', 
+    paddingVertical: 15,
+    paddingHorizontal: 40,
+    borderRadius: 50,
+  },
+  updateButtonText: {
+    color: '#000',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
   pickerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 30,
+    marginBottom: 20,
   },
   picker: {
-    height: 50,
-    width: 100,
+    height: 40,
+    width: 90,
+    backgroundColor: '#ffff',
+    marginHorizontal: 10,
   },
 });

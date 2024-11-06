@@ -1,11 +1,13 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, FlatList, Image } from 'react-native';
-import { getFirestore, collection, getDocs } from 'firebase/firestore';
+import { View, Text, TouchableOpacity, StyleSheet, Alert, FlatList, Image } from 'react-native';
+import { getFirestore, doc, collection, getDocs, deleteDoc } from 'firebase/firestore';
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { initializeApp } from 'firebase/app';
 import { firebaseConfig } from './firebaseConfig';
 import { useFocusEffect } from '@react-navigation/native';
 import editIcon from './images/edit.png';
-
+import deleteIcon from './images/eliminar_alumno.png';
+import avatarIcon from './images/avatar_1.png';
 
 // Inicializa Firebase
 initializeApp(firebaseConfig);
@@ -15,7 +17,7 @@ export default function UsersManagement({ navigation }) {
   useEffect(() => {
     // Configura las opciones del encabezado
     navigation.setOptions({
-      title: 'Lista de usuarios', 
+      title: 'Gestión de usuarios', 
       headerStyle: { backgroundColor: '#1565C0',  height: 80 },
       headerTintColor: '#fff',
       headerTitleStyle: { fontWeight: 'bold', fontSize: 35 },
@@ -24,6 +26,8 @@ export default function UsersManagement({ navigation }) {
   }, [navigation]);
 
   const [usuarios, setUsuarios] = useState([]);
+
+  const db = getFirestore();
   
   const getUsuarios = async () => {
     try {
@@ -45,10 +49,22 @@ export default function UsersManagement({ navigation }) {
     }, [])
   );
 
+  const handleDeleteUser = async (userId) => {
+    try {
+      const db = getFirestore();
+      await deleteDoc(doc(db, 'Estudiantes', userId));
+      Alert.alert('Éxito', 'Alumno eliminado exitosamente');
+      setUsuarios(usuarios.filter(user => user.id !== userId));
+    } catch (error) {
+      console.error('Error al eliminar el alumno: ', error);
+      Alert.alert('Error', 'No se pudo eliminar el alumno');
+    }
+  };
+
   return (
     <View style={styles.container}>
       <TouchableOpacity style={styles.addButton} onPress={() => navigation.navigate('AddUser')}>
-        <Text style={styles.addButtonText}>Agregar Usuario</Text>
+        <Text style={styles.addButtonText}>Añadir Usuario</Text>
         <Text style={styles.addButtonText}>+</Text>
       </TouchableOpacity>
       <Text style={styles.title}>Lista de Usuarios</Text>
@@ -57,12 +73,19 @@ export default function UsersManagement({ navigation }) {
         keyExtractor={(item, index) => index.toString()}
         renderItem={({ item }) => (
           <View style={styles.userItem}>
-            <Image source={{ uri: item.fotoAvatar }} style={styles.avatar} />
-
+          <Image 
+            source={item.fotoAvatar ? { uri: item.fotoAvatar.uri || item.fotoAvatar } : avatarIcon} 
+            style={styles.avatar} 
+          />
             <Text style={styles.userText}>{item.nombre}</Text>
-            <TouchableOpacity onPress={() => navigation.navigate('EditUser', { userId: item.id })}>
-              <Image source={editIcon} style={styles.editIcon} />
-            </TouchableOpacity>
+            <View style={styles.iconContainer}>
+              <TouchableOpacity onPress={() => navigation.navigate('EditUser', { userId: item.id })}>
+                <Image source={editIcon} style={styles.editIcon} />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => handleDeleteUser(item.id)}>
+                <Image source={deleteIcon} style={styles.deleteIcon} />
+              </TouchableOpacity>
+            </View>
           </View>
         )}
         contentContainerStyle={styles.listContent}
@@ -74,18 +97,18 @@ export default function UsersManagement({ navigation }) {
 const styles = StyleSheet.create({
   container: {
   flex: 1,
-  backgroundColor: '#fff',
+  backgroundColor: '#D9EFFF',
   padding: 20,
-  overflow: 'hidden',
 },
   addButton: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#FFFFE0', 
+    backgroundColor: '#FEF28A', 
     padding: 15,
     borderRadius: 5,
     marginBottom: 20,
+    borderRadius: 50,
   },
   addButtonText: {
     color: '#000',
@@ -99,7 +122,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   userItem: {
-    backgroundColor: '#ADD8E6',
+    backgroundColor: '#00BFFF',
     padding: 20,
     marginVertical: 8,
     borderRadius: 50,
@@ -115,11 +138,22 @@ const styles = StyleSheet.create({
   userText: {
     color: '#000',
     fontSize: 18,
+    flex: 1,
+  },
+  iconContainer: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
   },
   editIcon: {
-    width: 32,
-    height: 32,
+    width: 36, // Aumenta el tamaño del icono de editar
+    height: 36, // Aumenta el tamaño del icono de editar
     marginLeft: 20,
+    marginRight: 10, // Añade margen derecho para separar los iconos
+  },
+  deleteIcon: {
+    width: 36, // Aumenta el tamaño del icono de borrar
+    height: 36, // Aumenta el tamaño del icono de borrar
   },
   listContent: {
     paddingBottom: 20,

@@ -18,7 +18,7 @@ export default function LoginPage({ navigation }) {
 
   const db = getFirestore();
 
-  /////////////////////////////////////////////////////////////////
+
   const handleLogin = async () => {
     // Verifica que los campos no estén vacíos
     if (!nombre || !contrasena) {
@@ -50,7 +50,7 @@ export default function LoginPage({ navigation }) {
     
   };
   
-   /////////////////////////////////////////////////////////////////
+   
 
   return (
     <View style={styles.container}>
@@ -94,62 +94,61 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 20,
+    padding: width * 0.03,
     backgroundColor: '#D9EFFF', 
   },
 
   logoImage: {
     position: 'absolute',
     top: 50,
-    width: width*0.55,
+    width: width*0.65,
     height: undefined,
     aspectRatio: 5,
     marginBottom: 80, 
   },
 
   title: {
-    fontSize: 24,
+    fontSize: width * 0.08,
     fontWeight: 'bold',
-    marginBottom: height*0.05,
-    color: '#222', 
+    marginBottom: height * 0.05,
+    color: '#000', 
   },
 
   input: {
-    height: 40,
+    height: height * 0.06,
     borderColor: '#888', 
     borderWidth: 1,
-    marginBottom: height*0.05,
-    paddingHorizontal: 10,
+    marginBottom: height * 0.05,
+    paddingHorizontal: width * 0.04,
     width: '85%',
-    borderRadius: 2, 
+    borderRadius: 5, 
+    fontSize: width * 0.045,
   },
   buttonContainer: {
     width: '100%',
     alignItems: 'center',
   },
   button: {
-    paddingVertical: 10,
-    borderRadius: 5,
+    paddingVertical: height * 0.015,
+    borderRadius: 36,
     alignItems: 'center',
-    marginBottom: height*0.03, 
-    borderRadius: 30, 
-    borderWidth: 1, 
+    marginBottom: height * 0.04,
+    borderWidth: 1,
     borderColor: '#111',
   },
 
   loginButton: {
     backgroundColor: '#FEF28A', 
-    width: '60%', 
-
+    width: '60%',
   },
   backButton: {
-    backgroundColor: '#7CC3FD', 
+    backgroundColor: '#7CC3FD',
     width: '40%',
   },
 
   buttonText: {
-    color: '#000', // Color de texto blanco
+    color: '#000',
     fontWeight: 'bold',
-    fontSize: 16,
+    fontSize: width * 0.044,
   },
 });
