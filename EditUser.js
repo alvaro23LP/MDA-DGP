@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert, ScrollView, TouchableOpacity } from 'react-native';
-import { getFirestore, doc, getDoc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { getFirestore, doc, getDoc, updateDoc } from 'firebase/firestore';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { initializeApp } from 'firebase/app';
 import { firebaseConfig } from './firebaseConfig';
@@ -11,12 +11,12 @@ import { launchImageLibrary } from 'react-native-image-picker';
 // Inicializa Firebase
 initializeApp(firebaseConfig);
 
-export default function EditUser({ route, navigation }) {
+export default function EditUser({route, navigation }) {
 
   useEffect(() => {
     // Configura las opciones del encabezado
     navigation.setOptions({
-      title: 'Editar usuario', 
+      title: 'Editar alumno', 
       headerStyle: { backgroundColor: '#1565C0',  height: 80 },
       headerTintColor: '#fff',
       headerTitleStyle: { fontWeight: 'bold', fontSize: 35 },
@@ -124,20 +124,8 @@ export default function EditUser({ route, navigation }) {
     }
   };
 
-  const handleDeleteUser = async () => {
-    try {
-      await deleteDoc(doc(db, 'Estudiantes', userId));
-      Alert.alert('Éxito', 'Alumno eliminado exitosamente');
-      navigation.navigate('UsersManagement');
-    } catch (error) {
-      console.error('Error al eliminar el alumno: ', error);
-      Alert.alert('Error', 'No se pudo eliminar el alumno');
-    }
-  };
-
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Editar Alumno</Text>
       <View style={styles.inputContainer}>
         <Text style={styles.label}>Nombre</Text>
         <TextInput
@@ -157,9 +145,11 @@ export default function EditUser({ route, navigation }) {
           keyboardType="numeric"
         />
       </View>
-
+      
+      <Text style={styles.label}>Limitación</Text>
       <MultiSelect
         items={[
+          { id: 'Por defecto', name: 'Por defecto' },
           { id: 'Visual', name: 'Visual' },
           { id: 'Auditiva', name: 'Auditiva' },
           { id: 'Motriz', name: 'Motriz' },
@@ -167,7 +157,7 @@ export default function EditUser({ route, navigation }) {
         uniqueKey="id"
         onSelectedItemsChange={selectedItems => setTipoDiscapacidad(selectedItems)}
         selectedItems={tipoDiscapacidad}
-        selectText="Selecciona Discapacidades"
+        selectText="Selecciona limitaciones"
         submitButtonText="Seleccionar"
         styleDropdownMenuSubsection={styles.MultiSelect}
         styleTextDropdown={{ color: '#000' }}
@@ -175,10 +165,11 @@ export default function EditUser({ route, navigation }) {
         submitButtonColor="#90EE90"
         submitButtonTextColor="#000"
       />
-      
+
+      <Text style={styles.label}>Preferencia de vista</Text>
       <MultiSelect
         items={[
-          { id: 'Normal', name: 'Normal' },
+          { id: 'Por defecto', name: 'Por defecto' },
           { id: 'Pictograma', name: 'Pictograma' },
           { id: 'Sonido', name: 'Sonido' },
           { id: 'Texto', name: 'Texto' },
@@ -188,14 +179,18 @@ export default function EditUser({ route, navigation }) {
         selectedItems={preferenciasVista}
         selectText="Selecciona Preferencias de Vista"
         styleDropdownMenuSubsection={styles.MultiSelect}
+        styleTextDropdown={{ color: '#000' }}
+        styleTextDropdownSelected={{ color: '#000' }}
+        submitButtonColor="#90EE90"
+        submitButtonTextColor="#000"
       />
 
     <View style={styles.fileInputContainer}>
       <Button title="Select File"/>
     </View>
 
-      <View style={styles.inputContainer}>
-        <Text>Contraseña:</Text>
+      <View style={styles.pickerContainer}>
+      <Text style={styles.label}>Contraseña</Text>
         <Picker
           selectedValue={contrasena1}
           style={styles.picker}
@@ -215,11 +210,13 @@ export default function EditUser({ route, navigation }) {
           ))}
         </Picker>
       </View>
-      <Button title="Actualizar Alumno" onPress={handleUpdateUser} />
 
-      <TouchableOpacity style={styles.deleteButton} onPress={handleDeleteUser}>
-        <Text style={styles.deleteButtonText}>Eliminar Alumno</Text>
-      </TouchableOpacity>
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity style={styles.updateButton} onPress={handleUpdateUser}>
+          <Text style={styles.updateButtonText}>Aceptar</Text>
+        </TouchableOpacity>
+      </View>
+      
     </ScrollView>
   );
 }
@@ -264,29 +261,30 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     paddingLeft: 8,
   },
-  deleteButton: {
-    backgroundColor: 'red',
-    padding: 10,
-    borderRadius: 5,
-    marginTop: 20,
+  buttonContainer: {
     alignItems: 'center',
-    alignSelf: 'flex-start',
+    marginVertical: 20,
   },
-  deleteButtonText: {
-    color: '#fff',
-    fontSize: 18,
+  updateButton: {
+    backgroundColor: '#FEF28A', 
+    paddingVertical: 15,
+    paddingHorizontal: 40,
+    borderRadius: 50,
+  },
+  updateButtonText: {
+    color: '#000',
+    fontSize: 16,
     fontWeight: 'bold',
   },
   pickerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
     marginBottom: 20,
-    backgroundColor: '#D9EFFF',
-
   },
   picker: {
-    height: 50,
-    width: '100%',
-    borderColor: 'gray',
-    borderWidth: 1,
-    borderRadius: 5,
+    height: 40,
+    width: 90,
+    backgroundColor: '#ffff',
+    marginHorizontal: 10,
   },
 });
