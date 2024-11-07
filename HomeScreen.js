@@ -52,7 +52,6 @@ export default function HomeScreen({ navigation }) {
       <Text style={styles.selectUserText}>Elige tu usuario</Text>
 
       <View style={styles.userContainer}>
-        <ScrollView contentContainerStyle={styles.userGrid}>
           {students.map((student) => (
             <TouchableOpacity
               key={student.id}
@@ -70,7 +69,6 @@ export default function HomeScreen({ navigation }) {
 
             </TouchableOpacity>
           ))}
-        </ScrollView>
       </View>
 
       <TouchableOpacity style={styles.loginButton} onPress={handleAdminLogin}>
@@ -99,9 +97,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     padding: 15,
     borderRadius: 20,
-    marginBottom: 20,
-  },
-  userGrid: {
+    marginBottom: 200,
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'center',
@@ -124,7 +120,8 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 15,
     right: 15,
-    backgroundColor: '#007AFF',
+    backgroundColor: '#1565C0',
+    textShadowColor: '#000',
     paddingVertical: 10,
     paddingHorizontal: 15,
     borderRadius: 5,
@@ -133,5 +130,9 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
+    shadowColor: '#000',
+    textShadowColor: '#000', 
+    textShadowOffset: { width: 1, height: 1 }, 
+    textShadowRadius: 3, 
   },
 });

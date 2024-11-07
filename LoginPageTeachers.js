@@ -108,14 +108,14 @@ const styles = StyleSheet.create({
   },
 
   title: {
-    fontSize: width * 0.08,
+    fontSize: width * 0.075,
     fontWeight: 'bold',
     marginBottom: height * 0.05,
     color: '#000', 
   },
 
   input: {
-    height: height * 0.06,
+    height: height * 0.052,
     borderColor: '#888', 
     borderWidth: 1,
     marginBottom: height * 0.05,

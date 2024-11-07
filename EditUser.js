@@ -125,7 +125,7 @@ export default function EditUser({route, navigation }) {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <View style={styles.container}>
       <View style={styles.inputContainer}>
         <Text style={styles.label}>Nombre</Text>
         <TextInput
@@ -146,7 +146,7 @@ export default function EditUser({route, navigation }) {
         />
       </View>
       
-      <Text style={styles.label}>Limitación</Text>
+      <Text style={styles.label}>Diversidad funcional</Text>
       <MultiSelect
         items={[
           { id: 'Por defecto', name: 'Por defecto' },
@@ -157,7 +157,7 @@ export default function EditUser({route, navigation }) {
         uniqueKey="id"
         onSelectedItemsChange={selectedItems => setTipoDiscapacidad(selectedItems)}
         selectedItems={tipoDiscapacidad}
-        selectText="Selecciona limitaciones"
+        selectText="Selecciona diversidad funcional"
         submitButtonText="Seleccionar"
         styleDropdownMenuSubsection={styles.MultiSelect}
         styleTextDropdown={{ color: '#000' }}
@@ -217,14 +217,14 @@ export default function EditUser({route, navigation }) {
         </TouchableOpacity>
       </View>
       
-    </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    padding: 40,
     backgroundColor: '#D9EFFF', 
   },
   title: {
@@ -234,7 +234,8 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   inputContainer: {
-    marginBottom: 20,
+    marginBottom: 30,
+    marginTop: 5,
   },
   label: {
     fontSize: 20,
@@ -249,6 +250,7 @@ const styles = StyleSheet.create({
     paddingLeft: 8,
     backgroundColor: '#fff',
     fontSize: 20,
+    marginBottom: 12,
   },
   fileInputContainer: {
     marginBottom: 20,

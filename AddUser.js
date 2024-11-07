@@ -109,7 +109,7 @@ export default function AddUser({ navigation }) {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <View style={styles.container}>
       <View style={styles.inputContainer}>
         <Text style={styles.label}>Nombre</Text>
 
@@ -131,13 +131,13 @@ export default function AddUser({ navigation }) {
           />
       </View>
 
-    <Text style={styles.label}>Limitación</Text>
+    <Text style={styles.label}>Diversidad funcional</Text>
     <MultiSelect
         items={items}
         uniqueKey="id"
         onSelectedItemsChange={selectedItems => setTipoDiscapacidad(selectedItems)}
         selectedItems={tipoDiscapacidad}
-        selectText="Selecciona limitación"
+        selectText="Selecciona diversidad funcional"
         submitButtonText="Seleccionar"
         styleDropdownMenuSubsection={styles.MultiSelect}
         styleTextDropdown={{ color: '#000' }}
@@ -172,7 +172,7 @@ export default function AddUser({ navigation }) {
           onValueChange={(itemValue) => setContrasena1(itemValue)}
           itemStyle={styles.pickerItem} // Añade esta línea
         >
-          {[...Array(10).keys()].map((num) => (
+          {[...Array(9).keys()].map((num) => (
             <Picker.Item key={num} label={num.toString()} value={num.toString()} />
           ))}
         </Picker>
@@ -182,7 +182,7 @@ export default function AddUser({ navigation }) {
           onValueChange={(itemValue) => setContrasena2(itemValue)}
           itemStyle={styles.pickerItem} // Añade esta línea
         >
-          {[...Array(10).keys()].map((num) => (
+          {[...Array(9).keys()].map((num) => (
             <Picker.Item key={num} label={num.toString()} value={num.toString()} />
           ))}
         </Picker>
@@ -195,14 +195,14 @@ export default function AddUser({ navigation }) {
         </TouchableOpacity>
       </View>
 
-    </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    padding: 40,
     backgroundColor: '#D9EFFF', 
   },
   input: {
@@ -213,6 +213,7 @@ const styles = StyleSheet.create({
     paddingLeft: 8,
     backgroundColor: '#fff',
     fontSize: 20,
+    marginBottom: 12,
   },
   MultiSelect: {
     height: 40,
@@ -251,7 +252,7 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   inputContainer: {
-    marginBottom: 10,
+    marginBottom: 30,
   },
   buttonContainer: {
     alignItems: 'center',

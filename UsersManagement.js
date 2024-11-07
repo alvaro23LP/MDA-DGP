@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   userItem: {
-    backgroundColor: '#00BFFF',
+    backgroundColor: '#7CC3FD',
     padding: 20,
     marginVertical: 8,
     borderRadius: 50,

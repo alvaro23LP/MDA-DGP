@@ -28,13 +28,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   title: {
-    fontSize: 30,
+    fontSize: width * 0.09,
     fontWeight: 'bold',
     marginBottom: 60,
   },
 
   logoImage: {
-    width: width*0.5,
+    width: width * 0.55,
     height: undefined,
     aspectRatio: 1,
     margin: 30, // Espacio entre la imagen y el texto
