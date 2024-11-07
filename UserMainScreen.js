@@ -7,7 +7,8 @@ const { width, height } = Dimensions.get('window');
 
 // Función de escalado en función del ancho de pantalla
 const scale = (size) => (width < 375 ? size : size * (width / 375));
-// Función de escalado adicional para pantallas grandes como el iPad Air
+
+// Función de escalado adicional para pantallas grandes
 const largeScale = (size) => (width > 800 ? size * 1.5 : size);
 
 export default function UserScreen({ navigation }) {
@@ -35,7 +36,7 @@ export default function UserScreen({ navigation }) {
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Bienvenido a tu perfil</Text>
-            <Text style={styles.subtitle}>Esta sección está en desarrollo</Text>
+            <Text style={styles.subtitle}>Desarrollo</Text>
         </View>
     );
 }

@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, Image, Alert } from 'react-native';
+import { StyleSheet, View, Text, TouchableOpacity, Image, Alert, Dimensions } from 'react-native';
 import { getFirestore, doc, getDoc } from 'firebase/firestore';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { getApp } from 'firebase/app';
 
 const fruitImages = {
-  Uvas: require('./images/uvas.png'),
+  Uvas: require('./images/uva.png'),
   Pina: require('./images/pina.png'),
   Sandia: require('./images/sandia.png'),
   Fresa: require('./images/fresa.png'),
-  Pera: require('./images/pera.png'),
+  Limon: require('./images/limon.png'),
   Manzana: require('./images/manzana.png'),
-  Banana: require('./images/banana.png'),
-  Papaya: require('./images/papaya.png'),
+  Pimiento: require('./images/pimiento.png'),
+  Naranja: require('./images/naranja.png'),
   Aguacate: require('./images/aguacate.png'),
 };
 
@@ -22,10 +22,10 @@ const fruitOptions = [
   { id: '1', name: 'Pina' },
   { id: '2', name: 'Sandia' },
   { id: '3', name: 'Fresa' },
-  { id: '4', name: 'Pera' },
+  { id: '4', name: 'Limon' },
   { id: '5', name: 'Manzana' },
-  { id: '6', name: 'Banana' },
-  { id: '7', name: 'Papaya' },
+  { id: '6', name: 'Pimiento' },
+  { id: '7', name: 'Naranja' },
   { id: '8', name: 'Aguacate' },
 ];
 
@@ -150,8 +150,11 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   fruitImage: {
-    width: '60%',
-    height: '60%',
-    borderRadius: 10,
-  },
+    width: '40%',            // Tamaño reducido para que se vea completa
+    height: undefined,       // Altura ajustada automáticamente
+    aspectRatio: 1,          // Mantiene proporción cuadrada
+    borderRadius: 10,        // Redondeo de esquinas
+    resizeMode: 'contain',   // Ajusta la imagen al contenedor sin recortarla
+},
+
 });
