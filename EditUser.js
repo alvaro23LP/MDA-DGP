@@ -11,6 +11,20 @@ import { launchImageLibrary } from 'react-native-image-picker';
 // Inicializa Firebase
 initializeApp(firebaseConfig);
 
+
+const fruitOptions = [
+  { id: '0', name: 'Uvas' },
+  { id: '1', name: 'Pina' },
+  { id: '2', name: 'Sandia' },
+  { id: '3', name: 'Fresa' },
+  { id: '4', name: 'Limon' },
+  { id: '5', name: 'Manzana' },
+  { id: '6', name: 'Pimiento' },
+  { id: '7', name: 'Naranja' },
+  { id: '8', name: 'Aguacate' },
+];
+
+
 export default function EditUser({route, navigation }) {
 
   useEffect(() => {
@@ -196,8 +210,8 @@ export default function EditUser({route, navigation }) {
           style={styles.picker}
           onValueChange={(itemValue) => setContrasena1(itemValue)}
         >
-          {[...Array(10).keys()].map((num) => (
-            <Picker.Item key={num} label={num.toString()} value={num.toString()} />
+          {fruitOptions.map((fruit) => (
+            <Picker.Item key={fruit.id} label={fruit.name} value={fruit.id} />
           ))}
         </Picker>
         <Picker
@@ -205,8 +219,8 @@ export default function EditUser({route, navigation }) {
           style={styles.picker}
           onValueChange={(itemValue) => setContrasena2(itemValue)}
         >
-          {[...Array(10).keys()].map((num) => (
-            <Picker.Item key={num} label={num.toString()} value={num.toString()} />
+          {fruitOptions.map((fruit) => (
+            <Picker.Item key={fruit.id} label={fruit.name} value={fruit.id} />
           ))}
         </Picker>
       </View>

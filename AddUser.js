@@ -10,6 +10,18 @@ import { Picker } from '@react-native-picker/picker';
 // Inicializa Firebase
 initializeApp(firebaseConfig);
 
+const fruitOptions = [
+  { id: '0', name: 'Uvas' },
+  { id: '1', name: 'Pina' },
+  { id: '2', name: 'Sandia' },
+  { id: '3', name: 'Fresa' },
+  { id: '4', name: 'Limon' },
+  { id: '5', name: 'Manzana' },
+  { id: '6', name: 'Pimiento' },
+  { id: '7', name: 'Naranja' },
+  { id: '8', name: 'Aguacate' },
+];
+
 export default function AddUser({ navigation }) {
   const [nombre, setNombre] = useState('');
   const [edad, setEdad] = useState('');
@@ -172,8 +184,8 @@ export default function AddUser({ navigation }) {
           onValueChange={(itemValue) => setContrasena1(itemValue)}
           itemStyle={styles.pickerItem} // Añade esta línea
         >
-          {[...Array(9).keys()].map((num) => (
-            <Picker.Item key={num} label={num.toString()} value={num.toString()} />
+          {fruitOptions.map((fruit) => (
+            <Picker.Item key={fruit.id} label={fruit.name} value={fruit.id} />
           ))}
         </Picker>
         <Picker
@@ -182,8 +194,8 @@ export default function AddUser({ navigation }) {
           onValueChange={(itemValue) => setContrasena2(itemValue)}
           itemStyle={styles.pickerItem} // Añade esta línea
         >
-          {[...Array(9).keys()].map((num) => (
-            <Picker.Item key={num} label={num.toString()} value={num.toString()} />
+          {fruitOptions.map((fruit) => (
+            <Picker.Item key={fruit.id} label={fruit.name} value={fruit.id} />
           ))}
         </Picker>
       </View>
