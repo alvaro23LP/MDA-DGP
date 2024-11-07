@@ -12,6 +12,8 @@ import TaskManagement from './taskManagement';
 import UsersManagement from './UsersManagement';
 import EditUser from './EditUser';
 import AddUser from './AddUser';
+import UserScreen from './UserMainScreen';
+
 
 const Stack = createStackNavigator();
 
@@ -50,10 +52,15 @@ export default function App() {
           component={PasswordUser}
           //options={{ title: 'Selecciona la Contraseña' }}
         />
+        <Stack.Screen
+            name="UserScreen"
+            component={UserScreen}
+        />
+        
         <Stack.Screen 
-        name="TeachersMainScreen" 
-        component={TeachersMainScreen}
-        options={{ headerLeft: () => null }}
+         name="TeachersMainScreen" 
+         component={TeachersMainScreen}
+         options={{ headerLeft: () => null }}
         />
 
         <Stack.Screen
