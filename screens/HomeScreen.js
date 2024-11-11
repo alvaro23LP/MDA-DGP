@@ -2,14 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Image, ScrollView } from 'react-native';
 import { getFirestore, collection, getDocs } from 'firebase/firestore';
 import { initializeApp } from 'firebase/app';
-import { firebaseConfig } from './firebaseConfig';
-import avatarIcon from './images/avatar_1.png';
+import { firebaseConfig } from '../services/firebaseConfig';
 
 // Inicializa Firebase
 initializeApp(firebaseConfig);
 const db = getFirestore();
 
-export default function HomeScreen({ navigation }) {
+export default function HomeScreen({ navigation}) {
   const [students, setStudents] = useState([]);
 
   useEffect(() => {
@@ -44,7 +43,7 @@ export default function HomeScreen({ navigation }) {
   };
 
   const handleAdminLogin = () => {
-    navigation.navigate('Login');
+    navigation.navigate('LoginPage');
   };
 
   return (
@@ -62,7 +61,7 @@ export default function HomeScreen({ navigation }) {
                 source={
                   student.fotoAvatar && typeof student.fotoAvatar === 'string'
                     ? { uri: student.fotoAvatar }
-                    : require('./images/avatar_1.png')
+                    : require('../images/avatar_1.png')
                 }
                 style={styles.userImage}
               />

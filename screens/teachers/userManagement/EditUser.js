@@ -3,7 +3,7 @@ import { View, Text, TextInput, Button, StyleSheet, Alert, ScrollView, Touchable
 import { getFirestore, doc, getDoc, updateDoc } from 'firebase/firestore';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { initializeApp } from 'firebase/app';
-import { firebaseConfig } from './firebaseConfig';
+import { firebaseConfig } from '../../../services/firebaseConfig';
 import MultiSelect from 'react-native-multiple-select';
 import { Picker } from '@react-native-picker/picker';
 import { launchImageLibrary } from 'react-native-image-picker';

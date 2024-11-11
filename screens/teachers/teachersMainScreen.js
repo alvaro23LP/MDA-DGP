@@ -26,7 +26,7 @@ export default function TeachersMainScreen({navigation})
           headerRight: () => (
             <TouchableOpacity
                 style={styles.buttonExit}
-                onPress={() => navigation.navigate('Login')}
+                onPress={() => navigation.navigate('LoginPage')}
             >
                 <Text style={{color: '#fff', fontSize: scale(10), marginRight: scale(10)}}>Cerar Sesión</Text>
                 <Icon name="exit" size={scale(20)} color="#fff" /> 

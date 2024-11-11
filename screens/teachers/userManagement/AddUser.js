@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert, ScrollView, TouchableOpacity } from 'react-native';
 import { getFirestore, collection, addDoc } from 'firebase/firestore';
 import { initializeApp } from 'firebase/app';
-import { firebaseConfig } from './firebaseConfig';
+import { firebaseConfig } from '../../../services/firebaseConfig';
 import MultiSelect from 'react-native-multiple-select';
 import { Picker } from '@react-native-picker/picker';
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, View, ActivityIndicator, Text, Image, Dimensions } from 'react-native';
-import logo from './images/Logo-sinFondo.png';
+import logo from '../images/Logo-sinFondo.png';
 
 // Obtener el ancho de la pantalla
 const { width } = Dimensions.get('window');

@@ -3,11 +3,11 @@ import { View, Text, TouchableOpacity, StyleSheet, Alert, FlatList, Image } from
 import { getFirestore, doc, collection, getDocs, deleteDoc } from 'firebase/firestore';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { initializeApp } from 'firebase/app';
-import { firebaseConfig } from './firebaseConfig';
+import { firebaseConfig } from '../../../services/firebaseConfig';
 import { useFocusEffect } from '@react-navigation/native';
-import editIcon from './images/edit.png';
-import deleteIcon from './images/eliminar_alumno.png';
-import avatarIcon from './images/avatar_1.png';
+import editIcon from '../../../images/edit.png';
+import deleteIcon from '../../../images/eliminar_alumno.png';
+import avatarIcon from '../../../images/avatar_1.png';
 
 // Inicializa Firebase
 initializeApp(firebaseConfig);

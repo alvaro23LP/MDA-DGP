@@ -5,15 +5,15 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import { getApp } from 'firebase/app';
 
 const fruitImages = {
-  Uvas: require('./images/uva.png'),
-  Pina: require('./images/pina.png'),
-  Sandia: require('./images/sandia.png'),
-  Fresa: require('./images/fresa.png'),
-  Limon: require('./images/limon.png'),
-  Manzana: require('./images/manzana.png'),
-  Pimiento: require('./images/pimiento.png'),
-  Naranja: require('./images/naranja.png'),
-  Aguacate: require('./images/aguacate.png'),
+  Uvas: require('../images/uva.png'),
+  Pina: require('../images/pina.png'),
+  Sandia: require('../images/sandia.png'),
+  Fresa: require('../images/fresa.png'),
+  Limon: require('../images/limon.png'),
+  Manzana: require('../images/manzana.png'),
+  Pimiento: require('../images/pimiento.png'),
+  Naranja: require('../images/naranja.png'),
+  Aguacate: require('../images/aguacate.png'),
 };
 
 // Lista de opciones de frutas con sus respectivos IDs

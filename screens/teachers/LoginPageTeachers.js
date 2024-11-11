@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, Image, StyleSheet, TouchableOpacity, Dimensions, Button } from 'react-native';
 import { getFirestore, collection, query, where, getDocs } from 'firebase/firestore';
 import { initializeApp } from 'firebase/app';
-import { firebaseConfig } from './firebaseConfig'; // Asegúrate de que la ruta sea correcta
-import logo from './images/Logo2-SinFondo.png';
+import { firebaseConfig } from '../../services/firebaseConfig'; // Asegúrate de que la ruta sea correcta
+import logo from '../../images/Logo2-SinFondo.png';
 
 // Obtener el ancho de la pantalla
 const { height, width } = Dimensions.get('window');
