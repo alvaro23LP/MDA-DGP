@@ -15,7 +15,7 @@ export default function App() {
     loadData();
   }, []);
 
- 
+
   return (
     <AppNavigator isLoading={isLoading}/>
   );
