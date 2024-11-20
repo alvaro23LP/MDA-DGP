@@ -2,9 +2,16 @@
 Repositorio del proyecto desarrollado en MDA y DGP en la UGR.
 
 
----
+## **COMANDOS ÚTILES:**
 
-**CAMBIOS PENDIENTES:**
+- Iniciar la aplicación ```npx expo start```
+- Iniciar la aplicación borrando cache de Metro Bundler ```npx expo start --clear```
+- Instalar todas las depencias ```npm install```
+- Instalación limpia ```rm -rf node_modules/``` y **SOLO en caso de haber actualizaciado las dependencias en *package.json* Y SI LO ANTERIOR NO FUNCIONA** ```rm -rf package-lock.json```  ---> Tras esto hacer ```npm install```
+
+
+
+## **CAMBIOS PENDIENTES:**
 
 - Incluir archivo de configuracion de firebase en gitignore
 - Arreglar splashScreen -- "Created"
