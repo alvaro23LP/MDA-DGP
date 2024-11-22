@@ -46,8 +46,8 @@ export default function HomeScreen({ navigation}) {
     navigation.navigate('LoginPage');
   };
 
-    const handleExtra = () => {
-    navigation.navigate('MaterialTaskTeacher');
+  const handleExtra = (id) => () => {
+    navigation.navigate('Recoger Material', { studentId: id });
   };
 
   return (
@@ -78,7 +78,7 @@ export default function HomeScreen({ navigation}) {
         <Text style={styles.buttonText}>Iniciar Sesión Administrador/Profesor</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.ExtraButton} onPress={handleExtra}>
+      <TouchableOpacity style={styles.ExtraButton} onPress={handleExtra('HzvSSyDOgYzhvWrdc6Y6')}>
         <Text style={styles.buttonText}>Pantalla Recogida Material Prof</Text>
       </TouchableOpacity>
     </View>
