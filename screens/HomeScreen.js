@@ -46,7 +46,7 @@ export default function HomeScreen({ navigation}) {
     navigation.navigate('LoginPage');
   };
 
-  const handleExtra = () => {
+    const handleExtra = () => {
     navigation.navigate('MaterialTaskTeacher');
   };
 
