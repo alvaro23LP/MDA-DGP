@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, Alert, ScrollView, TouchableOpacity, Image } from 'react-native';
 import { getFirestore, collection, addDoc } from 'firebase/firestore';
 import { initializeApp } from 'firebase/app';
 import { firebaseConfig } from '../../../services/firebaseConfig';
 import MultiSelect from 'react-native-multiple-select';
 import { Picker } from '@react-native-picker/picker';
-
+import * as ImagePicker from 'expo-image-picker';
+import { uploadAvatarToCloudinary } from '../../../services/cloudinary';
 
 // Inicializa Firebase
 initializeApp(firebaseConfig);
@@ -30,6 +31,7 @@ export default function AddUser({ navigation }) {
   const [tipoDiscapacidad, setTipoDiscapacidad] = useState([]);
   const [preferenciasVista, setPreferenciasVista] = useState([]);
   const [fotoAvatar, setFotoAvatar] = useState(null);
+  const [selectedImage, setSelectedImage] = useState(null);
 
   const items = [
     { id: 'Por defecto', name: 'Por defecto' },
@@ -53,35 +55,48 @@ export default function AddUser({ navigation }) {
       headerTintColor: '#fff',
       headerTitleStyle: { fontWeight: 'bold', fontSize: 35 },
     });
+
+    // Solicita permisos para acceder a la galería de imágenes
+    (async () => {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted') {
+        alert('Se requieren permisos para acceder a la galería de imágenes.');
+      }
+    })();
   }, [navigation]);
 
   const db = getFirestore();
 
-  const handleFileChange = async (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setFotoAvatar(reader.result);
-      };
-      reader.readAsDataURL(file);
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: [ImagePicker.MediaType.Images],
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    console.log('ImagePicker result:', result);
+
+    if (!result.canceled && result.assets && result.assets.length > 0) {
+      const uri = result.assets[0].uri;
+      setSelectedImage(uri);
+      console.log('Selected image URI:', uri);
+    } else {
+      console.log('Image selection was canceled');
     }
   };
 
   const handleAddUser = async () => {
-    if (nombre === ''){
+    if (nombre === '') {
       alert('El nombre no puede estar vacío', '');
       return;
-    }
-    else if (edad === ''){
+    } else if (edad === '') {
       alert('La edad no puede estar vacía', '');
       return;
-    }
-    else if (tipoDiscapacidad.length === 0){
+    } else if (tipoDiscapacidad.length === 0) {
       alert('Debes seleccionar al menos un tipo de discapacidad', '');
       return;
-    }
-    else if (preferenciasVista.length === 0){
+    } else if (preferenciasVista.length === 0) {
       alert('Debes seleccionar al menos una preferencia de vista', '');
       return;
     }
@@ -94,12 +109,22 @@ export default function AddUser({ navigation }) {
     const contrasenaVisual = [contrasena1, contrasena2];
 
     try {
+      let fotoAvatarUrl = null;
+      if (selectedImage) {
+        console.log('Selected image URI:', selectedImage);
+        const uploadResult = await uploadAvatarToCloudinary(selectedImage);
+        fotoAvatarUrl = uploadResult.secure_url;
+        console.log('Uploaded image URL:', fotoAvatarUrl);
+      } else {
+        console.log('No image selected');
+      }
+
       await addDoc(collection(getFirestore(), 'Estudiantes'), {
         nombre,
         edad,
         tipoDiscapacidad,
         preferenciasVista,
-        fotoAvatar,
+        fotoAvatar: fotoAvatarUrl,
         historialTareas: [],
         contrasenaVisual,
       });
@@ -112,6 +137,7 @@ export default function AddUser({ navigation }) {
       setContrasena1('0');
       setContrasena2('0');
       setFotoAvatar(null);
+      setSelectedImage(null);
 
       navigation.navigate('UsersManagement');
     } catch (error) {
@@ -133,18 +159,18 @@ export default function AddUser({ navigation }) {
         />
       </View>
 
-       <View style={styles.inputContainer}>
+      <View style={styles.inputContainer}>
         <Text style={styles.label}>Edad</Text>
         <TextInput
-            style={styles.input}
-            placeholder="Edad"
-            value={edad}
-            onChangeText={setEdad}
-          />
+          style={styles.input}
+          placeholder="Edad"
+          value={edad}
+          onChangeText={setEdad}
+        />
       </View>
 
-    <Text style={styles.label}>Diversidad funcional</Text>
-    <MultiSelect
+      <Text style={styles.label}>Diversidad funcional</Text>
+      <MultiSelect
         items={items}
         uniqueKey="id"
         onSelectedItemsChange={selectedItems => setTipoDiscapacidad(selectedItems)}
@@ -172,13 +198,16 @@ export default function AddUser({ navigation }) {
         submitButtonColor="#90EE90"
         submitButtonTextColor="#000"
       />
+
       <View style={styles.fileInputContainer}>
-        <Button title="Select File"/>
-      </View>
+      <Text style={styles.label}>Foto Avatar</Text>
+        <Button title="Seleccionar Imagen" onPress={pickImage} />
+        {selectedImage && <Image source={{ uri: selectedImage }} style={{ width: 200, height: 200 }} />}
+      </View> 
 
       <View style={styles.pickerContainer}>
-      <Text style={styles.label}>Contraseña</Text>
-      <Picker
+        <Text style={styles.label}>Contraseña</Text>
+        <Picker
           selectedValue={contrasena1}
           style={styles.picker}
           onValueChange={(itemValue) => setContrasena1(itemValue)}

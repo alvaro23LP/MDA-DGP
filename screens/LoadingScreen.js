@@ -9,7 +9,7 @@ export default function LoadingScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.content}>
-        <Text style={styles.title}>Create by</Text>
+        <Text style={styles.title}>Created by</Text>
         <Image style={styles.logoImage} source={logo} />
         <ActivityIndicator style={styles.loader} size="large" color="#0000ff" />
       </View>
