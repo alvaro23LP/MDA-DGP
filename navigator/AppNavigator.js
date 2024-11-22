@@ -18,9 +18,11 @@ import TaskManagement from '../screens/teachers/taskManagement/taskManagement';
 import UsersManagement from '../screens/teachers/userManagement/UsersManagement';
 import EditUser from '../screens/teachers/userManagement/EditUser';
 import AddUser from '../screens/teachers/userManagement/AddUser';
+import ShowTasks from '../screens/teachers/taskManagement/ShowTasks';
+import EditTask from '../screens/teachers/taskManagement/EditTask';
+import AddTask from '../screens/teachers/taskManagement/AddTask';
 
 const Stack = createStackNavigator();
-jgjgjg
 
 
 
@@ -73,6 +75,21 @@ export default function AppNavigator({ isLoading}) {
         <Stack.Screen
           name="AddUser"
           component={AddUser}
+        />
+
+        <Stack.Screen
+          name="ShowTasks"
+          component={ShowTasks}
+        />
+
+        <Stack.Screen
+          name="EditTask"
+          component={EditTask}
+        />
+
+        <Stack.Screen
+          name="AddTask"
+          component={AddTask}
         />
 
 

@@ -39,13 +39,22 @@ export default function TaskManagement({navigation})
         <View style={{backgroundColor:'#D9EFFF', flex:1 }}>
             <View style={styles.container}>
 
-                <TouchableOpacity style={styles.button}>
-                    <Text style={styles.textButton}> Asignar Tareas </Text>
+                <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('no olvides añadirlo en AppNavigator.js')}>
+                    <Text style={styles.textButton}> Tarea por pasos </Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('ShowTasks')}>
-                    <Text style={styles.textButton}> Mostrar Tareas </Text>
+                <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('no olvides añadirlo en AppNavigator.js')}>
+                    <Text style={styles.textButton}> Tarea de material </Text>
                 </TouchableOpacity>
+
+                <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('no olvides añadirlo en AppNavigator.js')}>
+                    <Text style={styles.textButton}> Tarea de fotocopias </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('no olvides añadirlo en AppNavigator.js')}>
+                    <Text style={styles.textButton}> Tarea de menú </Text>
+                </TouchableOpacity>
+
             </View>
         </View>
     );
@@ -59,7 +68,7 @@ const styles = StyleSheet.create({
       alignItems: 'center',
 
       backgroundColor: '#D9EFFF',
-      padding: 20,
+      padding: 45,
       margin: 30,
       borderRadius: 10,
       borderWidth: 4,
