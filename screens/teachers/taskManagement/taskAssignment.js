@@ -7,8 +7,9 @@ import {
   TouchableOpacity,
   FlatList,
   Modal,
-  ScrollView,
 } from 'react-native';
+import Icon from 'react-native-vector-icons/Ionicons';
+import { Dimensions } from 'react-native';
 import { getFirestore, collection, getDocs, doc, updateDoc } from 'firebase/firestore';
 import { initializeApp } from 'firebase/app';
 import { firebaseConfig } from '../../../services/firebaseConfig';
@@ -16,25 +17,49 @@ import MultiSelect from 'react-native-multiple-select';
 
 // Inicializa Firebase
 initializeApp(firebaseConfig);
-
 const db = getFirestore();
 
-export default function TaskAssignment({ navigation }) {
-  const [taskTitle, setTaskTitle] = useState('');
-  const [selectedStudent, setSelectedStudent] = useState('');
-  const [preferenciasVista, setPreferenciasVista] = useState([]);
-  const [manualDate, setManualDate] = useState('');
-  const [tasks, setTasks] = useState([]);
-  const [students, setStudents] = useState([]);
-  const [filteredTasks, setFilteredTasks] = useState([]);
-  const [filteredStudents, setFilteredStudents] = useState([]);
-  const [searchTask, setSearchTask] = useState('');
-  const [searchStudent, setSearchStudent] = useState('');
-  const [isTaskModalVisible, setTaskModalVisible] = useState(false);
-  const [isStudentModalVisible, setStudentModalVisible] = useState(false);
+// Obtener el ancho de la pantalla
+const { width } = Dimensions.get('window');
+const scale = (size) => (width < 375 ? size : size * (width / 375));
 
+export default function TaskAssignment({ navigation }) {
+  const [taskTitle, setTaskTitle] = useState(''); // ID de la tarea seleccionada
+  const [selectedStudent, setSelectedStudent] = useState(''); // ID del estudiante seleccionado
+  const [preferenciasVista, setPreferenciasVista] = useState([]); // Preferencias visuales seleccionadas
+  const [manualDate, setManualDate] = useState(''); // Fecha límite
+
+  const [tasks, setTasks] = useState([]); // Lista de tareas
+  const [students, setStudents] = useState([]); // Lista de estudiantes
+  const [filteredTasks, setFilteredTasks] = useState([]); // Filtro para tareas
+  const [filteredStudents, setFilteredStudents] = useState([]); // Filtro para estudiantes
+
+  const [searchTask, setSearchTask] = useState(''); // Campo de búsqueda de tareas
+  const [searchStudent, setSearchStudent] = useState(''); // Campo de búsqueda de estudiantes
+
+  const [isTaskModalVisible, setTaskModalVisible] = useState(false); // Modal de tareas
+  const [isStudentModalVisible, setStudentModalVisible] = useState(false); // Modal de estudiantes
+
+  // Configuración del encabezado
   useEffect(() => {
-    // Cargar tareas desde Firebase
+    navigation.setOptions({
+      title: 'Asignar Tarea',
+      headerStyle: { backgroundColor: '#1565C0', height: scale(50) },
+      headerTintColor: '#fff',
+      headerTitleStyle: { fontWeight: 'bold', fontSize: scale(20) },
+      headerLeft: () => (
+        <TouchableOpacity
+          style={{ marginLeft: scale(20) }}
+          onPress={() => navigation.goBack()}
+        >
+          <Icon name="arrow-back" size={scale(20)} color="#fff" />
+        </TouchableOpacity>
+      ),
+    });
+  }, [navigation]);
+
+  // Cargar tareas y estudiantes desde Firebase
+  useEffect(() => {
     const fetchTasks = async () => {
       try {
         const taskSnapshot = await getDocs(collection(db, 'Tareas'));
@@ -49,7 +74,6 @@ export default function TaskAssignment({ navigation }) {
       }
     };
 
-    // Cargar estudiantes desde Firebase
     const fetchStudents = async () => {
       try {
         const studentSnapshot = await getDocs(collection(db, 'Estudiantes'));
@@ -68,10 +92,24 @@ export default function TaskAssignment({ navigation }) {
     fetchStudents();
   }, []);
 
-  // Función para asignar la tarea
+  // Validar fecha
+  const isValidDate = (dateString) => {
+    const regEx = /^\d{2}\/\d{2}\/\d{4}$/;
+    if (!dateString.match(regEx)) return false;  // Formato inválido
+    const [day, month, year] = dateString.split('/').map(Number);
+    const date = new Date(year, month - 1, day);
+    return date.getFullYear() === year && date.getMonth() === month - 1 && date.getDate() === day;
+  };
+
+  // Asignar tarea al estudiante
   const assignTask = async () => {
     if (!taskTitle || !selectedStudent || preferenciasVista.length === 0 || !manualDate) {
       alert('Por favor completa todos los campos.');
+      return;
+    }
+
+    if (!isValidDate(manualDate)) {
+      alert('Por favor ingresa una fecha válida en el formato dd/mm/yyyy.');
       return;
     }
 
@@ -79,14 +117,16 @@ export default function TaskAssignment({ navigation }) {
       const studentDoc = doc(db, 'Estudiantes', selectedStudent);
       const studentData = students.find((student) => student.id === selectedStudent);
 
-      // Agregar la nueva tarea a la agenda del estudiante
+      const [day, month, year] = manualDate.split('/');
+      const fechaLimite = new Date(year, month - 1, day);
+
       await updateDoc(studentDoc, {
         agendaTareas: [
           ...(studentData.agendaTareas || []),
           {
             idTarea: `/Tareas/${taskTitle}`,
             fechaInicio: new Date(),
-            fechaLimite: new Date(manualDate),
+            fechaLimite: fechaLimite,
           },
         ],
       });
@@ -102,45 +142,27 @@ export default function TaskAssignment({ navigation }) {
     }
   };
 
-  // Filtrar tareas
+  // Filtros dinámicos
   const filterTasks = (text) => {
     setSearchTask(text);
-    if (text === '') {
-      setFilteredTasks(tasks);
-    } else {
-      setFilteredTasks(
-        tasks.filter((task) =>
-          task.titulo.toLowerCase().includes(text.toLowerCase())
-        )
-      );
-    }
+    setFilteredTasks(
+      text ? tasks.filter((task) => task.titulo.toLowerCase().includes(text.toLowerCase())) : tasks
+    );
   };
 
-  // Filtrar estudiantes
   const filterStudents = (text) => {
     setSearchStudent(text);
-    if (text === '') {
-      setFilteredStudents(students);
-    } else {
-      setFilteredStudents(
-        students.filter((student) =>
-          student.nombre.toLowerCase().includes(text.toLowerCase())
-        )
-      );
-    }
+    setFilteredStudents(
+      text ? students.filter((student) => student.nombre.toLowerCase().includes(text.toLowerCase())) : students
+    );
   };
 
   return (
     <View style={styles.container}>
-      {/* Título */}
-      <View style={styles.header}>
-        <Text style={styles.headerText}>Asignar tarea</Text>
-      </View>
-
-      {/* Tarea a Asignar */}
+      {/* Selector de tareas */}
       <Text style={styles.label}>Tarea a asignar</Text>
-      <TouchableOpacity onPress={() => setTaskModalVisible(true)} style={styles.input}>
-        <Text>{searchTask || 'Buscar tarea'}</Text>
+      <TouchableOpacity onPress={() => setTaskModalVisible(true)} style={styles.inputButton}>
+        <Text style={styles.inputText}>{searchTask || 'Buscar tarea'}</Text>
       </TouchableOpacity>
       <Modal visible={isTaskModalVisible} animationType="slide">
         <View style={styles.modalContainer}>
@@ -167,15 +189,15 @@ export default function TaskAssignment({ navigation }) {
             )}
           />
           <TouchableOpacity onPress={() => setTaskModalVisible(false)} style={styles.closeButton}>
-            <Text style={styles.closeButtonText}>Cerrar</Text>
+            <Text style={styles.textButton}>Cerrar</Text>
           </TouchableOpacity>
         </View>
       </Modal>
 
-      {/* Alumno Asignado */}
+      {/* Selector de estudiantes */}
       <Text style={styles.label}>Alumno asignado</Text>
-      <TouchableOpacity onPress={() => setStudentModalVisible(true)} style={styles.input}>
-        <Text>{searchStudent || 'Buscar alumno'}</Text>
+      <TouchableOpacity onPress={() => setStudentModalVisible(true)} style={styles.inputButton}>
+        <Text style={styles.inputText}>{searchStudent || 'Buscar alumno'}</Text>
       </TouchableOpacity>
       <Modal visible={isStudentModalVisible} animationType="slide">
         <View style={styles.modalContainer}>
@@ -202,12 +224,12 @@ export default function TaskAssignment({ navigation }) {
             )}
           />
           <TouchableOpacity onPress={() => setStudentModalVisible(false)} style={styles.closeButton}>
-            <Text style={styles.closeButtonText}>Cerrar</Text>
+            <Text style={styles.textButton}>Cerrar</Text>
           </TouchableOpacity>
         </View>
       </Modal>
 
-      {/* Preferencia Visual */}
+      {/* Preferencias */}
       <Text style={styles.label}>Preferencia visual</Text>
       <MultiSelect
         items={[
@@ -217,17 +239,17 @@ export default function TaskAssignment({ navigation }) {
           { id: 'Texto', name: 'Texto' },
         ]}
         uniqueKey="id"
-        onSelectedItemsChange={(selected) => setPreferenciasVista(selected)}
+        onSelectedItemsChange={selectedItems => setPreferenciasVista(selectedItems)}
         selectedItems={preferenciasVista}
-        selectText="Escoger preferencia"
-        styleDropdownMenuSubsection={styles.dropdown}
+        selectText="Selecciona Preferencias de Vista"
+        styleDropdownMenuSubsection={styles.MultiSelect}
         styleTextDropdown={{ color: '#000' }}
         styleTextDropdownSelected={{ color: '#000' }}
         submitButtonColor="#90EE90"
         submitButtonTextColor="#000"
       />
 
-      {/* Fecha Límite */}
+      {/* Fecha límite */}
       <Text style={styles.label}>Fecha Límite</Text>
       <TextInput
         style={styles.input}
@@ -236,9 +258,9 @@ export default function TaskAssignment({ navigation }) {
         onChangeText={setManualDate}
       />
 
-      {/* Botón de aceptar */}
-      <TouchableOpacity style={styles.submitButton} onPress={assignTask}>
-        <Text style={styles.submitButtonText}>Aceptar</Text>
+      {/* Botón Aceptar */}
+      <TouchableOpacity style={styles.button} onPress={assignTask}>
+        <Text style={styles.textButton}>Aceptar</Text>
       </TouchableOpacity>
     </View>
   );
@@ -247,25 +269,14 @@ export default function TaskAssignment({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#D9EFFF',
     padding: 20,
-  },
-  header: {
-    backgroundColor: '#1565C0',
-    padding: 15,
-    marginBottom: 20,
-  },
-  headerText: {
-    color: '#fff',
-    fontWeight: 'bold',
-    fontSize: 20,
-    textAlign: 'center',
+    backgroundColor: '#D9EFFF',
   },
   label: {
     fontWeight: 'bold',
     color: '#1565C0',
     marginBottom: 5,
-    marginTop: 10,
+    fontSize: 16,
   },
   input: {
     backgroundColor: '#fff',
@@ -274,43 +285,58 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     padding: 10,
     marginBottom: 20,
+    width: '100%',
   },
-  dropdown: {
+  inputButton: {
+    backgroundColor: '#fff',
+    borderColor: '#1565C0',
+    borderWidth: 1,
+    borderRadius: 5,
+    padding: 10,
     marginBottom: 20,
-    marginTop: -5, // Ajuste para evitar que tape el título
+    justifyContent: 'center',
+  },
+  inputText: {
+    color: '#000',
+  },
+  button: {
+    backgroundColor: '#FEF28A',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginVertical: 10,
+    padding: 15,
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: '#424242',
+  },
+  textButton: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#424242',
   },
   modalContainer: {
     flex: 1,
-    backgroundColor: '#D9EFFF',
     padding: 20,
-  },
-  listItem: {
-    backgroundColor: '#fff',
-    padding: 10,
-    marginVertical: 5,
-    borderRadius: 5,
+    backgroundColor: '#D9EFFF',
   },
   closeButton: {
-    backgroundColor: '#1565C0',
-    padding: 10,
-    borderRadius: 5,
     marginTop: 20,
-  },
-  closeButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-  submitButton: {
-    backgroundColor: '#90EE90',
-    padding: 10,
+    backgroundColor: '#FEF28A',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 40,
     borderRadius: 5,
-    marginTop: 20,
+    borderWidth: 1,
+    borderColor: '#424242',
   },
-  submitButtonText: {
-    fontWeight: 'bold',
-    color: '#1565C0',
-    fontSize: 16,
-    textAlign: 'center',
+  listItem: {
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+  },
+  dropdown: {
+    borderWidth: 1,
+    borderColor: '#1565C0',
+    borderRadius: 5,
   },
 });
