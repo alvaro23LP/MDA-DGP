@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, Image, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Image,button, ScrollView } from 'react-native';
 import { getFirestore, collection, getDocs } from 'firebase/firestore';
 import { initializeApp } from 'firebase/app';
 import { firebaseConfig } from '../services/firebaseConfig';
@@ -73,6 +73,11 @@ export default function HomeScreen({ navigation}) {
       <TouchableOpacity style={styles.loginButton} onPress={handleAdminLogin}>
         <Text style={styles.buttonText}>Iniciar Sesión Administrador/Profesor</Text>
       </TouchableOpacity>
+
+      <TouchableOpacity onPress={() => navigation.navigate('TaskFotocopias')}>
+        <Text style={styles.buttonText}>prueba</Text>
+      </TouchableOpacity>
+
     </View>
   );
 }
