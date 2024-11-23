@@ -22,6 +22,7 @@ export default function UserMaterialTask({ navigation, route }) {
     const [tareas, setTareas] = useState([]);
     const [studentName, setStudentName] = useState('');
     const [showAllMaterials, setShowAllMaterials] = useState(false);
+    const [buttonPosition, setButtonPosition] = useState('right'); // Definir buttonPosition en el estado
 
 
     useEffect(() => {
@@ -93,11 +94,12 @@ export default function UserMaterialTask({ navigation, route }) {
 
     const toggleShowAllMaterials = () => {
         setShowAllMaterials(!showAllMaterials);
+        setButtonPosition(buttonPosition === 'right' ? 'left' : 'right');
     };
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Tareas de {studentName}</Text>
+            <Text style={styles.title}>{studentName}</Text>
             <View style={styles.contenedorTarea}>
                 {tareas.map(tarea => (
                     <View key={tarea.id} style={styles.contendorMaterialesVista}>
@@ -128,8 +130,8 @@ export default function UserMaterialTask({ navigation, route }) {
                     </View>
                 ))}
                 {tareas.some(tarea => Object.keys(tarea.materiales).length > 7) && (
-                    <TouchableOpacity onPress={toggleShowAllMaterials} style={styles.showMoreButton}>
-                        <Icon name={showAllMaterials ? "chevron-back" : "chevron-forward"} size={largeScale(40)} color="#1565C0" />
+                    <TouchableOpacity onPress={toggleShowAllMaterials} style={[styles.showMoreButton, buttonPosition === 'right' ? styles.buttonRight : styles.buttonLeft]}>
+                        <Icon name={showAllMaterials ? "chevron-back" : "chevron-forward"} size={largeScale(40)} color="#050500" />
                     </TouchableOpacity>
                 )}
             </View>
@@ -146,10 +148,10 @@ const styles = StyleSheet.create({
         padding: largeScale(10),
     },
     title: {
-        fontSize: largeScale(28),
+        fontSize: largeScale(35),
         fontWeight: 'bold',
         color: '#424242',
-        marginBottom: largeScale(15),
+        marginTop: largeScale(30),
     },
     buttonExitText: {
         color: '#fff',
@@ -160,18 +162,15 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: '#D9EFFF',
-        padding: largeScale(10),
         width: width,
     },
     contendorMaterialesVista: {
         flexDirection: 'column',
         justifyContent: 'space-evenly',
-        marginBottom: largeScale(20),
-        padding: largeScale(5),
+        paddingHorizontal: largeScale(5),
         borderRadius: largeScale(10),
         width: width * 0.70,
-        borderWidth: 2,
-        height: height * 0.75,
+        height: height * 0.80,
     },
     unidadMaterial: {
         flexDirection: 'row',
@@ -189,12 +188,13 @@ const styles = StyleSheet.create({
         flexDirection: 'column',
     },
     tituloMaterial: {
-        fontSize: largeScale(25),
+        fontSize: largeScale(28),
         color: '#111',
         marginLeft: scale(10),
+        fontWeight: 'bold', 
     },
     descripcionMaterial: {
-        fontSize: largeScale(23),
+        fontSize: largeScale(26),
         color: '#222',
         marginLeft: scale(10),
     },
@@ -220,12 +220,18 @@ const styles = StyleSheet.create({
     },
     showMoreButton: {
         position: 'absolute',
-        right: largeScale(20),
         alignItems: 'center',
         marginTop: largeScale(10),
-        backgroundColor: 'FEF28A',
-        borderRadius: largeScale(20),
+        backgroundColor: '#FEF28A', 
+        borderRadius: largeScale(30),
         padding: largeScale(10),
+        borderWidth: 1,
+        borderColor: '#1565C0', 
     },
-
+    buttonRight: {
+        right: largeScale(30),
+    },
+    buttonLeft: {
+        left: largeScale(30),
+    },
 });
