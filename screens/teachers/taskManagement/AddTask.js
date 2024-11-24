@@ -66,34 +66,29 @@ const styles = StyleSheet.create({
       flex: 1,
       justifyContent: 'center',
       alignItems: 'center',
-
       backgroundColor: '#D9EFFF',
       padding: 45,
       margin: 30,
       borderRadius: 10,
       borderWidth: 4,
       borderColor:'#1565C0'
-
     },
-
     title: {
       fontSize: 20,
       fontWeight: 'bold',
     },
-
     button: {
       backgroundColor: '#FEF28A',
       alignItems: 'center',
       justifyContent: 'center',
-      marginVertical: '10%', 
-      width:'80%',
-      height: '20%',
+      marginVertical: '5%', 
+      width:'83%',
+      height: '18%',
       padding: 10,
-      margin: 10,
-
+      margin: 0,
       borderStyle: 'solid',
       borderWidth: 3,
-      borderRadius: 10,
+      borderRadius: 35,
       borderBlockColor:'#424242',
       
     },

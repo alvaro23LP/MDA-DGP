@@ -14,7 +14,6 @@ import UserScreen from '../screens/students/UserMainScreen';
 // Pantallas de profesores
 import LoginPage from '../screens/teachers/LoginPageTeachers';
 import TeachersMainScreen from '../screens/teachers/teachersMainScreen';
-import TaskManagement from '../screens/teachers/taskManagement/taskManagement';
 import UsersManagement from '../screens/teachers/userManagement/UsersManagement';
 import EditUser from '../screens/teachers/userManagement/EditUser';
 import AddUser from '../screens/teachers/userManagement/AddUser';
@@ -55,11 +54,6 @@ export default function AppNavigator({ isLoading}) {
          name="TeachersMainScreen" 
          component={TeachersMainScreen}
          options={{ headerLeft: () => null }}
-        />
-
-        <Stack.Screen
-          name="TaskManagement"
-          component={TaskManagement}
         />
 
         <Stack.Screen
