@@ -22,6 +22,8 @@ import ShowTasks from '../screens/teachers/taskManagement/ShowTasks';
 import EditTask from '../screens/teachers/taskManagement/EditTask';
 import AddTask from '../screens/teachers/taskManagement/AddTask';
 import TaskAssignment from '../screens/teachers/taskManagement/taskAssignment';
+import MaterialTaskTeacher from '../screens/teachers/taskManagement/MaterialTaskTeacher';
+import UserMaterialTask from '../screens/students/UserMaterialTask';
 
 const Stack = createStackNavigator();
 
@@ -61,6 +63,16 @@ export default function AppNavigator({ isLoading}) {
         <Stack.Screen
           name="TaskManagement"
           component={TaskManagement}
+        />
+
+        <Stack.Screen 
+          name="MaterialTaskTeacher" 
+          component={MaterialTaskTeacher} 
+        />
+
+        <Stack.Screen
+          name="Recoger Material"
+          component={UserMaterialTask}
         />
 
         <Stack.Screen
