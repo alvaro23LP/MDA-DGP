@@ -18,7 +18,7 @@ export default function TeachersMainScreen({navigation})
         // Configura las opciones del encabezado
         navigation.setOptions({
           title: 'Inicio',  // Cambia el título
-          headerStyle: { backgroundColor: '#1565C0',  height: scale(50) }, // Color de fondo y tamaño del encabezado
+          headerStyle: { backgroundColor: '#1565C0',  height: scale(60) }, // Color de fondo y tamaño del encabezado
           headerTintColor: '#fff', // Color del texto
           headerTitleStyle: { fontWeight: 'bold', fontSize: scale(20) }, // Estilo del título
 

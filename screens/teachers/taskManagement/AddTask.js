@@ -6,10 +6,7 @@ import { useEffect } from 'react';
 
 // Obtener el ancho de la pantalla
 const { width } = Dimensions.get('window');
-
 const scale = (size) => (width < 375 ? size : size * (width / 375));
-
-
 
 export default function TaskManagement({navigation})
 {
@@ -17,8 +14,8 @@ export default function TaskManagement({navigation})
     useEffect(() => {
         // Configura las opciones del encabezado
         navigation.setOptions({
-          title: 'Gestión de Tareas',  // Cambia el título
-          headerStyle: { backgroundColor: '#1565C0',  height: scale(50) }, // Color de fondo y tamaño del encabezado
+          title: 'Seleciona tipo de tarea',  // Cambia el título
+          headerStyle: { backgroundColor: '#1565C0',  height: scale(60) }, // Color de fondo y tamaño del encabezado
           headerTintColor: '#fff', // Color del texto
           headerTitleStyle: { fontWeight: 'bold', fontSize: scale(20) }, // Estilo del título
           headerLeft: () => (
