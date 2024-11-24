@@ -8,6 +8,7 @@ import TaskAssignment from '../screens/teachers/taskManagement/taskAssignment';
 import UsersManagement from '../screens/teachers/userManagement/UsersManagement';
 import EditUser from '../screens/teachers/userManagement/EditUser';
 import AddUser from '../screens/teachers/userManagement/AddUser';
+import TaskFotocopias from '../screens/teachers/taskManagement/taskFotocopias';
 
 const Stack = createStackNavigator();
 
@@ -21,6 +22,7 @@ export default function TeacherNavigator() {
       <Stack.Screen name="UsersManagement" component={UsersManagement} />
       <Stack.Screen name="EditUser" component={EditUser} />
       <Stack.Screen name="AddUser" component={AddUser} />
+      <Stack.Screen name="TaskFotocopias" component={TaskFotocopias} />
     </Stack.Navigator>
   );
 }
