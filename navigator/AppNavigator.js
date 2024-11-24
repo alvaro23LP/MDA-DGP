@@ -21,6 +21,7 @@ import AddUser from '../screens/teachers/userManagement/AddUser';
 import ShowTasks from '../screens/teachers/taskManagement/ShowTasks';
 import EditTask from '../screens/teachers/taskManagement/EditTask';
 import AddTask from '../screens/teachers/taskManagement/AddTask';
+import TaskFotocopias from '../screens/teachers/taskManagement/taskFotocopias';
 import TaskAssignment from '../screens/teachers/taskManagement/taskAssignment';
 import MaterialTaskTeacher from '../screens/teachers/taskManagement/MaterialTaskTeacher';
 import UserMaterialTask from '../screens/students/UserMaterialTask';
@@ -93,6 +94,11 @@ export default function AppNavigator({ isLoading}) {
         <Stack.Screen
           name="AddUser"
           component={AddUser}
+        />
+
+        <Stack.Screen
+          name="TaskFotocopias"
+          component={TaskFotocopias}
         />
 
         <Stack.Screen
