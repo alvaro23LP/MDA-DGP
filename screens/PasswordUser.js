@@ -81,7 +81,7 @@ export default function PasswordUser() {
           newSelection[1] === password[1]
         ) {
           Alert.alert('¡Contraseña correcta!');
-          navigation.navigate('UserScreen'); // Redirige al perfil del usuario
+          navigation.navigate('UserScreen', { studentId }); 
         } else {
           Alert.alert('Ups, contraseña incorrecta.');
         }

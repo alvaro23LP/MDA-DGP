@@ -46,6 +46,10 @@ export default function HomeScreen({ navigation}) {
     navigation.navigate('LoginPage');
   };
 
+  const handleExtra = (id) => () => {
+    navigation.navigate('Recoger Material', { studentId: id });
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.selectUserText}>Elige tu usuario</Text>
@@ -74,14 +78,15 @@ export default function HomeScreen({ navigation}) {
         <Text style={styles.buttonText}>Iniciar Sesión Administrador/Profesor</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => navigation.navigate('TaskFotocopias')}>
-        <Text style={styles.buttonText}>prueba</Text>
+      
+
+      <TouchableOpacity   style={styles.ExtraButton} onPress={() => navigation.navigate('ShowFotocopia', { idAlumno: 'valorIdAlumno', idTarea: 'ykR7kuaIs1ps8aj5o03f' })}>
+        <Text style={styles.buttonText}>PantallaTareaFotocopias</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => navigation.navigate('ShowFotocopia', { idAlumno: 'valorIdAlumno', idTarea: 'ykR7kuaIs1ps8aj5o03f' })}>
-        <Text style={styles.buttonText}>prueba2</Text>
+      <TouchableOpacity style={styles.ExtraButton} onPress={handleExtra('HzvSSyDOgYzhvWrdc6Y6')}>
+        <Text style={styles.buttonText}>Pantalla Recogida Material Alumnos</Text>
       </TouchableOpacity>
-
     </View>
   );
 }
@@ -143,4 +148,15 @@ const styles = StyleSheet.create({
     textShadowOffset: { width: 1, height: 1 }, 
     textShadowRadius: 3, 
   },
+
+  ExtraButton: {
+    position: 'absolute',
+    top: 15,
+    left: 15,
+    backgroundColor: '#1565C0',
+    textShadowColor: '#000',
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 5,
+  },
 });
