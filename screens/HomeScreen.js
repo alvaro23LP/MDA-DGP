@@ -78,6 +78,10 @@ export default function HomeScreen({ navigation}) {
         <Text style={styles.buttonText}>prueba</Text>
       </TouchableOpacity>
 
+      <TouchableOpacity onPress={() => navigation.navigate('ShowFotocopia', { idAlumno: 'valorIdAlumno', idTarea: 'ykR7kuaIs1ps8aj5o03f' })}>
+        <Text style={styles.buttonText}>prueba2</Text>
+      </TouchableOpacity>
+
     </View>
   );
 }

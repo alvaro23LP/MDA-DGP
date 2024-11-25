@@ -1,11 +1,16 @@
-import { View,Text,TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { View,Text,TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { Dimensions } from 'react-native';
 import React from 'react';
 import {useState, useEffect } from 'react';
-import { Picker } from '@react-native-picker/picker';
-
+import { getFirestore, collection, addDoc } from 'firebase/firestore';
+import { initializeApp } from 'firebase/app';
+import { firebaseConfig } from '../../../services/firebaseConfig';
 import DropDownPicker from 'react-native-dropdown-picker';
+
+// Inicializa Firebase
+initializeApp(firebaseConfig);
+const db = getFirestore();
 
 // Obtener el ancho de la pantalla
 const { width } = Dimensions.get('window');
@@ -35,36 +40,51 @@ export default function TaskFotocopias({navigation})
         });
       }, [navigation]);
 
-      const saveTask = async () => {
-        // Aquí debes agregar la lógica para guardar la tarea en la base de datos
-        // Por ejemplo, si estás usando Firebase:
-        // await firebase.firestore().collection('tasks').add({
-        //     text,
-        //     selectedFotocopias,
-        //     selectedColor,
-        // });
+      const [selectedFotocopias, setSelectedFotocopias] = useState('');
+      const [selectedColor, setSelectedColors] = useState(''); 
+      const [openFotocopias, setOpenFotocopias] = useState(false);
+      const [openColor, setOpenColor] = useState(false);
+      const [quantity, setQuantity] = useState('');
 
-        // Después de guardar la tarea, navega de regreso a la página anterior
-        navigation.goBack();
+
+
+      const saveTask = async () => {
+
+        if (!quantity || selectedFotocopias === '' || selectedColor === '') {
+            Alert.alert('Error', 'Por favor, rellena todos los campos.');
+            return;
+        }
+
+        //Datos de la tarea
+        const taskData = {
+            cantidad: parseInt(quantity) ,
+            tipo: selectedFotocopias,
+            tipoColor: selectedColor,
+            tipoTarea: 'Fotocopias',
+            titulo: 'Fotocopias/Plastificado',
+        };
+  
+
+        // Guarda la tarea en la base de datos
+        try {
+            await addDoc(collection(db, 'Tareas'), taskData);
+            console.log('Tarea guardada correctamente');
+            navigation.goBack();
+        } catch (error) {
+            console.error('Error al guardar la tarea:', error);
+        }
+
+       
+        
     };
 
     const assingnSaveTask = async () => {
-        // Aquí debes agregar la lógica para asignar la tarea a un alumno y guardarla en la base de datos
-        // Por ejemplo, si estás usando Firebase:
-        // await firebase.firestore().collection('tasks').add({
-        //     text,
-        //     selectedFotocopias,
-        //     selectedColor,
-        //     assignedTo: selectedUser,
-        // });
+        
         navigation.goBack();
+        
     };
 
-      const [selectedFotocopias, setSelectedFotocopias] = useState('0');
-      const [selectedColor, setSelectedColors] = useState('0'); 
-      const [openFotocopias, setOpenFotocopias] = useState(false);
-      const [openColor, setOpenColor] = useState(false);
-      const [text, setText] = useState('Cantidad de fotocopias');
+      
 
     return (
         <View style={{backgroundColor:'#D9EFFF', flex:1,  alignItems: 'center' }}>
@@ -73,12 +93,12 @@ export default function TaskFotocopias({navigation})
             
                 <DropDownPicker
                     style={styles.pickers}
-                    placeholder="Selecciona una tipo"
+                    placeholder="Selecciona un tipo"
                     open={openFotocopias}
                     value={selectedFotocopias}
                     items={[
-                        { label: 'Fotocopia', value: '1' },
-                        { label: 'Plastificado', value: '2' },
+                        { label: 'Fotocopia', value: 'Fotocopia' },
+                        { label: 'Plastificado', value: 'Plastificado' },
                     ]}
                     setOpen={setOpenFotocopias}
                     setValue={setSelectedFotocopias}
@@ -87,12 +107,13 @@ export default function TaskFotocopias({navigation})
                 
                 
 
-
                 <TextInput
                     style={styles.textInput}
-                    value={text}
-                    onChangeText={setText} 
-                    onFocus={() => setText('')}
+                    placeholder='Cantidad de fotocopias'
+                    value={quantity}
+                    keyboardType="numeric"
+                    onChangeText={setQuantity} 
+                    onFocus={() => setQuantity('')}
                 />
 
                 
@@ -100,10 +121,10 @@ export default function TaskFotocopias({navigation})
                     style={styles.pickers}
                     placeholder="Selecciona blanco y negro o color"
                     open={openColor}
-                    value={setOpenColor}
+                    value={selectedColor}
                     items={[
-                        { label: 'Color', value: '1' },
-                        { label: 'Blanco y negro', value: '2' },
+                        { label: 'Color', value: 'Color' },
+                        { label: 'Blanco y negro', value: 'Blanco y negro' },
                     ]}
                     setOpen={setOpenColor}
                     setValue={setSelectedColors}
@@ -134,6 +155,7 @@ export default function TaskFotocopias({navigation})
 
 const styles = StyleSheet.create({
     container: {
+        marginTop: scale(20),
         width: '90%',
         backgroundColor: '#D9EFFF',
         padding: 20,
@@ -153,9 +175,9 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         borderWidth: 3,
         borderColor:'#1565C0',
-        fontSize: 18, // Tamaño del texto
-        fontWeight: 'bold', // Estilo del texto (negrita)
-        fontStyle: 'italic', // Estilo del texto (cursiva)
+        fontSize: 18, 
+        fontWeight: 'bold', 
+        fontStyle: 'italic', 
         color: '#424242'
     },
 

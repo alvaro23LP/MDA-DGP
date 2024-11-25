@@ -1,5 +1,4 @@
 // navigator/AppNavigator.js
-import React, { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
@@ -10,6 +9,7 @@ import LoadingScreen from '../screens/LoadingScreen';
 
 //Pantallas de estudiantes
 import UserScreen from '../screens/students/UserMainScreen';
+import ShowFotocopia from '../screens/students/ShowFotocopia';
 
 // Pantallas de profesores
 import LoginPage from '../screens/teachers/LoginPageTeachers';
@@ -93,6 +93,11 @@ export default function AppNavigator({ isLoading}) {
         <Stack.Screen
             name="UserScreen"
             component={UserScreen}
+        />
+
+        <Stack.Screen
+          name= "ShowFotocopia"
+          component={ShowFotocopia}
         />
 
       </Stack.Navigator>
