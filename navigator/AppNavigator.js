@@ -115,6 +115,12 @@ export default function AppNavigator({ isLoading}) {
           component={ShowTasks}
         />
 
+        <Stack.Screen
+          name="ShowFotocopia"
+          component={ShowFotocopia}
+        />
+
+
 
 
       </Stack.Navigator>

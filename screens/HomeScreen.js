@@ -80,7 +80,7 @@ export default function HomeScreen({ navigation}) {
 
       
 
-      <TouchableOpacity   style={styles.ExtraButton} onPress={() => navigation.navigate('ShowFotocopia', { idAlumno: 'valorIdAlumno', idTarea: 'ykR7kuaIs1ps8aj5o03f' })}>
+      <TouchableOpacity   style={styles.ExtraButton2} onPress={() => navigation.navigate('ShowFotocopia', { idAlumno: 'valorIdAlumno', idTarea: 'ykR7kuaIs1ps8aj5o03f' })}>
         <Text style={styles.buttonText}>PantallaTareaFotocopias</Text>
       </TouchableOpacity>
 
@@ -152,6 +152,17 @@ const styles = StyleSheet.create({
   ExtraButton: {
     position: 'absolute',
     top: 15,
+    left: 15,
+    backgroundColor: '#1565C0',
+    textShadowColor: '#000',
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 5,
+  },
+
+  ExtraButton2: {
+    position: 'absolute',
+    top: 70,
     left: 15,
     backgroundColor: '#1565C0',
     textShadowColor: '#000',

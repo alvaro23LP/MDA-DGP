@@ -30,7 +30,6 @@ export default function ShowFotocopia({navigation,route}){
     const [tipo, setTipo] = useState('');
     const [tipoColor, setTipoColor] = useState('');
     const { idTarea } = route.params;
-    console.log(idTarea);
 
 
     useEffect(() => {
