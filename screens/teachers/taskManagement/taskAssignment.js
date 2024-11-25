@@ -4,7 +4,7 @@ import {
   Text,
   StyleSheet,
   TextInput,
-  TouchableOpacity,
+  TouchableOpacity, 
   FlatList,
   Modal,
 } from 'react-native';
@@ -23,7 +23,8 @@ const db = getFirestore();
 const { width } = Dimensions.get('window');
 const scale = (size) => (width < 375 ? size : size * (width / 375));
 
-export default function TaskAssignment({ navigation }) {
+export default function TaskAssignment({ navigation, route }) {
+  const { taskId } = route.params || {}; // Recibe el ID de la tarea desde la navegación
   const [taskTitle, setTaskTitle] = useState(''); // ID de la tarea seleccionada
   const [selectedStudent, setSelectedStudent] = useState(''); // ID del estudiante seleccionado
   const [preferenciasVista, setPreferenciasVista] = useState([]); // Preferencias visuales seleccionadas
@@ -69,6 +70,13 @@ export default function TaskAssignment({ navigation }) {
         }));
         setTasks(fetchedTasks);
         setFilteredTasks(fetchedTasks);
+
+        // Si el taskId está disponible, selecciona automáticamente la tarea correspondiente
+        if (taskId) {
+          const selectedTask = fetchedTasks.find((task) => task.id === taskId);
+          setTaskTitle(selectedTask?.id || '');
+          setSearchTask(selectedTask?.titulo || '');
+        }
       } catch (error) {
         console.error('Error al cargar tareas:', error);
       }
@@ -90,12 +98,12 @@ export default function TaskAssignment({ navigation }) {
 
     fetchTasks();
     fetchStudents();
-  }, []);
+  }, [taskId]);
 
   // Validar fecha
   const isValidDate = (dateString) => {
     const regEx = /^\d{2}\/\d{2}\/\d{4}$/;
-    if (!dateString.match(regEx)) return false;  // Formato inválido
+    if (!dateString.match(regEx)) return false; // Formato inválido
     const [day, month, year] = dateString.split('/').map(Number);
     const date = new Date(year, month - 1, day);
     return date.getFullYear() === year && date.getMonth() === month - 1 && date.getDate() === day;

@@ -1,338 +1,173 @@
 import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-  FlatList,
-  Modal,
-} from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
-import { Dimensions } from 'react-native';
-import { getFirestore, collection, getDocs, doc, updateDoc } from 'firebase/firestore';
+import { View, Text, StyleSheet, TouchableOpacity, CheckBox } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { getFirestore, collection, addDoc } from 'firebase/firestore';
 import { initializeApp } from 'firebase/app';
 import { firebaseConfig } from '../../../services/firebaseConfig';
-import MultiSelect from 'react-native-multiple-select';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 // Inicializa Firebase
 initializeApp(firebaseConfig);
 const db = getFirestore();
 
-// Obtener el ancho de la pantalla
-const { width } = Dimensions.get('window');
-const scale = (size) => (width < 375 ? size : size * (width / 375));
+const TaskMenu = () => {
+  const navigation = useNavigation();
+  const [selectedClasses, setSelectedClasses] = useState({
+    ClaseA: false,
+    ClaseB: false,
+    ClaseC: false,
+    ClaseD: false,
+  });
 
-export default function TaskAssignment({ navigation }) {
-  const [taskTitle, setTaskTitle] = useState(''); // ID de la tarea seleccionada
-  const [selectedStudent, setSelectedStudent] = useState(''); // ID del estudiante seleccionado
-  const [preferenciasVista, setPreferenciasVista] = useState([]); // Preferencias visuales seleccionadas
-  const [manualDate, setManualDate] = useState(''); // Fecha límite
-
-  const [tasks, setTasks] = useState([]); // Lista de tareas
-  const [students, setStudents] = useState([]); // Lista de estudiantes
-  const [filteredTasks, setFilteredTasks] = useState([]); // Filtro para tareas
-  const [filteredStudents, setFilteredStudents] = useState([]); // Filtro para estudiantes
-
-  const [searchTask, setSearchTask] = useState(''); // Campo de búsqueda de tareas
-  const [searchStudent, setSearchStudent] = useState(''); // Campo de búsqueda de estudiantes
-
-  const [isTaskModalVisible, setTaskModalVisible] = useState(false); // Modal de tareas
-  const [isStudentModalVisible, setStudentModalVisible] = useState(false); // Modal de estudiantes
-
-  // Configuración del encabezado
   useEffect(() => {
     navigation.setOptions({
-      title: 'Asignar Tarea',
-      headerStyle: { backgroundColor: '#1565C0', height: scale(50) },
-      headerTintColor: '#fff',
-      headerTitleStyle: { fontWeight: 'bold', fontSize: scale(20) },
+      title: 'Menú de Tareas', // Título de la pantalla
+      headerStyle: { backgroundColor: '#1565C0', height: 50 }, // Estilo del encabezado
+      headerTintColor: '#fff', // Color del texto
+      headerTitleStyle: { fontWeight: 'bold', fontSize: 20 }, // Estilo del título
       headerLeft: () => (
         <TouchableOpacity
-          style={{ marginLeft: scale(20) }}
-          onPress={() => navigation.goBack()}
+          style={{ marginLeft: 20 }}
+          onPress={() => navigation.goBack()} // Acción al presionar el botón "Atrás"
         >
-          <Icon name="arrow-back" size={scale(20)} color="#fff" />
+          <Icon name="arrow-back" size={20} color="#fff" />
         </TouchableOpacity>
       ),
     });
   }, [navigation]);
 
-  // Cargar tareas y estudiantes desde Firebase
-  useEffect(() => {
-    const fetchTasks = async () => {
-      try {
-        const taskSnapshot = await getDocs(collection(db, 'Tareas'));
-        const fetchedTasks = taskSnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setTasks(fetchedTasks);
-        setFilteredTasks(fetchedTasks);
-      } catch (error) {
-        console.error('Error al cargar tareas:', error);
-      }
-    };
-
-    const fetchStudents = async () => {
-      try {
-        const studentSnapshot = await getDocs(collection(db, 'Estudiantes'));
-        const fetchedStudents = studentSnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setStudents(fetchedStudents);
-        setFilteredStudents(fetchedStudents);
-      } catch (error) {
-        console.error('Error al cargar estudiantes:', error);
-      }
-    };
-
-    fetchTasks();
-    fetchStudents();
-  }, []);
-
-  // Validar fecha
-  const isValidDate = (dateString) => {
-    const regEx = /^\d{2}\/\d{2}\/\d{4}$/;
-    if (!dateString.match(regEx)) return false;  // Formato inválido
-    const [day, month, year] = dateString.split('/').map(Number);
-    const date = new Date(year, month - 1, day);
-    return date.getFullYear() === year && date.getMonth() === month - 1 && date.getDate() === day;
+  const handleCheckBoxChange = (className) => {
+    setSelectedClasses((prev) => ({
+      ...prev,
+      [className]: !prev[className],
+    }));
   };
 
-  // Asignar tarea al estudiante
-  const assignTask = async () => {
-    if (!taskTitle || !selectedStudent || preferenciasVista.length === 0 || !manualDate) {
-      alert('Por favor completa todos los campos.');
+  const createAndAssignTask = async () => {
+    const selected = Object.keys(selectedClasses).filter((key) => selectedClasses[key]);
+    if (selected.length === 0) {
+      alert('Por favor, selecciona al menos una clase.');
       return;
     }
 
-    if (!isValidDate(manualDate)) {
-      alert('Por favor ingresa una fecha válida en el formato dd/mm/yyyy.');
-      return;
-    }
+    const taskData = {
+      tipoTarea: "Tarea Menu",
+      titulo: "Solicitar la comanda del menú del día", // Nombre predefinido de la tarea
+      Clases: {},
+    };
+
+    selected.forEach((className) => {
+      taskData.Clases[className] = {
+        Menu1: ["url", "url", 0],
+        Menu2: ["url", "url", 0],
+        Menu3: ["url", "url", 0],
+        Menu4: ["url", "url", 0],
+        Menu5: ["url", "url", 0],
+        Menu6: ["url", "url", 0],
+      };
+    });
 
     try {
-      const studentDoc = doc(db, 'Estudiantes', selectedStudent);
-      const studentData = students.find((student) => student.id === selectedStudent);
-
-      const [day, month, year] = manualDate.split('/');
-      const fechaLimite = new Date(year, month - 1, day);
-
-      await updateDoc(studentDoc, {
-        agendaTareas: [
-          ...(studentData.agendaTareas || []),
-          {
-            idTarea: `/Tareas/${taskTitle}`,
-            fechaInicio: new Date(),
-            fechaLimite: fechaLimite,
-          },
-        ],
-      });
-
-      alert('Tarea asignada correctamente.');
-      setTaskTitle('');
-      setSelectedStudent('');
-      setPreferenciasVista([]);
-      setManualDate('');
+      const docRef = await addDoc(collection(db, 'Tareas'), taskData);
+      navigation.navigate('TaskAssignment', { taskId: docRef.id });
     } catch (error) {
-      console.error('Error al asignar tarea:', error);
-      alert('Hubo un problema al asignar la tarea.');
+      console.error('Error creando la tarea:', error);
+      alert('Ocurrió un error al crear la tarea.');
     }
   };
 
-  // Filtros dinámicos
-  const filterTasks = (text) => {
-    setSearchTask(text);
-    setFilteredTasks(
-      text ? tasks.filter((task) => task.titulo.toLowerCase().includes(text.toLowerCase())) : tasks
-    );
-  };
+  const createTask = async () => {
+    const selected = Object.keys(selectedClasses).filter((key) => selectedClasses[key]);
+    if (selected.length === 0) {
+      alert('Por favor, selecciona al menos una clase.');
+      return;
+    }
 
-  const filterStudents = (text) => {
-    setSearchStudent(text);
-    setFilteredStudents(
-      text ? students.filter((student) => student.nombre.toLowerCase().includes(text.toLowerCase())) : students
-    );
+    const taskData = {
+      tipoTarea: "Tarea Menu",
+      titulo: "Solicitar la comanda del menú del día", // Nombre predefinido de la tarea
+      Clases: {},
+    };
+
+    selected.forEach((className) => {
+      taskData.Clases[className] = {
+        Menu1: ["url", "url", 0],
+        Menu2: ["url", "url", 0],
+        Menu3: ["url", "url", 0],
+        Menu4: ["url", "url", 0],
+        Menu5: ["url", "url", 0],
+        Menu6: ["url", "url", 0],
+      };
+    });
+
+    try {
+      await addDoc(collection(db, 'Tareas'), taskData);
+      alert('Tarea creada exitosamente.');
+    } catch (error) {
+      console.error('Error creando la tarea:', error);
+      alert('Ocurrió un error al crear la tarea.');
+    }
   };
 
   return (
     <View style={styles.container}>
-      {/* Selector de tareas */}
-      <Text style={styles.label}>Tarea a asignar</Text>
-      <TouchableOpacity onPress={() => setTaskModalVisible(true)} style={styles.inputButton}>
-        <Text style={styles.inputText}>{searchTask || 'Buscar tarea'}</Text>
-      </TouchableOpacity>
-      <Modal visible={isTaskModalVisible} animationType="slide">
-        <View style={styles.modalContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder="Buscar tarea"
-            value={searchTask}
-            onChangeText={filterTasks}
+      <Text style={styles.header}>Selecciona las clases</Text>
+      {Object.keys(selectedClasses).map((className) => (
+        <View key={className} style={styles.classContainer}>
+          <Text style={styles.classText}>{className}</Text>
+          <CheckBox
+            value={selectedClasses[className]}
+            onValueChange={() => handleCheckBoxChange(className)}
           />
-          <FlatList
-            data={filteredTasks}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <TouchableOpacity
-                style={styles.listItem}
-                onPress={() => {
-                  setTaskTitle(item.id);
-                  setSearchTask(item.titulo);
-                  setTaskModalVisible(false);
-                }}
-              >
-                <Text>{item.titulo}</Text>
-              </TouchableOpacity>
-            )}
-          />
-          <TouchableOpacity onPress={() => setTaskModalVisible(false)} style={styles.closeButton}>
-            <Text style={styles.textButton}>Cerrar</Text>
-          </TouchableOpacity>
         </View>
-      </Modal>
+      ))}
 
-      {/* Selector de estudiantes */}
-      <Text style={styles.label}>Alumno asignado</Text>
-      <TouchableOpacity onPress={() => setStudentModalVisible(true)} style={styles.inputButton}>
-        <Text style={styles.inputText}>{searchStudent || 'Buscar alumno'}</Text>
+      <TouchableOpacity style={styles.button} onPress={createAndAssignTask}>
+        <Text style={styles.buttonText}>Crear y asignar</Text>
       </TouchableOpacity>
-      <Modal visible={isStudentModalVisible} animationType="slide">
-        <View style={styles.modalContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder="Buscar alumno"
-            value={searchStudent}
-            onChangeText={filterStudents}
-          />
-          <FlatList
-            data={filteredStudents}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <TouchableOpacity
-                style={styles.listItem}
-                onPress={() => {
-                  setSelectedStudent(item.id);
-                  setSearchStudent(item.nombre);
-                  setStudentModalVisible(false);
-                }}
-              >
-                <Text>{item.nombre}</Text>
-              </TouchableOpacity>
-            )}
-          />
-          <TouchableOpacity onPress={() => setStudentModalVisible(false)} style={styles.closeButton}>
-            <Text style={styles.textButton}>Cerrar</Text>
-          </TouchableOpacity>
-        </View>
-      </Modal>
 
-      {/* Preferencias */}
-      <Text style={styles.label}>Preferencia visual</Text>
-      <MultiSelect
-        items={[
-          { id: 'Por defecto', name: 'Por defecto' },
-          { id: 'Pictograma', name: 'Pictograma' },
-          { id: 'Sonido', name: 'Sonido' },
-          { id: 'Texto', name: 'Texto' },
-        ]}
-        uniqueKey="id"
-        onSelectedItemsChange={(selected) => setPreferenciasVista(selected)}
-        selectedItems={preferenciasVista}
-        selectText="Escoger preferencia"
-        styleDropdownMenuSubsection={styles.dropdown}
-      />
-
-      {/* Fecha límite */}
-      <Text style={styles.label}>Fecha Límite</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="dd/mm/yyyy"
-        value={manualDate}
-        onChangeText={setManualDate}
-      />
-
-      {/* Botón Aceptar */}
-      <TouchableOpacity style={styles.button} onPress={assignTask}>
-        <Text style={styles.textButton}>Aceptar</Text>
+      <TouchableOpacity style={styles.button} onPress={createTask}>
+        <Text style={styles.buttonText}>Crear tarea</Text>
       </TouchableOpacity>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#e0f7fa',
     padding: 20,
-    backgroundColor: '#D9EFFF',
   },
-  label: {
+  header: {
+    fontSize: 20,
     fontWeight: 'bold',
-    color: '#1565C0',
-    marginBottom: 5,
+    marginBottom: 20,
+  },
+  classContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+    padding: 10,
+    backgroundColor: '#b2ebf2',
+    borderRadius: 8,
+  },
+  classText: {
     fontSize: 16,
   },
-  input: {
-    backgroundColor: '#fff',
-    borderColor: '#1565C0',
-    borderWidth: 1,
-    borderRadius: 5,
-    padding: 10,
-    marginBottom: 20,
-    width: '100%',
+  button: {
+    backgroundColor: '#ffd600',
+    padding: 15,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 10,
   },
-  inputButton: {
-    backgroundColor: '#fff',
-    borderColor: '#1565C0',
-    borderWidth: 1,
-    borderRadius: 5,
-    padding: 10,
-    marginBottom: 20,
-    justifyContent: 'center',
-  },
-  inputText: {
+  buttonText: {
+    fontSize: 16,
+    fontWeight: 'bold',
     color: '#000',
   },
-  button: {
-    backgroundColor: '#FEF28A',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginVertical: 10,
-    padding: 15,
-    borderRadius: 10,
-    borderWidth: 2,
-    borderColor: '#424242',
-  },
-  textButton: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#424242',
-  },
-  modalContainer: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: '#D9EFFF',
-  },
-  closeButton: {
-    marginTop: 20,
-    backgroundColor: '#FEF28A',
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: 40,
-    borderRadius: 5,
-    borderWidth: 1,
-    borderColor: '#424242',
-  },
-  listItem: {
-    padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
-  },
-  dropdown: {
-    borderWidth: 1,
-    borderColor: '#1565C0',
-    borderRadius: 5,
-  },
 });
+
+export default TaskMenu;
