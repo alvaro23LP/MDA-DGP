@@ -51,7 +51,7 @@ export default function TaskManagement({navigation})
                     <Text style={styles.textButton}> Tarea de fotocopias </Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('no olvides añadirlo en AppNavigator.js')}>
+                <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('TaskMenu')}>
                     <Text style={styles.textButton}> Tarea de menú </Text>
                 </TouchableOpacity>
 
