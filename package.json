@@ -25,6 +25,7 @@
     "react-dom": "18.3.1",
     "react-native": "0.76.2",
     "react-native-document-picker": "^9.3.1",
+    "react-native-dropdown-picker": "^5.4.6",
     "react-native-image-picker": "^7.1.2",
     "react-native-multiple-select": "^0.5.12",
     "react-native-reanimated": "~3.16.1",
