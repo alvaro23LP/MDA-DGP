@@ -170,7 +170,6 @@ const styles = StyleSheet.create({
         borderRadius: largeScale(10),
         width: width * 0.70,
         height: height * 0.80,
-        borderWidth: 2,
     },
     unidadMaterial: {
         flexDirection: 'row',
