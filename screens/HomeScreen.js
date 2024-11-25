@@ -79,7 +79,7 @@ export default function HomeScreen({ navigation}) {
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.ExtraButton} onPress={handleExtra('HzvSSyDOgYzhvWrdc6Y6')}>
-        <Text style={styles.buttonText}>Pantalla Recogida Material Prof</Text>
+        <Text style={styles.buttonText}>Pantalla Recogida Material Alumnos</Text>
       </TouchableOpacity>
     </View>
   );

@@ -28,9 +28,9 @@ export default function UserMaterialTask({ navigation, route }) {
     useEffect(() => {
         navigation.setOptions({
             title: 'Recoger Material',
-            headerStyle: { backgroundColor: '#1565C0', height: 120 },
-            headerTintColor: '#fff',
-            headerTitleStyle: { fontWeight: 'bold', fontSize: 40, marginLeft: 30 },
+            headerStyle: { backgroundColor: '#1565C0',  height: scale(70) }, // Color de fondo y tamaño del encabezado
+            headerTintColor: '#fff', // Color del texto
+            headerTitleStyle: { fontWeight: 'bold', fontSize: scale(20) }, // Estilo del título
             headerLeft: () => null,
             headerRight: () => (
                 <TouchableOpacity
@@ -48,7 +48,6 @@ export default function UserMaterialTask({ navigation, route }) {
             const userDoc = await getDoc(doc(db, 'Estudiantes', studentId));
             const userData = userDoc.data();
             setStudentName(userData.nombre);
-
             // Obtener las tareas del campo agendaTareas
             const tareasMap = userData.agendaTareas || {};
             const tareasList = [];
@@ -61,16 +60,16 @@ export default function UserMaterialTask({ navigation, route }) {
                     const tareaData = tareaDoc.data();
 
                     if (tareaData.tipoTarea === 'Recogida de material') {
-                        tareasList.push({
+                       tareasList.push({
                             id: tareaDoc.id,
                             ...tareaData,
                             completada: tarea.completada || false,
                         });
                     }
                 }
+                setTareas(tareasList);
             }
-
-            setTareas(tareasList);
+        
         };
         fetchPreferences();
     }, [studentId]);
@@ -171,6 +170,7 @@ const styles = StyleSheet.create({
         borderRadius: largeScale(10),
         width: width * 0.70,
         height: height * 0.80,
+        borderWidth: 2,
     },
     unidadMaterial: {
         flexDirection: 'row',
@@ -206,7 +206,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         backgroundColor: 'red',
-        padding: largeScale(8),
+        padding: largeScale(10),
         borderColor: 'black',
         borderWidth: 1,
         width: '30%',

@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Alert, FlatList, Image, Dimensions } from 'react-native';
 import { getFirestore, doc, collection, getDocs, deleteDoc } from 'firebase/firestore';
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { initializeApp } from 'firebase/app';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { firebaseConfig } from '../../../services/firebaseConfig';
@@ -21,7 +22,7 @@ export default function UsersManagement({ navigation }) {
   useEffect(() => {
     // Configura las opciones del encabezado
     navigation.setOptions({
-      title: 'Gestión de usuarios', 
+      title: 'Gestión de tareas', 
       headerStyle: { backgroundColor: '#1565C0',  height: scale(60) },
       headerTintColor: '#fff',
       headerTitleStyle: { fontWeight: 'bold', fontSize: scale(20) },
@@ -36,64 +37,60 @@ export default function UsersManagement({ navigation }) {
     });
   }, [navigation]);
 
-  const [usuarios, setUsuarios] = useState([]);
+  const [tareas, setTareas] = useState([]);
 
   const db = getFirestore();
   
-  const getUsuarios = async () => {
+  const getTareas = async () => {
     try {
       const db = getFirestore();
-      const querySnapshot = await getDocs(collection(db, 'Estudiantes'));
+      const querySnapshot = await getDocs(collection(db, 'Tareas'));
       const usuariosData = [];
       querySnapshot.forEach((doc) => {
         usuariosData.push({ id: doc.id, ...doc.data() });
       });
-      setUsuarios(usuariosData);
+      setTareas(usuariosData);
     } catch (error) {
-      console.error('Error al obtener los usuarios: ', error);
+      console.error('Error al obtener las tareas: ', error);
     }
   };
   
   useFocusEffect(
     useCallback(() => {
-      getUsuarios();
+      getTareas();
     }, [])
   );
 
-  const handleDeleteUser = async (userId) => {
+  const handleDeleteTask = async (taskId) => {
     try {
       const db = getFirestore();
-      await deleteDoc(doc(db, 'Estudiantes', userId));
-      Alert.alert('Éxito', 'Alumno eliminado exitosamente');
-      setUsuarios(usuarios.filter(user => user.id !== userId));
+      await deleteDoc(doc(db, 'Tareas', taskId));
+      Alert.alert('Éxito', 'Tarea eliminada exitosamente');
+      setTareas(tareas.filter(user => user.id !== taskId));
     } catch (error) {
-      console.error('Error al eliminar el alumno: ', error);
-      Alert.alert('Error', 'No se pudo eliminar el alumno');
+      console.error('Error al eliminar la tarea: ', error);
+      Alert.alert('Error', 'No se pudo eliminar la tarea');
     }
   };
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={styles.addButton} onPress={() => navigation.navigate('AddUser')}>
-        <Text style={styles.addButtonText}>Añadir Usuario</Text>
+      <TouchableOpacity style={styles.addButton} onPress={() => navigation.navigate('AddTask')}>
+        <Text style={styles.addButtonText}>Añadir Tarea</Text>
         <Text style={styles.addButtonText}>+</Text>
       </TouchableOpacity>
-      <Text style={styles.title}>Lista de Usuarios</Text>
+      <Text style={styles.title}>Lista de Tareas</Text>
       <FlatList
-        data={usuarios}
+        data={tareas}
         keyExtractor={(item, index) => index.toString()}
         renderItem={({ item }) => (
           <View style={styles.userItem}>
-          <Image 
-            source={item.fotoAvatar ? { uri: item.fotoAvatar.uri || item.fotoAvatar } : avatarIcon} 
-            style={styles.avatar} 
-          />
-            <Text style={styles.userText}>{item.nombre}</Text>
+            <Text style={styles.userText}>{item.titulo}</Text>
             <View style={styles.iconContainer}>
-              <TouchableOpacity onPress={() => navigation.navigate('EditUser', { userId: item.id })}>
+              <TouchableOpacity onPress={() => navigation.navigate('EditTask', { userId: item.id })}>
                 <Image source={editIcon} style={styles.editIcon} />
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => handleDeleteUser(item.id)}>
+              <TouchableOpacity onPress={() => handleDeleteTask(item.id)}>
                 <Image source={deleteIcon} style={styles.deleteIcon} />
               </TouchableOpacity>
             </View>
@@ -123,11 +120,11 @@ const styles = StyleSheet.create({
   },
   addButtonText: {
     color: '#000',
-    fontSize: 18,
+    fontSize: scale(10),
     fontWeight: 'bold',
   },
   title: {
-    fontSize: 24,
+    fontSize: scale(18),
     fontWeight: 'bold',
     marginBottom: 20,
     textAlign: 'center',
@@ -148,7 +145,7 @@ const styles = StyleSheet.create({
   },
   userText: {
     color: '#000',
-    fontSize: 18,
+    fontSize: scale(10),
     flex: 1,
   },
   iconContainer: {
