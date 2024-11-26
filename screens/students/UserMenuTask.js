@@ -9,8 +9,18 @@ import Icon from 'react-native-vector-icons/Ionicons';
 initializeApp(firebaseConfig);
 const db = getFirestore();
 
+// Mapa estático de imágenes
+const imageMap = {
+  Menu1: require('../../images/Menu.png'),
+  Menu2: require('../../images/NoCarne.png'),
+  Menu3: require('../../images/Triturado.png'),
+  Menu4: require('../../images/FrutaTriturada.png'),
+  Menu5: require('../../images/yogur_natillas.png'),
+  Menu6: require('../../images/Fruta.png'),
+};
+
 // Dimensiones para escalado
-const { width, height } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 const scale = (size) => (width < 375 ? size : size * (width / 375));
 const largeScale = (size) => (width > 800 ? size * 1.5 : size);
 
@@ -20,7 +30,6 @@ export default function UserMenuTask({ route, navigation }) {
   const [classData, setClassData] = useState(null);
   const [currentClassIndex, setCurrentClassIndex] = useState(0);
   const [classNames, setClassNames] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     navigation.setOptions({
@@ -49,7 +58,6 @@ export default function UserMenuTask({ route, navigation }) {
   }, [idTarea]);
 
   const fetchClassesAndMenus = async (classIndex) => {
-    setIsLoading(true);
     try {
       const taskDocRef = doc(db, 'Tareas', idTarea);
       const taskDoc = await getDoc(taskDocRef);
@@ -59,17 +67,19 @@ export default function UserMenuTask({ route, navigation }) {
         const classKeys = Object.keys(taskData.Clases).sort(); // Ordena alfabéticamente las clases
         setClassNames(classKeys);
 
-        // Ordena los menús por su posición y asigna los datos de la clase
-        const sortedMenuData = Object.entries(taskData.Clases[classKeys[classIndex]])
-          .sort((a, b) => a[1][3] - b[1][3]); // Ordena por el cuarto elemento (posición)
-        setClassData({ className: classKeys[classIndex], menus: sortedMenuData });
+        if (classKeys.length > 0) {
+          const sortedMenuData = Object.entries(taskData.Clases[classKeys[classIndex]])
+            .sort((a, b) => a[0].localeCompare(b[0])); // Ordena los menús por nombre
+
+          setClassData({ className: classKeys[classIndex], menus: sortedMenuData });
+        } else {
+          setClassData(null);
+        }
       } else {
-        console.error('No se encontró la tarea en la base de datos.');
+        setClassData(null);
       }
     } catch (error) {
       console.error('Error al obtener datos de la base de datos:', error);
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -89,57 +99,63 @@ export default function UserMenuTask({ route, navigation }) {
     }
   };
 
-  const updateMenuCounter = async (menuKey, increment) => {
-    try {
-      const taskDocRef = doc(db, 'Tareas', idTarea);
-      const taskDoc = await getDoc(taskDocRef);
-
-      if (taskDoc.exists()) {
-        const taskData = taskDoc.data();
-        if (taskData.Clases[classNames[currentClassIndex]][menuKey]) {
-          const updatedCount = taskData.Clases[classNames[currentClassIndex]][menuKey][2] + increment;
-
-          if (updatedCount < 0) return;
-
-          taskData.Clases[classNames[currentClassIndex]][menuKey][2] = updatedCount;
-
-          await updateDoc(taskDocRef, {
-            [`Clases.${classNames[currentClassIndex]}`]: taskData.Clases[classNames[currentClassIndex]],
-          });
-
-          setClassData((prevData) => ({
-            ...prevData,
-            menus: prevData.menus.map((menuItem) =>
-              menuItem[0] === menuKey ? [menuItem[0], [...menuItem[1].slice(0, 2), updatedCount, menuItem[1][3]]] : menuItem
-            ),
-          }));
-        }
+  // Función para actualizar el contador en la base de datos
+  const handleCounterChange = async (menuKey, change) => {
+    // Actualizamos el contador en el estado local
+    const updatedMenus = classData.menus.map(([key, menuData]) => {
+      if (key === menuKey) {
+        const updatedMenuData = [...menuData];
+        updatedMenuData[2] = updatedMenuData[2] + change; // Cambia el contador
+        return [key, updatedMenuData]; // Retorna el menú actualizado
       }
+      return [key, menuData]; // Si no es el menú actual, no lo modificamos
+    });
+
+    setClassData({ ...classData, menus: updatedMenus });
+
+    // Ahora actualizamos el contador en la base de datos, sin borrar los valores de imagen y descripción
+    const taskDocRef = doc(db, 'Tareas', idTarea);
+    
+    try {
+      // Recuperamos el menú completo (imagen, descripción y contador) para este menú
+      const menuToUpdate = updatedMenus.find(([key]) => key === menuKey);
+      const updatedMenuData = menuToUpdate[1]; // Obtenemos los tres elementos (imagen, descripción, contador)
+
+      // Actualizamos solo el contador en Firestore
+      await updateDoc(taskDocRef, {
+        [`Clases.${classNames[currentClassIndex]}.${menuKey}`]: updatedMenuData, // Mantenemos los otros dos valores intactos
+      });
     } catch (error) {
-      console.error('Error al actualizar el contador en la base de datos:', error);
+      console.error('Error actualizando el contador en la base de datos:', error);
     }
   };
 
   const renderMenuItem = ({ item }) => {
     const [menuKey, menuData] = item;
 
+    // Utiliza el mapa para cargar las imágenes
+    const imageSource = imageMap[menuKey] || require('../../images/Menu.png'); // Imagen por defecto
+
     return (
       <View style={styles.menuItem}>
         <Image
-          source={
-            menuData[0] === '../images/Menu.png'
-              ? require('../../images/Menu.png')
-              : { uri: menuData[0] }
-          }
+          source={imageSource} // Usamos la fuente del mapa de imágenes
           style={styles.menuImage}
+          resizeMode="contain" // Ajuste de la imagen
         />
         <Text style={styles.menuDescription}>{menuData[1]}</Text>
         <View style={styles.counterContainer}>
-          <TouchableOpacity onPress={() => updateMenuCounter(menuKey, -1)} style={styles.counterButton}>
+          <TouchableOpacity
+            style={styles.counterButton}
+            onPress={() => handleCounterChange(menuKey, -1)} // Decrementa el contador
+          >
             <Text style={styles.counterText}>-</Text>
           </TouchableOpacity>
           <Text style={styles.counterValue}>{menuData[2]}</Text>
-          <TouchableOpacity onPress={() => updateMenuCounter(menuKey, 1)} style={styles.counterButton}>
+          <TouchableOpacity
+            style={styles.counterButton}
+            onPress={() => handleCounterChange(menuKey, 1)} // Incrementa el contador
+          >
             <Text style={styles.counterText}>+</Text>
           </TouchableOpacity>
         </View>
@@ -147,20 +163,12 @@ export default function UserMenuTask({ route, navigation }) {
     );
   };
 
-  if (isLoading) {
-    return (
-      <View style={styles.loadingContainer}>
-        <Text style={styles.loadingText}>Cargando...</Text>
-      </View>
-    );
-  }
-
   return (
     <View style={styles.container}>
-      <Text style={styles.title}> {classData.className}</Text>
+      <Text style={styles.title}>{classData ? classData.className : 'Clase no encontrada'}</Text>
 
       <FlatList
-        data={classData.menus}
+        data={classData ? classData.menus : []}
         keyExtractor={(item) => item[0]}
         renderItem={renderMenuItem}
         style={styles.menuList}
@@ -168,7 +176,11 @@ export default function UserMenuTask({ route, navigation }) {
 
       <View style={styles.navigationButtons}>
         <TouchableOpacity onPress={handlePreviousClass} disabled={currentClassIndex === 0}>
-          <Icon name="arrow-back-circle" size={50} color={currentClassIndex === 0 ? '#ccc' : '#1565C0'} />
+          <Icon
+            name="arrow-back-circle"
+            size={50}
+            color={currentClassIndex === 0 ? '#ccc' : '#1565C0'}
+          />
         </TouchableOpacity>
         <TouchableOpacity
           onPress={handleNextClass}
@@ -189,31 +201,28 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#D9EFFF',
-    padding: scale(20),
+    padding: scale(15), // Reducido para asegurar que todo encaje bien
   },
   title: {
-    fontSize: largeScale(35),
+    fontSize: largeScale(30), // Ajustar el tamaño de la fuente
     fontWeight: 'bold',
     color: '#424242',
-    marginTop: largeScale(30),
+    marginTop: largeScale(20),
     textAlign: 'center',
   },
   buttonExit: {
     position: 'absolute',
     top: largeScale(20),
     right: largeScale(20),
-    alignItems: 'center',
-    justifyContent: 'center',
     backgroundColor: 'red',
     padding: largeScale(10),
-    borderColor: 'black',
     borderWidth: 1,
     width: '30%',
     height: '60%',
   },
   buttonExitText: {
     color: '#fff',
-    fontSize: scale(10),
+    fontSize: scale(12), // Fuente más pequeña
   },
   menuList: {
     flex: 1,
@@ -221,8 +230,7 @@ const styles = StyleSheet.create({
   menuItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: scale(15),
+    padding: scale(10),
     marginBottom: scale(10),
     backgroundColor: '#fff',
     borderRadius: scale(10),
@@ -230,13 +238,13 @@ const styles = StyleSheet.create({
     borderColor: '#1565C0',
   },
   menuImage: {
-    width: scale(50),
+    width: scale(50), // Imagen más pequeña
     height: scale(50),
   },
   menuDescription: {
     flex: 1,
     marginLeft: scale(10),
-    fontSize: scale(16),
+    fontSize: scale(14), // Fuente más pequeña para mejor ajuste
     color: '#424242',
   },
   counterContainer: {
@@ -251,11 +259,11 @@ const styles = StyleSheet.create({
     borderColor: '#1565C0',
   },
   counterText: {
-    fontSize: scale(18),
+    fontSize: scale(16), // Fuente ajustada
     color: '#424242',
   },
   counterValue: {
-    fontSize: scale(18),
+    fontSize: scale(16), // Fuente ajustada
     marginHorizontal: scale(10),
     color: '#424242',
   },
@@ -263,14 +271,5 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginVertical: scale(20),
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  loadingText: {
-    fontSize: scale(18),
-    color: '#424242',
   },
 });
