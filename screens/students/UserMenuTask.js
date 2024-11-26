@@ -1,48 +1,68 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, FlatList } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, FlatList, Dimensions } from 'react-native';
 import { getFirestore, doc, getDoc, updateDoc } from 'firebase/firestore';
 import { initializeApp } from 'firebase/app';
 import { firebaseConfig } from '../../services/firebaseConfig';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { Dimensions } from 'react-native';
 
 // Inicializa Firebase
 initializeApp(firebaseConfig);
 const db = getFirestore();
 
 // Dimensiones para escalado
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 const scale = (size) => (width < 375 ? size : size * (width / 375));
+const largeScale = (size) => (width > 800 ? size * 1.5 : size);
 
 export default function UserMenuTask({ route, navigation }) {
-  // Desestructuración segura de los parámetros
-  const { idTarea } = route.params || {}; // Si no hay params, usamos un objeto vacío
+  const { idTarea } = route.params || {};
 
-  // Estado y variables
   const [classData, setClassData] = useState(null);
   const [currentClassIndex, setCurrentClassIndex] = useState(0);
   const [classNames, setClassNames] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Verificar que el idTarea esté disponible
+  useEffect(() => {
+    navigation.setOptions({
+      title: 'Menu',
+      headerStyle: { backgroundColor: '#1565C0', height: scale(70) },
+      headerTintColor: '#fff',
+      headerTitleStyle: { fontWeight: 'bold', fontSize: scale(20) },
+      headerLeft: () => null,
+      headerRight: () => (
+        <TouchableOpacity
+          style={styles.buttonExit}
+          onPress={() => navigation.navigate('Home')}
+        >
+          <Text style={styles.buttonExitText}>Salir</Text>
+        </TouchableOpacity>
+      ),
+    });
+  }, [navigation]);
+
   useEffect(() => {
     if (!idTarea) {
       alert('No se ha proporcionado el ID de la tarea.');
       return;
     }
-    fetchClassesAndMenus();
+    fetchClassesAndMenus(0); // Inicializa en la primera clase
   }, [idTarea]);
 
-  const fetchClassesAndMenus = async () => {
+  const fetchClassesAndMenus = async (classIndex) => {
+    setIsLoading(true);
     try {
-      const taskDocRef = doc(db, 'Tareas', idTarea);  // Usa el idTarea pasado desde HomeScreen
+      const taskDocRef = doc(db, 'Tareas', idTarea);
       const taskDoc = await getDoc(taskDocRef);
 
       if (taskDoc.exists()) {
         const taskData = taskDoc.data();
-        const classKeys = Object.keys(taskData.Clases);
-        setClassNames(classKeys);  // Lista de nombres de las clases
-        setClassData(taskData.Clases[classKeys[0]]);  // Configura la primera clase
+        const classKeys = Object.keys(taskData.Clases).sort(); // Ordena alfabéticamente las clases
+        setClassNames(classKeys);
+
+        // Ordena los menús por su posición y asigna los datos de la clase
+        const sortedMenuData = Object.entries(taskData.Clases[classKeys[classIndex]])
+          .sort((a, b) => a[1][3] - b[1][3]); // Ordena por el cuarto elemento (posición)
+        setClassData({ className: classKeys[classIndex], menus: sortedMenuData });
       } else {
         console.error('No se encontró la tarea en la base de datos.');
       }
@@ -55,15 +75,17 @@ export default function UserMenuTask({ route, navigation }) {
 
   const handlePreviousClass = () => {
     if (currentClassIndex > 0) {
-      setCurrentClassIndex((prevIndex) => prevIndex - 1);
-      setClassData(classNames[currentClassIndex - 1]);
+      const newIndex = currentClassIndex - 1;
+      setCurrentClassIndex(newIndex);
+      fetchClassesAndMenus(newIndex); // Carga la clase anterior
     }
   };
 
   const handleNextClass = () => {
     if (currentClassIndex < classNames.length - 1) {
-      setCurrentClassIndex((prevIndex) => prevIndex + 1);
-      setClassData(classNames[currentClassIndex + 1]);
+      const newIndex = currentClassIndex + 1;
+      setCurrentClassIndex(newIndex);
+      fetchClassesAndMenus(newIndex); // Carga la siguiente clase
     }
   };
 
@@ -74,23 +96,24 @@ export default function UserMenuTask({ route, navigation }) {
 
       if (taskDoc.exists()) {
         const taskData = taskDoc.data();
-        const updatedCount = taskData.Clases[classNames[currentClassIndex]][menuKey][2] + increment;
+        if (taskData.Clases[classNames[currentClassIndex]][menuKey]) {
+          const updatedCount = taskData.Clases[classNames[currentClassIndex]][menuKey][2] + increment;
 
-        if (updatedCount < 0) return;
+          if (updatedCount < 0) return;
 
-        taskData.Clases[classNames[currentClassIndex]][menuKey][2] = updatedCount;
+          taskData.Clases[classNames[currentClassIndex]][menuKey][2] = updatedCount;
 
-        await updateDoc(taskDocRef, {
-          [`Clases.${classNames[currentClassIndex]}`]: taskData.Clases[classNames[currentClassIndex]],
-        });
+          await updateDoc(taskDocRef, {
+            [`Clases.${classNames[currentClassIndex]}`]: taskData.Clases[classNames[currentClassIndex]],
+          });
 
-        setClassData({
-          ...classData,
-          [menuKey]: [
-            ...classData[menuKey].slice(0, 2),
-            updatedCount,
-          ],
-        });
+          setClassData((prevData) => ({
+            ...prevData,
+            menus: prevData.menus.map((menuItem) =>
+              menuItem[0] === menuKey ? [menuItem[0], [...menuItem[1].slice(0, 2), updatedCount, menuItem[1][3]]] : menuItem
+            ),
+          }));
+        }
       }
     } catch (error) {
       console.error('Error al actualizar el contador en la base de datos:', error);
@@ -134,10 +157,10 @@ export default function UserMenuTask({ route, navigation }) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.classTitle}>{classNames[currentClassIndex]}</Text>
+      <Text style={styles.title}> {classData.className}</Text>
 
       <FlatList
-        data={Object.entries(classData || {})}
+        data={classData.menus}
         keyExtractor={(item) => item[0]}
         renderItem={renderMenuItem}
         style={styles.menuList}
@@ -168,12 +191,29 @@ const styles = StyleSheet.create({
     backgroundColor: '#D9EFFF',
     padding: scale(20),
   },
-  classTitle: {
-    fontSize: scale(24),
+  title: {
+    fontSize: largeScale(35),
     fontWeight: 'bold',
-    color: '#1565C0',
+    color: '#424242',
+    marginTop: largeScale(30),
     textAlign: 'center',
-    marginVertical: scale(20),
+  },
+  buttonExit: {
+    position: 'absolute',
+    top: largeScale(20),
+    right: largeScale(20),
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'red',
+    padding: largeScale(10),
+    borderColor: 'black',
+    borderWidth: 1,
+    width: '30%',
+    height: '60%',
+  },
+  buttonExitText: {
+    color: '#fff',
+    fontSize: scale(10),
   },
   menuList: {
     flex: 1,
@@ -192,7 +232,6 @@ const styles = StyleSheet.create({
   menuImage: {
     width: scale(50),
     height: scale(50),
-    resizeMode: 'contain',
   },
   menuDescription: {
     flex: 1,
@@ -213,12 +252,11 @@ const styles = StyleSheet.create({
   },
   counterText: {
     fontSize: scale(18),
-    fontWeight: 'bold',
-    color: '#1565C0',
+    color: '#424242',
   },
   counterValue: {
+    fontSize: scale(18),
     marginHorizontal: scale(10),
-    fontSize: scale(16),
     color: '#424242',
   },
   navigationButtons: {
@@ -230,10 +268,9 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#D9EFFF',
   },
   loadingText: {
     fontSize: scale(18),
-    color: '#1565C0',
+    color: '#424242',
   },
 });
