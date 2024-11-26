@@ -3,12 +3,16 @@ import { View, Text, StyleSheet, TouchableOpacity, CheckBox } from 'react-native
 import { useNavigation } from '@react-navigation/native';
 import { getFirestore, collection, addDoc } from 'firebase/firestore';
 import { initializeApp } from 'firebase/app';
-import { firebaseConfig } from '../../../services/firebaseConfig';
 import Icon from 'react-native-vector-icons/Ionicons';
+import { Dimensions } from 'react-native';
+import { firebaseConfig } from '../../../services/firebaseConfig';
 
 // Inicializa Firebase
 initializeApp(firebaseConfig);
 const db = getFirestore();
+
+const { width, height } = Dimensions.get('window');
+const scale = (size) => (width < 375 ? size : size * (width / 375));
 
 const TaskMenu = () => {
   const navigation = useNavigation();
@@ -21,16 +25,16 @@ const TaskMenu = () => {
 
   useEffect(() => {
     navigation.setOptions({
-      title: 'Menú de Tareas', // Título de la pantalla
-      headerStyle: { backgroundColor: '#1565C0', height: 50 }, // Estilo del encabezado
-      headerTintColor: '#fff', // Color del texto
-      headerTitleStyle: { fontWeight: 'bold', fontSize: 20 }, // Estilo del título
+      title: 'Menú de Tareas',
+      headerStyle: { backgroundColor: '#1565C0', height: scale(50) },
+      headerTintColor: '#fff',
+      headerTitleStyle: { fontWeight: 'bold', fontSize: scale(20) },
       headerLeft: () => (
         <TouchableOpacity
-          style={{ marginLeft: 20 }}
-          onPress={() => navigation.goBack()} // Acción al presionar el botón "Atrás"
+          style={{ marginLeft: scale(20) }}
+          onPress={() => navigation.goBack()}
         >
-          <Icon name="arrow-back" size={20} color="#fff" />
+          <Icon name="arrow-back" size={scale(20)} color="#fff" />
         </TouchableOpacity>
       ),
     });
@@ -43,6 +47,16 @@ const TaskMenu = () => {
     }));
   };
 
+  const createTaskInCollection = async (taskData) => {
+    try {
+      const docRef = await addDoc(collection(db, 'Tareas'), taskData); // Siempre usa 'Tareas'
+      return docRef;
+    } catch (error) {
+      console.error('Error creando la tarea:', error);
+      throw new Error('Ocurrió un error al crear la tarea.');
+    }
+  };
+
   const createAndAssignTask = async () => {
     const selected = Object.keys(selectedClasses).filter((key) => selectedClasses[key]);
     if (selected.length === 0) {
@@ -51,28 +65,27 @@ const TaskMenu = () => {
     }
 
     const taskData = {
-      tipoTarea: "Tarea Menu",
-      titulo: "Solicitar la comanda del menú del día", // Nombre predefinido de la tarea
+      tipoTarea: 'Tarea Menu',
+      titulo: 'Solicitar la comanda del menú del día',
       Clases: {},
     };
 
     selected.forEach((className) => {
       taskData.Clases[className] = {
-        Menu1: ["url", "url", 0],
-        Menu2: ["url", "url", 0],
-        Menu3: ["url", "url", 0],
-        Menu4: ["url", "url", 0],
-        Menu5: ["url", "url", 0],
-        Menu6: ["url", "url", 0],
+        Menu1: ['../../../images/Menu.png', 'Menu', 0],
+        Menu2: ['../../../images/NoCarne.png', 'Sin Carne', 0],
+        Menu3: ['../../../images/Triturado.png', 'Triturado', 0],
+        Menu4: ['../../../images/FrutaTriturada.png', 'Fruta Triturada', 0],
+        Menu5: ['../../../images/yogur_natillas.png', 'Yogur Natillas', 0],
+        Menu6: ['../../../images/Fruta.png', 'Fruta', 0],
       };
     });
 
     try {
-      const docRef = await addDoc(collection(db, 'Tareas'), taskData);
+      const docRef = await createTaskInCollection(taskData);
       navigation.navigate('TaskAssignment', { taskId: docRef.id });
     } catch (error) {
-      console.error('Error creando la tarea:', error);
-      alert('Ocurrió un error al crear la tarea.');
+      alert(error.message);
     }
   };
 
@@ -84,51 +97,53 @@ const TaskMenu = () => {
     }
 
     const taskData = {
-      tipoTarea: "Tarea Menu",
-      titulo: "Solicitar la comanda del menú del día", // Nombre predefinido de la tarea
+      tipoTarea: 'Tarea Menu',
+      titulo: 'Solicitar la comanda del menú del día',
       Clases: {},
     };
 
     selected.forEach((className) => {
       taskData.Clases[className] = {
-        Menu1: ["url", "url", 0],
-        Menu2: ["url", "url", 0],
-        Menu3: ["url", "url", 0],
-        Menu4: ["url", "url", 0],
-        Menu5: ["url", "url", 0],
-        Menu6: ["url", "url", 0],
+        Menu1: ['../../../images/Menu.png', 'Menu', 0],
+        Menu2: ['../../../images/NoCarne.png', 'Sin Carne', 0],
+        Menu3: ['../../../images/Triturado.png', 'Triturado', 0],
+        Menu4: ['../../../images/FrutaTriturada.png', 'Fruta Triturada', 0],
+        Menu5: ['../../../images/yogur_natillas.png', 'Yogur Natillas', 0],
+        Menu6: ['../../../images/Fruta.png', 'Fruta', 0],
       };
     });
 
     try {
-      await addDoc(collection(db, 'Tareas'), taskData);
+      await createTaskInCollection(taskData);
       alert('Tarea creada exitosamente.');
     } catch (error) {
-      console.error('Error creando la tarea:', error);
-      alert('Ocurrió un error al crear la tarea.');
+      alert(error.message);
     }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Selecciona las clases</Text>
-      {Object.keys(selectedClasses).map((className) => (
-        <View key={className} style={styles.classContainer}>
-          <Text style={styles.classText}>{className}</Text>
-          <CheckBox
-            value={selectedClasses[className]}
-            onValueChange={() => handleCheckBoxChange(className)}
-          />
-        </View>
-      ))}
+      <View style={styles.content}>
+        <Text style={styles.header}>Selecciona las clases</Text>
+        {Object.keys(selectedClasses).map((className) => (
+          <View key={className} style={styles.classContainer}>
+            <Text style={styles.classText}>{className}</Text>
+            <CheckBox
+              value={selectedClasses[className]}
+              onValueChange={() => handleCheckBoxChange(className)}
+            />
+          </View>
+        ))}
+      </View>
 
-      <TouchableOpacity style={styles.button} onPress={createAndAssignTask}>
-        <Text style={styles.buttonText}>Crear y asignar</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity style={styles.button} onPress={createTask}>
-        <Text style={styles.buttonText}>Crear tarea</Text>
-      </TouchableOpacity>
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity style={styles.button} onPress={createAndAssignTask}>
+          <Text style={styles.textButton}>Crear y asignar</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.button} onPress={createTask}>
+          <Text style={styles.textButton}>Crear tarea</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -136,37 +151,58 @@ const TaskMenu = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#e0f7fa',
-    padding: 20,
+    backgroundColor: '#D9EFFF',
+    padding: scale(20),
+  },
+  content: {
+    backgroundColor: '#D9EFFF',
+    margin: scale(20),
+    borderRadius: scale(10),
+    borderWidth: 4,
+    borderColor: '#1565C0',
+    padding: scale(20),
   },
   header: {
-    fontSize: 20,
+    fontSize: scale(20),
     fontWeight: 'bold',
-    marginBottom: 20,
+    marginBottom: scale(20),
+    color: '#1565C0',
+    textAlign: 'center',
   },
   classContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 10,
-    padding: 10,
-    backgroundColor: '#b2ebf2',
-    borderRadius: 8,
+    marginBottom: scale(10),
+    padding: scale(10),
+    backgroundColor: '#fff',
+    borderRadius: scale(10),
+    borderColor: '#1565C0',
+    borderWidth: 2,
   },
   classText: {
-    fontSize: 16,
+    fontSize: scale(16),
+    color: '#424242',
+  },
+  buttonContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: scale(30),
   },
   button: {
-    backgroundColor: '#ffd600',
-    padding: 15,
-    borderRadius: 8,
+    backgroundColor: '#FEF28A',
+    padding: scale(13),
+    borderRadius: scale(30),
     alignItems: 'center',
-    marginTop: 10,
+    marginVertical: scale(10),
+    borderWidth: 3,
+    borderColor: '#424242',
+    width: '60%',
   },
-  buttonText: {
-    fontSize: 16,
+  textButton: {
+    fontSize: scale(15),
+    color: '#424242',
     fontWeight: 'bold',
-    color: '#000',
   },
 });
 

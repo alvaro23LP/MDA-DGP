@@ -49,7 +49,7 @@ export default function TeachersMainScreen({navigation})
                     <Text style={styles.textButton}> Gestión de Tareas </Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.button}>
+                <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('TaskAssignment')}>
                     <Text style={styles.textButton} > Asignar tareas </Text>
                 </TouchableOpacity>
             </View>
