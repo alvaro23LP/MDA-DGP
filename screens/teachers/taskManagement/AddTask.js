@@ -6,10 +6,7 @@ import { useEffect } from 'react';
 
 // Obtener el ancho de la pantalla
 const { width } = Dimensions.get('window');
-
 const scale = (size) => (width < 375 ? size : size * (width / 375));
-
-
 
 export default function TaskManagement({navigation})
 {
@@ -17,8 +14,8 @@ export default function TaskManagement({navigation})
     useEffect(() => {
         // Configura las opciones del encabezado
         navigation.setOptions({
-          title: 'Gestión de Tareas',  // Cambia el título
-          headerStyle: { backgroundColor: '#1565C0',  height: scale(50) }, // Color de fondo y tamaño del encabezado
+          title: 'Seleciona tipo de tarea',  // Cambia el título
+          headerStyle: { backgroundColor: '#1565C0',  height: scale(60) }, // Color de fondo y tamaño del encabezado
           headerTintColor: '#fff', // Color del texto
           headerTitleStyle: { fontWeight: 'bold', fontSize: scale(20) }, // Estilo del título
           headerLeft: () => (
@@ -43,11 +40,11 @@ export default function TaskManagement({navigation})
                     <Text style={styles.textButton}> Tarea por pasos </Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('no olvides añadirlo en AppNavigator.js')}>
+                <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('MaterialTaskTeacher')}>
                     <Text style={styles.textButton}> Tarea de material </Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('no olvides añadirlo en AppNavigator.js')}>
+                <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('TaskFotocopias')}>
                     <Text style={styles.textButton}> Tarea de fotocopias </Text>
                 </TouchableOpacity>
 
@@ -66,34 +63,29 @@ const styles = StyleSheet.create({
       flex: 1,
       justifyContent: 'center',
       alignItems: 'center',
-
       backgroundColor: '#D9EFFF',
       padding: 45,
       margin: 30,
       borderRadius: 10,
       borderWidth: 4,
       borderColor:'#1565C0'
-
     },
-
     title: {
       fontSize: 20,
       fontWeight: 'bold',
     },
-
     button: {
       backgroundColor: '#FEF28A',
       alignItems: 'center',
       justifyContent: 'center',
-      marginVertical: '10%', 
-      width:'80%',
-      height: '20%',
+      marginVertical: '5%', 
+      width:'83%',
+      height: '18%',
       padding: 10,
-      margin: 10,
-
+      margin: 0,
       borderStyle: 'solid',
       borderWidth: 3,
-      borderRadius: 10,
+      borderRadius: 35,
       borderBlockColor:'#424242',
       
     },

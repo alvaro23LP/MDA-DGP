@@ -1,13 +1,17 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Alert, FlatList, Image } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Alert, FlatList, Image, Dimensions } from 'react-native';
 import { getFirestore, doc, collection, getDocs, deleteDoc } from 'firebase/firestore';
-import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { initializeApp } from 'firebase/app';
+import Icon from 'react-native-vector-icons/Ionicons';
 import { firebaseConfig } from '../../../services/firebaseConfig';
 import { useFocusEffect } from '@react-navigation/native';
 import editIcon from '../../../images/edit.png';
 import deleteIcon from '../../../images/eliminar_alumno.png';
 import avatarIcon from '../../../images/avatar_1.png';
+
+// Obtener el ancho de la pantalla
+const { width } = Dimensions.get('window');
+const scale = (size) => (width < 375 ? size : size * (width / 375));
 
 // Inicializa Firebase
 initializeApp(firebaseConfig);
@@ -18,10 +22,17 @@ export default function UsersManagement({ navigation }) {
     // Configura las opciones del encabezado
     navigation.setOptions({
       title: 'Gestión de usuarios', 
-      headerStyle: { backgroundColor: '#1565C0',  height: 80 },
+      headerStyle: { backgroundColor: '#1565C0',  height: scale(60) },
       headerTintColor: '#fff',
-      headerTitleStyle: { fontWeight: 'bold', fontSize: 35 },
-
+      headerTitleStyle: { fontWeight: 'bold', fontSize: scale(20) },
+      headerLeft: () => (
+        <TouchableOpacity
+            style={{ marginLeft: scale(20) }}
+            onPress={() => navigation.goBack()}
+        >
+            <Icon name="arrow-back" size={scale(20)} color="#fff" />
+        </TouchableOpacity>
+        ),
     });
   }, [navigation]);
 

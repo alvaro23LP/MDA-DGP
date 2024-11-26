@@ -51,7 +51,6 @@ export default function UserScreen({ navigation, route }) {
                     // Obtener los datos de la tarea
                     const tareaDoc = await getDoc(tareaDocRef);
                     const tareaData = tareaDoc.data();
-                    
                     const tareaObj = {
                         ...tarea,
                         titulo: tareaData.titulo,
@@ -60,19 +59,19 @@ export default function UserScreen({ navigation, route }) {
                         fechaInicio: tarea.fechaInicio.toDate().toLocaleDateString(),
                         fechaLimite: tarea.fechaLimite.toDate().toLocaleDateString(),
                         fechaCompletada: tarea.fechaCompletada ? tarea.fechaCompletada.toDate().toLocaleDateString() : null,
-                        completada: completada,
+                        //completada: completada,
                         tipoTarea: tareaData.tipoTarea,
+                    
                     };
 
                     if (tareaData.tipoTarea === 'Tarea por pasos') {
                         const pasos = tareaData.Pasos || {};
                         tareaObj.Pasos = pasos;
                     }
-
                     tareasList.push(tareaObj);
                 }
             }
-            //console.log('tareasList:', tareasList); // Verificar la lista de tareas
+            
 
             setTareas(tareasList);
         };
@@ -86,9 +85,9 @@ export default function UserScreen({ navigation, route }) {
         } */
         if (preferenciasVista == "Normal") {
             return tareas.map((tarea, index) => {
-                if (tarea.tipoTarea == 'Recogida Materiales') {
+                if (tarea.tipoTarea == 'Recogida de material') {
                     return (
-                        <View key={index} style={[styles.tareaContainer, tarea.completada && styles.tareaCompletada]}>
+                        <View key={index} style={styles.tareaContainer}>
                             <Text style={styles.tareaTitulo}>{tarea.titulo}</Text>
                             <Text style={styles.tareaDescripcion}>{tarea.descripcion}</Text>
                             <Text style={styles.tareaFecha}>Inicio: {tarea.fechaInicio}</Text>

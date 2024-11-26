@@ -11,7 +11,11 @@
   "dependencies": {
     "@babel/runtime": "^7.26.0",
     "@expo/metro-runtime": "~4.0.0",
+<<<<<<< HEAD
     "@react-native-community/datetimepicker": "^8.2.0",
+=======
+    "@react-native-community/checkbox": "^0.5.17",
+>>>>>>> 53dff7f68011fd829451efafd307698746a90de9
     "@react-native-picker/picker": "^2.9.0",
     "@react-navigation/native": "^6.1.18",
     "@react-navigation/stack": "^6.4.1",
