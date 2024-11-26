@@ -25,7 +25,7 @@ import TaskAssignment from '../screens/teachers/taskManagement/taskAssignment';
 import TaskMenu from '../screens/teachers/taskManagement/taskMenu';
 import MaterialTaskTeacher from '../screens/teachers/taskManagement/MaterialTaskTeacher';
 import UserMaterialTask from '../screens/students/UserMaterialTask';
-import TaskFotocopias from '../screens/teachers/taskManagement/taskFotocopias';
+//import TaskFotocopias from '../screens/teachers/taskManagement/taskFotocopias';
 
 
 const Stack = createStackNavigator();
@@ -95,16 +95,6 @@ export default function AppNavigator({ isLoading}) {
           component={AddUser}
         />
 
-        <Stack.Screen
-
-          name="ShowTasks"
-          component={ShowTasks}
-        />
-        
-        <Stack.Screen
-          name="TaskFotocopias"
-          component={TaskFotocopias}
-        />
 
         <Stack.Screen
           name="EditTask"
@@ -127,11 +117,6 @@ export default function AppNavigator({ isLoading}) {
         <Stack.Screen
             name="UserScreen"
             component={UserScreen}
-        />
-
-        <Stack.Screen
-          name="Recoger Material"
-          component={UserMaterialTask}
         />
 
         <Stack.Screen
