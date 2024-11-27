@@ -54,7 +54,7 @@ export default function UserMenuTask({ route, navigation }) {
       alert('No se ha proporcionado el ID de la tarea.');
       return;
     }
-    fetchClassesAndMenus(0); // Inicializa en la primera clase
+    fetchClassesAndMenus(0);
   }, [idTarea]);
 
   const fetchClassesAndMenus = async (classIndex) => {
@@ -64,12 +64,12 @@ export default function UserMenuTask({ route, navigation }) {
 
       if (taskDoc.exists()) {
         const taskData = taskDoc.data();
-        const classKeys = Object.keys(taskData.Clases).sort(); // Ordena alfabéticamente las clases
+        const classKeys = Object.keys(taskData.Clases).sort();
         setClassNames(classKeys);
 
         if (classKeys.length > 0) {
           const sortedMenuData = Object.entries(taskData.Clases[classKeys[classIndex]])
-            .sort((a, b) => a[0].localeCompare(b[0])); // Ordena los menús por nombre
+            .sort((a, b) => a[0].localeCompare(b[0]));
 
           setClassData({ className: classKeys[classIndex], menus: sortedMenuData });
         } else {
@@ -87,7 +87,7 @@ export default function UserMenuTask({ route, navigation }) {
     if (currentClassIndex > 0) {
       const newIndex = currentClassIndex - 1;
       setCurrentClassIndex(newIndex);
-      fetchClassesAndMenus(newIndex); // Carga la clase anterior
+      fetchClassesAndMenus(newIndex);
     }
   };
 
@@ -95,35 +95,30 @@ export default function UserMenuTask({ route, navigation }) {
     if (currentClassIndex < classNames.length - 1) {
       const newIndex = currentClassIndex + 1;
       setCurrentClassIndex(newIndex);
-      fetchClassesAndMenus(newIndex); // Carga la siguiente clase
+      fetchClassesAndMenus(newIndex);
     }
   };
 
-  // Función para actualizar el contador en la base de datos
   const handleCounterChange = async (menuKey, change) => {
-    // Actualizamos el contador en el estado local
     const updatedMenus = classData.menus.map(([key, menuData]) => {
       if (key === menuKey) {
         const updatedMenuData = [...menuData];
-        updatedMenuData[2] = updatedMenuData[2] + change; // Cambia el contador
-        return [key, updatedMenuData]; // Retorna el menú actualizado
+        updatedMenuData[2] = updatedMenuData[2] + change;
+        return [key, updatedMenuData];
       }
-      return [key, menuData]; // Si no es el menú actual, no lo modificamos
+      return [key, menuData];
     });
 
     setClassData({ ...classData, menus: updatedMenus });
 
-    // Ahora actualizamos el contador en la base de datos, sin borrar los valores de imagen y descripción
     const taskDocRef = doc(db, 'Tareas', idTarea);
-    
-    try {
-      // Recuperamos el menú completo (imagen, descripción y contador) para este menú
-      const menuToUpdate = updatedMenus.find(([key]) => key === menuKey);
-      const updatedMenuData = menuToUpdate[1]; // Obtenemos los tres elementos (imagen, descripción, contador)
 
-      // Actualizamos solo el contador en Firestore
+    try {
+      const menuToUpdate = updatedMenus.find(([key]) => key === menuKey);
+      const updatedMenuData = menuToUpdate[1];
+
       await updateDoc(taskDocRef, {
-        [`Clases.${classNames[currentClassIndex]}.${menuKey}`]: updatedMenuData, // Mantenemos los otros dos valores intactos
+        [`Clases.${classNames[currentClassIndex]}.${menuKey}`]: updatedMenuData,
       });
     } catch (error) {
       console.error('Error actualizando el contador en la base de datos:', error);
@@ -133,28 +128,27 @@ export default function UserMenuTask({ route, navigation }) {
   const renderMenuItem = ({ item }) => {
     const [menuKey, menuData] = item;
 
-    // Utiliza el mapa para cargar las imágenes
-    const imageSource = imageMap[menuKey] || require('../../images/Menu.png'); // Imagen por defecto
+    const imageSource = imageMap[menuKey] || require('../../images/Menu.png');
 
     return (
       <View style={styles.menuItem}>
         <Image
-          source={imageSource} // Usamos la fuente del mapa de imágenes
+          source={imageSource}
           style={styles.menuImage}
-          resizeMode="contain" // Ajuste de la imagen
+          resizeMode="contain"
         />
         <Text style={styles.menuDescription}>{menuData[1]}</Text>
         <View style={styles.counterContainer}>
           <TouchableOpacity
             style={styles.counterButton}
-            onPress={() => handleCounterChange(menuKey, -1)} // Decrementa el contador
+            onPress={() => handleCounterChange(menuKey, -1)}
           >
             <Text style={styles.counterText}>-</Text>
           </TouchableOpacity>
           <Text style={styles.counterValue}>{menuData[2]}</Text>
           <TouchableOpacity
             style={styles.counterButton}
-            onPress={() => handleCounterChange(menuKey, 1)} // Incrementa el contador
+            onPress={() => handleCounterChange(menuKey, 1)}
           >
             <Text style={styles.counterText}>+</Text>
           </TouchableOpacity>
@@ -167,28 +161,34 @@ export default function UserMenuTask({ route, navigation }) {
     <View style={styles.container}>
       <Text style={styles.title}>{classData ? classData.className : 'Clase no encontrada'}</Text>
 
-      <FlatList
-        data={classData ? classData.menus : []}
-        keyExtractor={(item) => item[0]}
-        renderItem={renderMenuItem}
-        style={styles.menuList}
-      />
-
-      <View style={styles.navigationButtons}>
-        <TouchableOpacity onPress={handlePreviousClass} disabled={currentClassIndex === 0}>
+      <View style={styles.mainContent}>
+        <TouchableOpacity
+          style={styles.arrowLeft}
+          onPress={handlePreviousClass}
+          disabled={currentClassIndex === 0}
+        >
           <Icon
             name="arrow-back-circle"
-            size={50}
+            size={largeScale(70)}
             color={currentClassIndex === 0 ? '#ccc' : '#1565C0'}
           />
         </TouchableOpacity>
+
+        <FlatList
+          data={classData ? classData.menus : []}
+          keyExtractor={(item) => item[0]}
+          renderItem={renderMenuItem}
+          style={styles.menuList}
+        />
+
         <TouchableOpacity
+          style={styles.arrowRight}
           onPress={handleNextClass}
           disabled={currentClassIndex === classNames.length - 1}
         >
           <Icon
             name="arrow-forward-circle"
-            size={50}
+            size={largeScale(70)}
             color={currentClassIndex === classNames.length - 1 ? '#ccc' : '#1565C0'}
           />
         </TouchableOpacity>
@@ -201,31 +201,34 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#D9EFFF',
-    padding: scale(15), // Reducido para asegurar que todo encaje bien
+    padding: scale(15),
   },
   title: {
-    fontSize: largeScale(30), // Ajustar el tamaño de la fuente
+    fontSize: largeScale(30),
     fontWeight: 'bold',
     color: '#424242',
-    marginTop: largeScale(20),
+    marginBottom: scale(20),
     textAlign: 'center',
   },
   buttonExit: {
-    position: 'absolute',
-    top: largeScale(20),
-    right: largeScale(20),
+    marginRight: scale(10),
+    paddingVertical: scale(5),
+    paddingHorizontal: scale(10),
     backgroundColor: 'red',
-    padding: largeScale(10),
-    borderWidth: 1,
-    width: '30%',
-    height: '60%',
+    borderRadius: scale(5),
   },
   buttonExitText: {
     color: '#fff',
-    fontSize: scale(12), // Fuente más pequeña
+    fontSize: scale(14),
+    fontWeight: 'bold',
+  },
+  mainContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   menuList: {
     flex: 1,
+    marginHorizontal: scale(10),
   },
   menuItem: {
     flexDirection: 'row',
@@ -238,13 +241,13 @@ const styles = StyleSheet.create({
     borderColor: '#1565C0',
   },
   menuImage: {
-    width: scale(50), // Imagen más pequeña
+    width: scale(50),
     height: scale(50),
   },
   menuDescription: {
     flex: 1,
     marginLeft: scale(10),
-    fontSize: scale(14), // Fuente más pequeña para mejor ajuste
+    fontSize: scale(14),
     color: '#424242',
   },
   counterContainer: {
@@ -259,17 +262,18 @@ const styles = StyleSheet.create({
     borderColor: '#1565C0',
   },
   counterText: {
-    fontSize: scale(16), // Fuente ajustada
+    fontSize: scale(16),
     color: '#424242',
   },
   counterValue: {
-    fontSize: scale(16), // Fuente ajustada
+    fontSize: scale(16),
     marginHorizontal: scale(10),
     color: '#424242',
   },
-  navigationButtons: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginVertical: scale(20),
+  arrowLeft: {
+    marginRight: scale(10),
+  },
+  arrowRight: {
+    marginLeft: scale(10),
   },
 });

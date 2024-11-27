@@ -87,7 +87,7 @@ export default function HomeScreen({ navigation}) {
       </TouchableOpacity>
 
       <TouchableOpacity
-        style={styles.ExtraButton3} onPress={() => navigation.navigate('UserMenuTask', { idTarea: 'SFnTVzHxoAtyT1kPIgxJ' })}>
+        style={styles.ExtraButton3} onPress={() => navigation.navigate('UserMenuTask', { idTarea: 'kyPBZo38maFbjVwcWupy' })}>
        <Text style={styles.buttonText}>Pantalla Menus</Text>
      </TouchableOpacity>
     </View>
