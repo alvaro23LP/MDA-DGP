@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, CheckBox } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, CheckBox, Switch } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { getFirestore, collection, addDoc } from 'firebase/firestore';
 import { initializeApp } from 'firebase/app';
@@ -128,7 +128,7 @@ const TaskMenu = () => {
         {Object.keys(selectedClasses).map((className) => (
           <View key={className} style={styles.classContainer}>
             <Text style={styles.classText}>{className}</Text>
-            <CheckBox
+            <Switch
               value={selectedClasses[className]}
               onValueChange={() => handleCheckBoxChange(className)}
             />
