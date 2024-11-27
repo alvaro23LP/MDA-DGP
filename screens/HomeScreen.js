@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, Image, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Image,button, ScrollView } from 'react-native';
 import { getFirestore, collection, getDocs } from 'firebase/firestore';
 import { initializeApp } from 'firebase/app';
 import { firebaseConfig } from '../services/firebaseConfig';
@@ -46,6 +46,10 @@ export default function HomeScreen({ navigation}) {
     navigation.navigate('LoginPage');
   };
 
+  const handleExtra = (id) => () => {
+    navigation.navigate('Recoger Material', { studentId: id });
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.selectUserText}>Elige tu usuario</Text>
@@ -72,6 +76,16 @@ export default function HomeScreen({ navigation}) {
 
       <TouchableOpacity style={styles.loginButton} onPress={handleAdminLogin}>
         <Text style={styles.buttonText}>Iniciar Sesión Administrador/Profesor</Text>
+      </TouchableOpacity>
+
+      
+
+      <TouchableOpacity   style={styles.ExtraButton2} onPress={() => navigation.navigate('ShowFotocopia', { idAlumno: 'valorIdAlumno', idTarea: 'ykR7kuaIs1ps8aj5o03f' })}>
+        <Text style={styles.buttonText}>PantallaTareaFotocopias</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity style={styles.ExtraButton} onPress={handleExtra('HzvSSyDOgYzhvWrdc6Y6')}>
+        <Text style={styles.buttonText}>Pantalla Recogida Material Alumnos</Text>
       </TouchableOpacity>
     </View>
   );
@@ -134,4 +148,26 @@ const styles = StyleSheet.create({
     textShadowOffset: { width: 1, height: 1 }, 
     textShadowRadius: 3, 
   },
+
+  ExtraButton: {
+    position: 'absolute',
+    top: 15,
+    left: 15,
+    backgroundColor: '#1565C0',
+    textShadowColor: '#000',
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 5,
+  },
+
+  ExtraButton2: {
+    position: 'absolute',
+    top: 70,
+    left: 15,
+    backgroundColor: '#1565C0',
+    textShadowColor: '#000',
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 5,
+  },
 });

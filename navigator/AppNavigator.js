@@ -1,5 +1,4 @@
 // navigator/AppNavigator.js
-import React, { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
@@ -10,19 +9,23 @@ import LoadingScreen from '../screens/LoadingScreen';
 
 //Pantallas de estudiantes
 import UserScreen from '../screens/students/UserMainScreen';
+import ShowFotocopia from '../screens/students/ShowFotocopia';
 
 // Pantallas de profesores
 import LoginPage from '../screens/teachers/LoginPageTeachers';
 import TeachersMainScreen from '../screens/teachers/teachersMainScreen';
-import TaskManagement from '../screens/teachers/taskManagement/taskManagement';
 import UsersManagement from '../screens/teachers/userManagement/UsersManagement';
 import EditUser from '../screens/teachers/userManagement/EditUser';
 import AddUser from '../screens/teachers/userManagement/AddUser';
+import TaskFotocopias from '../screens/teachers/taskManagement/taskFotocopias';
+
+import MaterialTaskTeacher from '../screens/teachers/taskManagement/MaterialTaskTeacher';
+import UserMaterialTask from '../screens/students/UserMaterialTask';
+import ShowTasks from '../screens/teachers/taskManagement/ShowTasks';
+import EditTask from '../screens/teachers/taskManagement/EditTask';
+import AddTask from '../screens/teachers/taskManagement/AddTask';
 
 const Stack = createStackNavigator();
-
-
-
 
 export default function AppNavigator({ isLoading}) {
 
@@ -41,7 +44,6 @@ export default function AppNavigator({ isLoading}) {
           //options={{ headerShown: false }}
         />
 
-
         {/* Pantallas de profesores */}
         <Stack.Screen
           name="LoginPage"
@@ -55,9 +57,9 @@ export default function AppNavigator({ isLoading}) {
          options={{ headerLeft: () => null }}
         />
 
-        <Stack.Screen
-          name="TaskManagement"
-          component={TaskManagement}
+        <Stack.Screen 
+          name="MaterialTaskTeacher" 
+          component={MaterialTaskTeacher} 
         />
 
         <Stack.Screen
@@ -75,6 +77,21 @@ export default function AppNavigator({ isLoading}) {
           component={AddUser}
         />
 
+        <Stack.Screen
+          name="TaskFotocopias"
+          component={TaskFotocopias}
+        />
+
+        <Stack.Screen
+          name="EditTask"
+          component={EditTask}
+        />
+
+        <Stack.Screen
+          name="AddTask"
+          component={AddTask}
+        />
+
 
 
        {/* Pantallas de estudiantes */}
@@ -87,6 +104,24 @@ export default function AppNavigator({ isLoading}) {
             name="UserScreen"
             component={UserScreen}
         />
+
+        <Stack.Screen
+          name="Recoger Material"
+          component={UserMaterialTask}
+        />
+
+        <Stack.Screen
+          name="ShowTasks"
+          component={ShowTasks}
+        />
+
+        <Stack.Screen
+          name="ShowFotocopia"
+          component={ShowFotocopia}
+        />
+
+
+
 
       </Stack.Navigator>
     </NavigationContainer>

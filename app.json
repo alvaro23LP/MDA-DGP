@@ -4,7 +4,6 @@
     "slug": "SyncMind",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.pngSS",
     "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/splash.png",
