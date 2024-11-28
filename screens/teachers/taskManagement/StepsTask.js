@@ -74,15 +74,15 @@ export default function StepsTask({ navigation }) {
         setStepImage('');
     };
 
-    useEffect(() => {
-        console.log('Cambia stepNumber:', stepNumber);
-    }, [stepNumber]);
+    // useEffect(() => {
+    //     console.log('Cambia stepNumber:', stepNumber);
+    // }, [stepNumber]);
 
-    useEffect(() => {
-        console.log('Cambia currentStepNumber:', currentStepNumber);
-    }, [currentStepNumber]);
+    // useEffect(() => {
+    //     console.log('Cambia currentStepNumber:', currentStepNumber);
+    // }, [currentStepNumber]);
 
-    const saveTask = async () => {
+    const saveTaskInDB = async () => {
         if (stepMap.size === 0) {
             console.log('Introduce al menos un paso para guardar la tarea.');
             return;
@@ -103,13 +103,24 @@ export default function StepsTask({ navigation }) {
         };
 
         try {
-            await addDoc(collection(db, 'Tareas'), taskData);
+            const docRef = await addDoc(collection(db, 'Tareas'), taskData);
             console.log('Tarea guardada correctamente');
-            navigation.navigate('ShowTasks');
+            return docRef;            
         } catch (error) {
             console.error('Error al guardar la tarea:', error);
         }
     };
+
+    const createAndAssignTask = async () => {
+        const docRef = await saveTaskInDB();
+        navigation.navigate('TaskAssignment', { taskId: docRef.id });
+    };
+
+    const createTask = async () => {
+        await saveTaskInDB();
+        navigation.navigate('ShowTasks');
+    };
+
 
     const showPreviousStep = () => {
         if (currentStepNumber > 1) {
@@ -186,11 +197,11 @@ export default function StepsTask({ navigation }) {
                     </TouchableOpacity>
                 </View>
 
-                <TouchableOpacity style={styles.button} onPress={saveTask}>
+                <TouchableOpacity style={styles.button} onPress={createAndAssignTask}>
                     <Text style={styles.textButton}>Crear y asignar</Text>
                 </TouchableOpacity>
                 <View style={styles.buttonContainer2}>
-                    <TouchableOpacity style={styles.button} onPress={saveTask}>
+                    <TouchableOpacity style={styles.button} onPress={createTask}>
                         <Text style={styles.textButton}>Crear tarea</Text>
                     </TouchableOpacity>
                 </View>

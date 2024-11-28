@@ -81,6 +81,7 @@ const TaskMenu = () => {
       };
     });
 
+
     try {
       const docRef = await createTaskInCollection(taskData);
       return docRef;
@@ -92,7 +93,7 @@ const TaskMenu = () => {
   
 
   const createAndAssignTask = async () => {
-    const docRef = saveTaskInDB();
+    const docRef = await saveTaskInDB();
     navigation.navigate('TaskAssignment', { taskId: docRef.id });
   };
 
