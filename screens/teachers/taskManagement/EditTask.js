@@ -21,7 +21,7 @@ export default function StepsTask({route, navigation }) {
     useEffect(() => {
         // Configura las opciones del encabezado
         navigation.setOptions({
-            title: 'Crear Tarea de Pasos',
+            title: 'Editar Tarea por Pasos',
             headerStyle: { backgroundColor: '#1565C0', height: scale(50) },
             headerTintColor: '#fff', // Color del texto
             headerTitleStyle: { fontWeight: 'bold', fontSize: scale(20) },
@@ -180,7 +180,7 @@ export default function StepsTask({route, navigation }) {
 
             <View style={styles.buttonContainer}>
                 <View style={styles.arrowButtonContainer}>
-                    <TouchableOpacity
+                    {/* <TouchableOpacity
                         style={styles.arrowLeft}
                         onPress={showPreviousStep}
                         disabled={currentStepNumber === 1}
@@ -190,31 +190,27 @@ export default function StepsTask({route, navigation }) {
                             size={scale(50)}
                             color={currentStepNumber === 1 ? '#ccc' : '#1565C0'}
                         />
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
                     {currentStepNumber < stepMap ? (
-               <View style={styles.buttonContainer2}>
-               <TouchableOpacity style={styles.button} onPress={editStep}>
-                   <Text style={styles.textButton}>Siguiente paso</Text>
-               </TouchableOpacity>
-           </View>
-                ) : (
-                    <View style={styles.buttonContainer2}>
-                    <TouchableOpacity style={styles.button} onPress={saveTask}>
-                        <Text style={styles.textButton}>Confirmar edición</Text>
-                    </TouchableOpacity>
-                </View>
-                )}
-                    <TouchableOpacity
+                        <TouchableOpacity style={styles.button2} onPress={editStep}>
+                            <Text style={styles.textButton}>Siguiente paso</Text>
+                        </TouchableOpacity>
+                    ) : (
+                        <TouchableOpacity style={styles.button2} onPress={saveTask}>
+                            <Text style={styles.textButton}>Confirmar edición</Text>
+                        </TouchableOpacity>
+                    )}
+                    {/* <TouchableOpacity
                         style={styles.arrowRight}
                         onPress={showNextStep}
-                        disabled={currentStepNumber === stepNumber}
+                        disabled={currentStepNumber === stepMap.size}
                     >
                         <Icon
                             name="arrow-forward-circle"
                             size={scale(50)}
-                            color={currentStepNumber === stepNumber ? '#ccc' : '#1565C0'}
+                            color={currentStepNumber === stepMap.size ? '#ccc' : '#1565C0'}
                         />
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
                 </View>
 
             </View>
@@ -266,10 +262,21 @@ const styles = StyleSheet.create({
         borderStyle: 'solid',
         borderWidth: 3,
         borderRadius: 30,
-        marginTop: 50,
         backgroundColor: '#FEF28A',
         borderColor: '#424242',
         width: '55%',
+    },
+    button2: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 13,
+        margin: 10,
+        borderStyle: 'solid',
+        borderWidth: 3,
+        borderRadius: 30,
+        backgroundColor: '#FEF28A',
+        borderColor: '#424242',
+        width: '40%',
     },
     textButton: {
         fontSize: scale(15),
@@ -288,10 +295,10 @@ const styles = StyleSheet.create({
     },
     arrowButtonContainer: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
+        // justifyContent: 'space-between',
+        justifyContent: 'center',
         alignItems: 'center',
         width: '100%',
-        marginRight: 100,
         backgroundColor: '#D9EFFF',
     },
 });

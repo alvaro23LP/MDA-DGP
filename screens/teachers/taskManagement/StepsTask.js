@@ -21,7 +21,7 @@ export default function StepsTask({ navigation }) {
     useEffect(() => {
         // Configura las opciones del encabezado
         navigation.setOptions({
-            title: 'Crear Tarea de Pasos',
+            title: 'Crear Tarea por Pasos',
             headerStyle: { backgroundColor: '#1565C0', height: scale(50) },
             headerTintColor: '#fff', // Color del texto
             headerTitleStyle: { fontWeight: 'bold', fontSize: scale(20) },
