@@ -12,6 +12,7 @@ import UserScreen from '../screens/students/UserMainScreen';
 import ShowFotocopia from '../screens/students/ShowFotocopia';
 import UserMaterialTask from '../screens/students/UserMaterialTask';
 import UserMenuTask from '../screens/students/UserMenuTask';
+import UserStepsTask from '../screens/students/UserStepsTask';
 
 // Pantallas de profesores
 import LoginPage from '../screens/teachers/LoginPageTeachers';
@@ -26,6 +27,7 @@ import AddTask from '../screens/teachers/taskManagement/AddTask';
 import TaskAssignment from '../screens/teachers/taskManagement/taskAssignment';
 import TaskMenu from '../screens/teachers/taskManagement/taskMenu';
 import MaterialTaskTeacher from '../screens/teachers/taskManagement/MaterialTaskTeacher';
+import StepsTask from '../screens/teachers/taskManagement/StepsTask';
 
 //import TaskFotocopias from '../screens/teachers/taskManagement/taskFotocopias';
 
@@ -65,6 +67,11 @@ export default function AppNavigator({ isLoading}) {
         <Stack.Screen 
           name="MaterialTaskTeacher" 
           component={MaterialTaskTeacher} 
+        />
+
+        <Stack.Screen 
+          name="StepsTask" 
+          component={StepsTask} 
         />
 
         <Stack.Screen
@@ -129,6 +136,11 @@ export default function AppNavigator({ isLoading}) {
         <Stack.Screen
           name="Recoger Material"
           component={UserMaterialTask}
+        />
+
+        <Stack.Screen
+          name="UserStepsTask"
+          component={UserStepsTask}
         />
 
         <Stack.Screen

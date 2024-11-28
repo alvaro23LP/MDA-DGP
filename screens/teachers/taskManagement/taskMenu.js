@@ -57,7 +57,7 @@ const TaskMenu = () => {
     }
   };
 
-  const createAndAssignTask = async () => {
+  const saveTaskInDB = async () => {
     const selected = Object.keys(selectedClasses).filter((key) => selectedClasses[key]);
     if (selected.length === 0) {
       alert('Por favor, selecciona al menos una clase.');
@@ -83,42 +83,22 @@ const TaskMenu = () => {
 
     try {
       const docRef = await createTaskInCollection(taskData);
-      navigation.navigate('TaskAssignment', { taskId: docRef.id });
+      return docRef;
     } catch (error) {
       alert(error.message);
     }
   };
 
+  
+
+  const createAndAssignTask = async () => {
+    const docRef = saveTaskInDB();
+    navigation.navigate('TaskAssignment', { taskId: docRef.id });
+  };
+
   const createTask = async () => {
-    const selected = Object.keys(selectedClasses).filter((key) => selectedClasses[key]);
-    if (selected.length === 0) {
-      alert('Por favor, selecciona al menos una clase.');
-      return;
-    }
-
-    const taskData = {
-      tipoTarea: 'Tarea Menu',
-      titulo: 'Solicitar la comanda del menú del día',
-      Clases: {},
-    };
-
-    selected.forEach((className) => {
-      taskData.Clases[className] = {
-        Menu1: ['../../../images/Menu.png', 'Menu', 0],
-        Menu2: ['../../../images/NoCarne.png', 'Sin Carne', 0],
-        Menu3: ['../../../images/Triturado.png', 'Triturado', 0],
-        Menu4: ['../../../images/FrutaTriturada.png', 'Fruta Triturada', 0],
-        Menu5: ['../../../images/yogur_natillas.png', 'Yogur Natillas', 0],
-        Menu6: ['../../../images/Fruta.png', 'Fruta', 0],
-      };
-    });
-
-    try {
-      await createTaskInCollection(taskData);
-      alert('Tarea creada exitosamente.');
-    } catch (error) {
-      alert(error.message);
-    }
+    saveTaskInDB();
+    navigation.navigate('ShowTasks');
   };
 
   return (

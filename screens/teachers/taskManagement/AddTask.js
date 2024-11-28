@@ -36,7 +36,7 @@ export default function TaskManagement({navigation})
         <View style={{backgroundColor:'#D9EFFF', flex:1 }}>
             <View style={styles.container}>
 
-                <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('no olvides añadirlo en AppNavigator.js')}>
+                <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('StepsTask')}>
                     <Text style={styles.textButton}> Tarea por pasos </Text>
                 </TouchableOpacity>
 
