@@ -52,13 +52,16 @@ export default function MaterialTaskTeacher({navigation}) {
             const newMaterialsMap = new Map(materialsMap);
             newMaterialsMap.set(selectedMaterial, { quantity: parseInt(quantity), descripcion });
             setMaterialsMap(newMaterialsMap);
+            setSelectedMaterial('');
+            setQuantity('');
+            setDescripcion('');
             console.log('Materials Map:', newMaterialsMap);
         } else {
             console.log('Por favor, complete todos los campos antes de añadir el material.');
         }
     };
 
-    const saveTask = async () => {
+    const saveTaskInDB = async () => {
         if (materialsMap.size === 0) {
             console.log('No hay materiales para guardar.');
             return;
@@ -79,11 +82,24 @@ export default function MaterialTaskTeacher({navigation}) {
         };
 
         try {
-            await addDoc(collection(db, 'Tareas'), taskData);
+            const docRef = await addDoc(collection(db, 'Tareas'), taskData);
             console.log('Tarea guardada correctamente');
+            return docRef;
         } catch (error) {
             console.error('Error al guardar la tarea:', error);
         }
+
+        
+    };
+
+    const createAndAssignTask = async () => {
+        const docRef = await saveTaskInDB();
+        navigation.navigate('TaskAssignment', { taskId: docRef.id });
+    };
+
+    const createTask = async () => {
+        await saveTaskInDB();
+        navigation.navigate('ShowTasks');
     };
 
     return(
@@ -122,11 +138,11 @@ export default function MaterialTaskTeacher({navigation}) {
                 <TouchableOpacity style={styles.button} onPress={addMaterial}>
                     <Text style={styles.textButton}>Añadir Material</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.button} onPress={saveTask}>
+                <TouchableOpacity style={styles.button} onPress={createAndAssignTask}>
                     <Text style={styles.textButton}>Crear y asignar</Text>
                 </TouchableOpacity>
                 <View style={styles.buttonContainer2}>
-                    <TouchableOpacity style={styles.button} onPress={saveTask}>
+                    <TouchableOpacity style={styles.button} onPress={createTask}>
                         <Text style={styles.textButton}>Crear tarea</Text>
                     </TouchableOpacity>
                 </View>

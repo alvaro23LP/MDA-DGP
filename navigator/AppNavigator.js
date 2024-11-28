@@ -28,8 +28,7 @@ import TaskAssignment from '../screens/teachers/taskManagement/taskAssignment';
 import TaskMenu from '../screens/teachers/taskManagement/taskMenu';
 import MaterialTaskTeacher from '../screens/teachers/taskManagement/MaterialTaskTeacher';
 import StepsTask from '../screens/teachers/taskManagement/StepsTask';
-
-//import TaskFotocopias from '../screens/teachers/taskManagement/taskFotocopias';
+import TaskFotocopias from '../screens/teachers/taskManagement/taskFotocopias';
 
 
 const Stack = createStackNavigator();
@@ -72,6 +71,11 @@ export default function AppNavigator({ isLoading}) {
         <Stack.Screen 
           name="StepsTask" 
           component={StepsTask} 
+        />
+
+        <Stack.Screen
+          name="TaskFotocopias"
+          component={TaskFotocopias}
         />
 
         <Stack.Screen

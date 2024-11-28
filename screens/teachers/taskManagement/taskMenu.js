@@ -47,16 +47,6 @@ const TaskMenu = () => {
     }));
   };
 
-  const createTaskInCollection = async (taskData) => {
-    try {
-      const docRef = await addDoc(collection(db, 'Tareas'), taskData); // Siempre usa 'Tareas'
-      return docRef;
-    } catch (error) {
-      console.error('Error creando la tarea:', error);
-      throw new Error('Ocurrió un error al crear la tarea.');
-    }
-  };
-
   const saveTaskInDB = async () => {
     const selected = Object.keys(selectedClasses).filter((key) => selectedClasses[key]);
     if (selected.length === 0) {
@@ -81,23 +71,25 @@ const TaskMenu = () => {
       };
     });
 
+
     try {
-      const docRef = await createTaskInCollection(taskData);
+      const docRef = await addDoc(collection(db, 'Tareas'), taskData);
+      console.log('Tarea guardada correctamente');
       return docRef;
     } catch (error) {
-      alert(error.message);
+      console.error('Error al guardar la tarea:', error);
     }
   };
 
-  
+
 
   const createAndAssignTask = async () => {
-    const docRef = saveTaskInDB();
+    const docRef = await saveTaskInDB();
     navigation.navigate('TaskAssignment', { taskId: docRef.id });
   };
 
   const createTask = async () => {
-    saveTaskInDB();
+    await saveTaskInDB();
     navigation.navigate('ShowTasks');
   };
 
