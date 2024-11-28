@@ -99,7 +99,9 @@ export default function HomeScreen({ navigation}) {
         <Text style={styles.buttonText}>Pantalla Menus</Text>
       </TouchableOpacity>
       
-      <TouchableOpacity style={styles.ExtraButton4} onPress={() => navigation.navigate('UserStepsTask', { idAlumno: 'valorIdAlumno', idTarea: 'OReKtR3EGKxb8oWSBKwc' })}>
+
+      {/* estudiante PruebaDavid y tarea por pasos */}
+      <TouchableOpacity style={styles.ExtraButton4} onPress={() => navigation.navigate('UserStepsTask', { idAlumno: 'JNPHNDw2nCF9vbqVdcEN', idTarea: 'OReKtR3EGKxb8oWSBKwc' })}> 
         <Text style={styles.buttonText}>Pantalla Tarea por pasos</Text>
       </TouchableOpacity>
 

@@ -33,7 +33,7 @@ export default function UserMenuTask({ route, navigation }) {
 
   useEffect(() => {
     navigation.setOptions({
-      title: 'Menu',
+      title: '      Menu',
       headerStyle: { backgroundColor: '#1565C0', height: scale(70) },
       headerTintColor: '#fff',
       headerTitleStyle: { fontWeight: 'bold', fontSize: scale(20) },
@@ -207,7 +207,7 @@ const styles = StyleSheet.create({
     fontSize: largeScale(30),
     fontWeight: 'bold',
     color: '#424242',
-    marginBottom: scale(20),
+    marginBottom: scale(10),
     textAlign: 'center',
   },
   buttonExit: {
@@ -234,7 +234,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     padding: scale(10),
-    marginBottom: scale(10),
+    marginBottom: scale(4),
     backgroundColor: '#fff',
     borderRadius: scale(10),
     borderWidth: 2,
