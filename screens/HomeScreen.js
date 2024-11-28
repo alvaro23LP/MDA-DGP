@@ -38,6 +38,11 @@ export default function HomeScreen({ navigation}) {
     fetchStudents();
   }, [navigation]);
 
+  // mostrar contenido de la lista de estudiantes
+  // useEffect(() => {
+  //   console.log(students);
+  // }, [students]);
+
   const handleStudentLogin = (studentId) => {
     navigation.navigate('LoginUser', { studentId });
   };
@@ -61,14 +66,17 @@ export default function HomeScreen({ navigation}) {
               style={styles.userIcon}
               onPress={() => handleStudentLogin(student.id)}
             >
-              <Image 
-                source={
-                  student.fotoAvatar && typeof student.fotoAvatar === 'string'
-                    ? { uri: student.fotoAvatar }
-                    : require('../images/avatar_1.png')
-                }
-                style={styles.userImage}
-              />
+              <View style={styles.userIconContent}>
+                <Image
+                  source={
+                    student.fotoAvatar && typeof student.fotoAvatar === 'string'
+                      ? { uri: student.fotoAvatar }
+                      : require('../images/avatar_1.png')
+                  }
+                  style={styles.userImage}
+                />
+                <Text style={styles.userName}>{student.nombre}</Text>
+              </View>
 
             </TouchableOpacity>
           ))}
@@ -77,9 +85,9 @@ export default function HomeScreen({ navigation}) {
       <TouchableOpacity style={styles.loginButton} onPress={handleAdminLogin}>
         <Text style={styles.buttonText}>Iniciar Sesión Administrador/Profesor</Text>
       </TouchableOpacity>
-      
-      <TouchableOpacity   style={styles.ExtraButton2} onPress={() => navigation.navigate('ShowFotocopia', { idAlumno: 'valorIdAlumno', idTarea: 'ykR7kuaIs1ps8aj5o03f' })}>
-        <Text style={styles.buttonText}>PantallaTareaFotocopias</Text>
+
+      <TouchableOpacity style={styles.ExtraButton2} onPress={() => navigation.navigate('ShowFotocopia', { idAlumno: 'valorIdAlumno', idTarea: 'ykR7kuaIs1ps8aj5o03f' })}>
+        <Text style={styles.buttonText}>Pantalla Tarea Fotocopias</Text>
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.ExtraButton} onPress={handleExtra('HzvSSyDOgYzhvWrdc6Y6')}>
@@ -88,8 +96,13 @@ export default function HomeScreen({ navigation}) {
 
       <TouchableOpacity
         style={styles.ExtraButton3} onPress={() => navigation.navigate('UserMenuTask', { idTarea: 'kyPBZo38maFbjVwcWupy' })}>
-       <Text style={styles.buttonText}>Pantalla Menus</Text>
-     </TouchableOpacity>
+        <Text style={styles.buttonText}>Pantalla Menus</Text>
+      </TouchableOpacity>
+      
+      <TouchableOpacity style={styles.ExtraButton4} onPress={() => navigation.navigate('UserStepsTask', { idAlumno: 'valorIdAlumno', idTarea: 'OReKtR3EGKxb8oWSBKwc' })}>
+        <Text style={styles.buttonText}>Pantalla Tarea por pasos</Text>
+      </TouchableOpacity>
+
     </View>
   );
 }
@@ -120,10 +133,14 @@ const styles = StyleSheet.create({
   },
   userIcon: {
     width: 100,
-    height: 100,
+    height: 130,
     backgroundColor: '#D3D3D3',
     borderRadius: 15,
     margin: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  userIconContent: {
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -131,6 +148,8 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 10,
+    borderColor: '#aaa',
+    borderWidth: 2,
   },
   loginButton: {
     position: 'absolute',
@@ -176,7 +195,18 @@ const styles = StyleSheet.create({
 
   ExtraButton3: {
     position: 'absolute',
-    top: 130,
+    top: 125,
+    left: 15,
+    backgroundColor: '#1565C0',
+    textShadowColor: '#000',
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 5,
+  },
+
+  ExtraButton4: {
+    position: 'absolute',
+    top: 180,
     left: 15,
     backgroundColor: '#1565C0',
     textShadowColor: '#000',
