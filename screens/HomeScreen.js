@@ -77,9 +77,7 @@ export default function HomeScreen({ navigation}) {
       <TouchableOpacity style={styles.loginButton} onPress={handleAdminLogin}>
         <Text style={styles.buttonText}>Iniciar Sesión Administrador/Profesor</Text>
       </TouchableOpacity>
-
       
-
       <TouchableOpacity   style={styles.ExtraButton2} onPress={() => navigation.navigate('ShowFotocopia', { idAlumno: 'valorIdAlumno', idTarea: 'ykR7kuaIs1ps8aj5o03f' })}>
         <Text style={styles.buttonText}>PantallaTareaFotocopias</Text>
       </TouchableOpacity>
@@ -87,6 +85,11 @@ export default function HomeScreen({ navigation}) {
       <TouchableOpacity style={styles.ExtraButton} onPress={handleExtra('HzvSSyDOgYzhvWrdc6Y6')}>
         <Text style={styles.buttonText}>Pantalla Recogida Material Alumnos</Text>
       </TouchableOpacity>
+
+      <TouchableOpacity
+        style={styles.ExtraButton3} onPress={() => navigation.navigate('UserMenuTask', { idTarea: 'kyPBZo38maFbjVwcWupy' })}>
+       <Text style={styles.buttonText}>Pantalla Menus</Text>
+     </TouchableOpacity>
     </View>
   );
 }
@@ -163,6 +166,17 @@ const styles = StyleSheet.create({
   ExtraButton2: {
     position: 'absolute',
     top: 70,
+    left: 15,
+    backgroundColor: '#1565C0',
+    textShadowColor: '#000',
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 5,
+  },
+
+  ExtraButton3: {
+    position: 'absolute',
+    top: 130,
     left: 15,
     backgroundColor: '#1565C0',
     textShadowColor: '#000',

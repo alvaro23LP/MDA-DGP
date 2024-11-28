@@ -10,6 +10,9 @@ import LoadingScreen from '../screens/LoadingScreen';
 //Pantallas de estudiantes
 import UserScreen from '../screens/students/UserMainScreen';
 import ShowFotocopia from '../screens/students/ShowFotocopia';
+import UserMaterialTask from '../screens/students/UserMaterialTask';
+import UserMenuTask from '../screens/students/UserMenuTask';
+import UserStepsTask from '../screens/students/UserStepsTask';
 
 // Pantallas de profesores
 import LoginPage from '../screens/teachers/LoginPageTeachers';
@@ -17,13 +20,17 @@ import TeachersMainScreen from '../screens/teachers/teachersMainScreen';
 import UsersManagement from '../screens/teachers/userManagement/UsersManagement';
 import EditUser from '../screens/teachers/userManagement/EditUser';
 import AddUser from '../screens/teachers/userManagement/AddUser';
-import TaskFotocopias from '../screens/teachers/taskManagement/taskFotocopias';
 
-import MaterialTaskTeacher from '../screens/teachers/taskManagement/MaterialTaskTeacher';
-import UserMaterialTask from '../screens/students/UserMaterialTask';
 import ShowTasks from '../screens/teachers/taskManagement/ShowTasks';
 import EditTask from '../screens/teachers/taskManagement/EditTask';
 import AddTask from '../screens/teachers/taskManagement/AddTask';
+import TaskAssignment from '../screens/teachers/taskManagement/taskAssignment';
+import TaskMenu from '../screens/teachers/taskManagement/taskMenu';
+import MaterialTaskTeacher from '../screens/teachers/taskManagement/MaterialTaskTeacher';
+import StepsTask from '../screens/teachers/taskManagement/StepsTask';
+
+//import TaskFotocopias from '../screens/teachers/taskManagement/taskFotocopias';
+
 
 const Stack = createStackNavigator();
 
@@ -62,6 +69,21 @@ export default function AppNavigator({ isLoading}) {
           component={MaterialTaskTeacher} 
         />
 
+        <Stack.Screen 
+          name="StepsTask" 
+          component={StepsTask} 
+        />
+
+        <Stack.Screen
+          name="TaskAssignment"
+          component={TaskAssignment}
+        />
+
+        <Stack.Screen
+          name="TaskMenu"
+          component={TaskMenu}
+        />
+
         <Stack.Screen
           name="UsersManagement"
           component={UsersManagement}
@@ -77,10 +99,6 @@ export default function AppNavigator({ isLoading}) {
           component={AddUser}
         />
 
-        <Stack.Screen
-          name="TaskFotocopias"
-          component={TaskFotocopias}
-        />
 
         <Stack.Screen
           name="EditTask"
@@ -106,11 +124,6 @@ export default function AppNavigator({ isLoading}) {
         />
 
         <Stack.Screen
-          name="Recoger Material"
-          component={UserMaterialTask}
-        />
-
-        <Stack.Screen
           name="ShowTasks"
           component={ShowTasks}
         />
@@ -120,7 +133,20 @@ export default function AppNavigator({ isLoading}) {
           component={ShowFotocopia}
         />
 
+        <Stack.Screen
+          name="Recoger Material"
+          component={UserMaterialTask}
+        />
 
+        <Stack.Screen
+          name="UserStepsTask"
+          component={UserStepsTask}
+        />
+
+        <Stack.Screen
+          name="UserMenuTask"
+          component={UserMenuTask}
+        />
 
 
       </Stack.Navigator>
