@@ -186,7 +186,7 @@ export default function StepsTask({ navigation }) {
                     </TouchableOpacity>
                 </View>
 
-                <TouchableOpacity style={styles.button} onPress={createAndAssignTask}>
+                <TouchableOpacity style={styles.button} onPress={saveTask}>
                     <Text style={styles.textButton}>Crear y asignar</Text>
                 </TouchableOpacity>
                 <View style={styles.buttonContainer2}>
