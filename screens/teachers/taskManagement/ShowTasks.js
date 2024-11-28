@@ -87,9 +87,11 @@ export default function UsersManagement({ navigation }) {
           <View style={styles.userItem}>
             <Text style={styles.userText}>{item.titulo}</Text>
             <View style={styles.iconContainer}>
-              <TouchableOpacity onPress={() => navigation.navigate('EditTask', { userId: item.id })}>
+            {item.tipoTarea === "Tarea por pasos" && (
+              <TouchableOpacity onPress={() => navigation.navigate('EditTask', { taskId: item.id })}>
                 <Image source={editIcon} style={styles.editIcon} />
               </TouchableOpacity>
+            )}
               <TouchableOpacity onPress={() => handleDeleteTask(item.id)}>
                 <Image source={deleteIcon} style={styles.deleteIcon} />
               </TouchableOpacity>
@@ -120,7 +122,7 @@ const styles = StyleSheet.create({
   },
   addButtonText: {
     color: '#000',
-    fontSize: scale(10),
+    fontSize: scale(16),
     fontWeight: 'bold',
   },
   title: {
@@ -145,7 +147,7 @@ const styles = StyleSheet.create({
   },
   userText: {
     color: '#000',
-    fontSize: scale(10),
+    fontSize: scale(16),
     flex: 1,
   },
   iconContainer: {
