@@ -17,6 +17,7 @@ const scale = (size) => (width < 375 ? size : size * (width / 375));
 const largeScale = (size) => (width > 800 ? size * 1.5 : size);
 
 export default function UserStepsTask({ navigation, route }) {
+  const { studentId, idTarea } = route.params; 
   const [taskData, setTaskData] = useState(null);
   const [currentStep, setCurrentStep] = useState(1);
 
@@ -39,6 +40,7 @@ export default function UserStepsTask({ navigation, route }) {
 
     const fetchTaskData = async (taskId) => {
       try {
+        console.log('Buscando tarea:', taskId);
         const taskDoc = await getDoc(doc(db, 'Tareas', taskId));
         if (taskDoc.exists()) {
           return taskDoc.data();
@@ -53,7 +55,7 @@ export default function UserStepsTask({ navigation, route }) {
     };
 
     const loadTaskData = async () => {
-      const data = await fetchTaskData(route.params.idTarea);
+      const data = await fetchTaskData(idTarea);
       setTaskData(data);
     };
 
@@ -70,7 +72,7 @@ export default function UserStepsTask({ navigation, route }) {
         [
           {
             text: 'OK',
-            onPress: () => navigation.navigate('UserScreen', { studentId: route.params.idAlumno }),
+            onPress: () => navigation.navigate('UserScreen', { studentId: studentId }),
           },
         ],
         { cancelable: false }

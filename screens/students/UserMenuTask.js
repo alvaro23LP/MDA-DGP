@@ -25,7 +25,7 @@ const scale = (size) => (width < 375 ? size : size * (width / 375));
 const largeScale = (size) => (width > 800 ? size * 1.5 : size);
 
 export default function UserMenuTask({ route, navigation }) {
-  const { idTarea } = route.params || {};
+  const { studentId, idTarea } = route.params || {};
 
   const [classData, setClassData] = useState(null);
   const [currentClassIndex, setCurrentClassIndex] = useState(0);

@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Dimensions, Image } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { getFirestore, doc, getDoc, collection, getDocs } from 'firebase/firestore';
+import { getFirestore, doc, getDoc } from 'firebase/firestore';
 import { initializeApp } from 'firebase/app';
 import { firebaseConfig } from '../../services/firebaseConfig';
+import { format, differenceInDays } from 'date-fns';
 
 // Inicializa Firebase
 initializeApp(firebaseConfig);
@@ -44,27 +45,28 @@ export default function UserScreen({ navigation, route }) {
                     // Obtener los datos de la agendaTareas del alumno
                     const tarea = tareasMap[key];
                     const tareaDocRef = tarea.idTarea; 
-                    console.log('tareaDocRef:', tareaDocRef);
+                    const fechaInicio = tarea.fechaInicio.toDate();
+                    const fechaLimite = tarea.fechaLimite.toDate();
+                    const diasRestantes = differenceInDays(fechaLimite, new Date());
+
+                    //console.log('tareaDocRef:', tareaDocRef);
 
                     // Obtener los datos de la tarea
                     const tareaDoc = await getDoc(tareaDocRef);
                     const tareaData = tareaDoc.data();
                     const tareaObj = {
+                        id: tareaDoc.id,
                         ...tarea,
                         titulo: tareaData.titulo,
-                        //descripcion: tareaData.descripcion,
-                        //imagenes: tareaData.imagenes,
-                        fechaInicio: tarea.fechaInicio.toDate().toLocaleDateString(),
-                        fechaLimite: tarea.fechaLimite.toDate().toLocaleDateString(),
-                        //fechaCompletada: tarea.fechaCompletada ? tarea.fechaCompletada.toDate().toLocaleDateString() : null,
-                        //completada: completada,
+                        fechaInicio: format(fechaInicio, 'dd/MM/yyyy'), // Formato específico para la fecha de inicio
+                        fechaLimite: `${format(fechaLimite, 'dd/MM/yyyy')} (${diasRestantes} días restantes)`, // Formato específico para la fecha límite y días restantes
                         tipoTarea: tareaData.tipoTarea,
-                    
                     };
 
                     tareasList.push(tareaObj);
                 }
             }
+            console.log('tareasList:', tareasList);
             setTareas(tareasList);
         };
         fetchPreferences();
@@ -72,21 +74,40 @@ export default function UserScreen({ navigation, route }) {
 
 
     const getImageForTaskType = (tipoTarea) => {
-        switch (tipoTarea) {
-            case 'Recogida de material':
-                return require('../../images/tijeras.png'); // Ruta a la imagen para "Recogida de material"
-            case 'Tarea por pasos':
-                return require('../../images/pasosLogo.png'); // Ruta a la imagen para "Tarea por pasos"
-            case 'Tarea de fotocopias':
-                return require('../../images/plastificar.png'); // Ruta a la imagen para "Tarea de fotocopias"
-            case 'Tarea de menú':
-                return require('../../images/menú.png'); // Ruta a la imagen para "Tarea de menú"
-            default:
-                return require('../../images/user1.png'); // Ruta a una imagen por defecto
+        const preferencia = Array.isArray(preferenciasVista) ? preferenciasVista[0] : preferenciasVista;
+
+        if (preferencia === 'texto') {
+            return null; 
+        } else if (preferencia === 'pictograma') {
+            switch (tipoTarea) {
+                case 'Recogida de material':
+                    return require('../../images/tijeras.png');
+                case 'Tarea por pasos':
+                    return require('../../images/pasosLogo.png'); 
+                case 'Fotocopias':
+                    return require('../../images/plastificar.png'); 
+                case 'Tarea de menú':
+                    return require('../../images/menú.png'); 
+                default:
+                    return require('../../images/user1.png'); 
+            }
+        } else {
+            switch (tipoTarea) {
+                case 'Recogida de material':
+                    return require('../../images/materialReal.jpg');
+                case 'Tarea por pasos':
+                    return require('../../images/pasosLogo.png'); 
+                case 'Fotocopias':
+                    return require('../../images/impresoraReal.jpg'); 
+                case 'Tarea Menu':
+                    return require('../../images/menú.png'); 
+                default:
+                    return require('../../images/user1.png'); 
+            }
         }
     };
 
-    const getNavigationRouteForTaskType = (tipoTarea,tareaId) => {
+    const getNavigationRouteForTaskType = (tipoTarea) => {
         switch (tipoTarea) {
             case 'Recogida de material':
                 return'Recoger Material';
@@ -94,13 +115,14 @@ export default function UserScreen({ navigation, route }) {
                 return 'UserStepsTask';
             case 'Tarea de fotocopias':
                 return 'ShowFotocopia';
-            case 'Tarea de menú':
+            case 'Tarea Menu':
                 return 'UserMenuTask';
             default:
                 return 'Home'; // Ruta por defecto
         }
     };
     const renderTareas = () => {
+        console.log('tareasLARGO:', tareas.length);
         if (tareas.length <= 0) {
             return (
                 <View style={styles.noTareasContainer}>
@@ -115,7 +137,7 @@ export default function UserScreen({ navigation, route }) {
             return tareas.map((tarea, index) => {
                 const navigationRoute = getNavigationRouteForTaskType(tarea.tipoTarea);
                 return (
-                    <TouchableOpacity key={index} style={styles.tareaContainer} onPress={() => navigation.navigate(navigationRoute, { studentId, tareaId: tarea.id })}>
+                    <TouchableOpacity key={index} style={styles.tareaContainer} onPress={() => navigation.navigate(navigationRoute, { studentId: studentId, idTarea: tarea.id })}>
                         <Image
                             source={getImageForTaskType(tarea.tipoTarea)}
                             style={styles.tareaImage}
