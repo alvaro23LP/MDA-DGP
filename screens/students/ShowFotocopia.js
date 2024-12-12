@@ -6,6 +6,7 @@ import {useState, useEffect } from 'react';
 import { getFirestore, getDoc, doc } from 'firebase/firestore';
 import { initializeApp } from 'firebase/app';
 import { firebaseConfig } from '../../services/firebaseConfig';
+import AceptButton from '../../componentes/AceptButton';
 
 const fotocopiaImage = require('../../images/fotocopias/fotocopia.png'); 
 const plastificarImage = require('../../images/fotocopias/plastificar.png');
@@ -110,6 +111,9 @@ export default function ShowFotocopia({navigation,route}){
            
     }, [navigation, idTarea, idAlumno]);
 
+   
+
+
     
 
     const selectedImage = tipo === 'Fotocopia' ? fotocopiaImage : plastificarImage;
@@ -144,16 +148,11 @@ export default function ShowFotocopia({navigation,route}){
                 </View>
 
 
-                <TouchableOpacity style={styles.Button}  onPress={() => navigation.goBack()}>
-                    {prefPictograma &&
-                        <Image source={okImage} style={{width: scale(100), height: scale(100), marginVertical:scale(5)}}/>
-                    }   
-
-                    {prefTexto &&
-                            <Text style={styles.textButton}> Hecho </Text>
-                    }
-
-                </TouchableOpacity>
+                <AceptButton
+                    prefPictograma={prefPictograma}
+                    prefTexto={prefTexto}
+                    navigate={navigation}
+                />
                 
 
             </View>
@@ -233,8 +232,7 @@ const styles = StyleSheet.create({
         borderWidth: 3,
         borderColor: '#424242',
         borderRadius: 10, 
-        alignItems: 'center', 
-        marginTop: scale(15),
+        alignItems: 'center'
         
     },
 
