@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, Image, Alert, Dimensions } from 'react-native';
 import { getFirestore, doc, getDoc } from 'firebase/firestore';
+import Icon from 'react-native-vector-icons/Ionicons';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { getApp } from 'firebase/app';
 
@@ -69,9 +70,19 @@ export default function PasswordUser() {
 
     navigation.setOptions({
       title: 'Selecciona la contraseña',
-      headerStyle: { backgroundColor: '#1565C0', height: 100 },
+      headerStyle: { backgroundColor: '#1565C0', height: scale(70) },
       headerTintColor: '#fff',
-      headerTitleStyle: { fontWeight: 'bold', fontSize: 35 },
+      headerTitleStyle: { fontWeight: 'bold', fontSize: scale(20) },
+      headerTitleAlign: 'center',
+      headerLeft: () => null,
+      headerRight: () => (
+        <TouchableOpacity
+          style={styles.buttonExit}
+          onPress={() => navigation.navigate('Home')}
+        >
+          <Text style={styles.buttonExitText}>Salir</Text>
+        </TouchableOpacity>
+      )
     });
   }, [navigation, studentId]);
 
@@ -106,8 +117,9 @@ export default function PasswordUser() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.selectPasswordText}>Selecciona la contraseña</Text>
+      {/* <Text style={styles.selectPasswordText}>Selecciona la contraseña</Text> */}
       
+
       <View style={styles.fruitContainer}>
         <View style={styles.fruitGrid}>
           {fruitOptions.map((fruit) => (
@@ -139,6 +151,27 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: 20,
+  },
+  buttonExit: { 
+    position: 'absolute',
+    top: largeScale(30),
+    right: largeScale(20),
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'red',
+    padding: largeScale(10),
+    borderColor: 'black',
+    borderWidth: 1,
+    width: '80%',
+    height: '60%',
+  },
+  buttonExitText: {
+    color: '#fff',
+    fontSize: scale(15),
+    fontWeight: 'bold',
+    fontshadowColor: 'black',
+    textShadowOffset: { width: 3, height: 3 },
+    textShadowRadius: 3,
   },
   selectPasswordText: {
     padding: 30,

@@ -41,6 +41,7 @@ export default function UserScreen({ navigation, route }) {
                 const tareasMap = userData.agendaTareas || {};
                 const tareasList = [];
 
+                console.log('tareasMap', tareasMap);
                 //for (const key in tareasMap) {
                 const tareasPromises = Object.keys(tareasMap).map(async (key) => {
                     if (tareasMap.hasOwnProperty(key)) {
@@ -120,7 +121,7 @@ export default function UserScreen({ navigation, route }) {
                 return'Recoger Material';
             case 'Tarea por pasos':
                 return 'UserStepsTask';
-            case 'Tarea de fotocopias':
+            case 'Fotocopias':
                 return 'ShowFotocopia';
             case 'Tarea Menu':
                 return 'UserMenuTask';
@@ -129,22 +130,21 @@ export default function UserScreen({ navigation, route }) {
         }
     };
     const renderTareas = () => {
-        //console.log('tareasLARGO:', tareas.length);
-        if (tareas.length <= 0) {
+        if (tareas.length === 0) {
             return (
                 <View style={styles.noTareasContainer}>
                     <Image
                         source={require('../../images/sí.png')}
                         style={styles.noTareaImage}
                     />
-                    <Text style={styles.noTareasText}>¡¡ Enhorabuena {studentName} !! {"\n"} No hay tareas</Text>;
+                    <Text style={styles.noTareasText}>¡¡ Enhorabuena {studentName} !! {"\n"} No hay tareas</Text>
                 </View>
             );
         } else {
             return tareas.map((tarea, index) => {
                 const navigationRoute = getNavigationRouteForTaskType(tarea.tipoTarea);
                 const preferencia = Array.isArray(preferenciasVista) ? preferenciasVista[0] : preferenciasVista;
-                console.log('preferencia:', preferencia);
+
                 return (
                     <View style={styles.listaTareas}>
                         <TouchableOpacity key={index} style={styles.tareaContainer} onPress={() => navigation.navigate(navigationRoute, { studentId: studentId, idTarea: tarea.id })}>
