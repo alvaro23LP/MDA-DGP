@@ -32,42 +32,49 @@ export default function UserScreen({ navigation, route }) {
     useEffect(() => {
         const fetchPreferences = async () => {
             const userDoc = await getDoc(doc(db, 'Estudiantes', studentId));
-            const userData = userDoc.data();
-            setStudentName(userData.nombre); 
-            setPreferenciasVista(userData.preferenciasVista);
+            if (userDoc.exists()) {
+                const userData = userDoc.data();
+                setStudentName(userData.nombre); 
+                setPreferenciasVista(userData.preferenciasVista);
 
-            // Obtener las tareas del campo agenteTareas
-            const tareasMap = userData.agendaTareas || {};
-            const tareasList = [];
+                // Obtener las tareas del campo agenteTareas
+                const tareasMap = userData.agendaTareas || {};
+                const tareasList = [];
 
-            for (const key in tareasMap) {
-                if (tareasMap.hasOwnProperty(key)) {
-                    // Obtener los datos de la agendaTareas del alumno
-                    const tarea = tareasMap[key];
-                    const tareaDocRef = tarea.idTarea; 
-                    const fechaInicio = tarea.fechaInicio.toDate();
-                    const fechaLimite = tarea.fechaLimite.toDate();
-                    const diasRestantes = differenceInDays(fechaLimite, new Date());
+                //for (const key in tareasMap) {
+                const tareasPromises = Object.keys(tareasMap).map(async (key) => {
+                    if (tareasMap.hasOwnProperty(key)) {
+                        // Obtener los datos de la agendaTareas del alumno
+                        const tarea = tareasMap[key];
+                        const tareaDocRef = tarea.idTarea; 
+                        const fechaInicio = tarea.fechaInicio.toDate();
+                        const fechaLimite = tarea.fechaLimite.toDate();
+                        const diasRestantes = differenceInDays(fechaLimite, new Date());                        
 
-                    //console.log('tareaDocRef:', tareaDocRef);
+                        // Obtener los datos de la tarea
+                        const tareaDoc = await getDoc(tareaDocRef);
+                        if (tareaDoc.exists()) {
+                            const tareaData = tareaDoc.data();
+                            const tareaObj = {
+                                id: tareaDoc.id,
+                                ...tarea,
+                                titulo: tareaData.titulo,
+                                fechaInicio: format(fechaInicio, 'dd/MM/yyyy'), 
+                                fechaLimite: `${format(fechaLimite, 'dd/MM/yyyy')}`, 
+                                restante: `(${diasRestantes} días restantes)`, 
+                                tipoTarea: tareaData.tipoTarea,
+                            };
+                            tareasList.push(tareaObj);
+                        } else {
+                        }
+                    }
+                });
 
-                    // Obtener los datos de la tarea
-                    const tareaDoc = await getDoc(tareaDocRef);
-                    const tareaData = tareaDoc.data();
-                    const tareaObj = {
-                        id: tareaDoc.id,
-                        ...tarea,
-                        titulo: tareaData.titulo,
-                        fechaInicio: format(fechaInicio, 'dd/MM/yyyy'), // Formato específico para la fecha de inicio
-                        fechaLimite: `${format(fechaLimite, 'dd/MM/yyyy')} (${diasRestantes} días restantes)`, // Formato específico para la fecha límite y días restantes
-                        tipoTarea: tareaData.tipoTarea,
-                    };
-
-                    tareasList.push(tareaObj);
-                }
+                await Promise.all(tareasPromises);
+                setTareas(tareasList);
+            } else {
+                console.log('No se encontró el documento del estudiante.');
             }
-            console.log('tareasList:', tareasList);
-            setTareas(tareasList);
         };
         fetchPreferences();
     }, [studentId]);
@@ -122,7 +129,7 @@ export default function UserScreen({ navigation, route }) {
         }
     };
     const renderTareas = () => {
-        console.log('tareasLARGO:', tareas.length);
+        //console.log('tareasLARGO:', tareas.length);
         if (tareas.length <= 0) {
             return (
                 <View style={styles.noTareasContainer}>
@@ -136,18 +143,28 @@ export default function UserScreen({ navigation, route }) {
         } else {
             return tareas.map((tarea, index) => {
                 const navigationRoute = getNavigationRouteForTaskType(tarea.tipoTarea);
+                const preferencia = Array.isArray(preferenciasVista) ? preferenciasVista[0] : preferenciasVista;
+                console.log('preferencia:', preferencia);
                 return (
-                    <TouchableOpacity key={index} style={styles.tareaContainer} onPress={() => navigation.navigate(navigationRoute, { studentId: studentId, idTarea: tarea.id })}>
-                        <Image
-                            source={getImageForTaskType(tarea.tipoTarea)}
-                            style={styles.tareaImage}
-                        />
-                        <View style={styles.tareaTexto}>
-                            <Text style={styles.tareaTitulo}>{tarea.titulo}</Text>
-                            <Text style={styles.tareaFecha}>Inicio: {tarea.fechaInicio}</Text>
-                            <Text style={styles.tareaFecha}>Límite: {tarea.fechaLimite}</Text>
-                        </View>
-                    </TouchableOpacity>
+                    <View style={styles.listaTareas}>
+                        <TouchableOpacity key={index} style={styles.tareaContainer} onPress={() => navigation.navigate(navigationRoute, { studentId: studentId, idTarea: tarea.id })}>
+                            <Image
+                                source={getImageForTaskType(tarea.tipoTarea)}
+                                style={styles.tareaImage}
+                            />
+                            <View style={styles.tareaTexto}>
+                                <Text style={styles.tareaTitulo}>{tarea.titulo}</Text>
+                                {(preferencia === 'Normal' || preferencia === 'texto') ? (
+                                    <>
+                                        <Text style={styles.tareaFecha}>Inicio: {tarea.fechaInicio}</Text>
+                                        <Text style={styles.tareaFecha}>Límite: {tarea.fechaLimite + ' ' + tarea.restante}</Text>
+                                    </>
+                                ) : (
+                                    <Text style={styles.tareaFecha}>{tarea.restante}</Text>
+                                )}
+                            </View>
+                        </TouchableOpacity>
+                    </View>
                 );
             });
 
@@ -203,6 +220,9 @@ const styles = StyleSheet.create({
         borderWidth: 2,
     },
 
+    listaTareas: {
+        paddingBottom: largeScale(50),
+    },
     tareaContainer: {
         flexDirection: 'row',
         padding: largeScale(12),
