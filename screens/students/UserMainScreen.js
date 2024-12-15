@@ -27,28 +27,6 @@ export default function UserScreen({ navigation, route }) {
           headerShown: false, // Oculta el encabezado
         });
 
-        const resetTareasCompletadas = async () => {
-            try {
-                console.log('Iniciando reset de tareas completadas');
-                const studentsSnapshot = await getDocs(collection(db, 'Estudiantes'));
-                
-                for (const doc of studentsSnapshot.docs) {
-                    const studentData = doc.data();
-                    const studentRef = doc.ref;
-                    await updateDoc(studentRef, { tareasCompletadas: 5 });
-                    console.log(`Actualizando tareasCompletadas para el documento ${doc.id}`);
-    
-
-                }
-                
-            } catch (error) {
-                console.error('Error reseteando tareas completadas:', error);
-            }
-        };
-  
-        const intervalId = setInterval(resetTareasCompletadas, 100);
-  
-        return () => clearInterval(intervalId);
     }, [navigation]);
 
     useEffect(() => {

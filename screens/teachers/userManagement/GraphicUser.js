@@ -75,7 +75,7 @@ export default function GraphicUser({route, navigation }) {
 
         usersInfo.forEach(async (doc) => {
             const studentRef = doc.ref;
-            await updateDoc(studentRef, { tareasCompletadas: 8 });
+            await updateDoc(studentRef, { tareasCompletadas: 0 });
         });
         console.log('Valores de tareasCompletadas reiniciados a 0 para todos los estudiantes');
         navigation.navigate('UsersManagement');
