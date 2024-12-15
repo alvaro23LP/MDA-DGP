@@ -29,6 +29,7 @@ import TaskMenu from '../screens/teachers/taskManagement/taskMenu';
 import MaterialTaskTeacher from '../screens/teachers/taskManagement/MaterialTaskTeacher';
 import StepsTask from '../screens/teachers/taskManagement/StepsTask';
 import TaskFotocopias from '../screens/teachers/taskManagement/taskFotocopias';
+import GraphicUser from '../screens/teachers/userManagement/GraphicUser';
 
 
 const Stack = createStackNavigator();
@@ -103,6 +104,10 @@ export default function AppNavigator({ isLoading}) {
           component={AddUser}
         />
 
+        <Stack.Screen
+          name="GraphicUser"
+          component={GraphicUser}
+        />
 
         <Stack.Screen
           name="EditTask"

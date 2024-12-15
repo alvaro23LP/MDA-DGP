@@ -102,11 +102,31 @@ export default function EditUser({route, navigation }) {
     });
   };
 
+  const pickImage = async () => {
+      let result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: [ImagePicker.MediaType.Images],
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+      });
+  
+      console.log('ImagePicker result:', result);
+  
+      if (!result.canceled && result.assets && result.assets.length > 0) {
+        const uri = result.assets[0].uri;
+        setSelectedImage(uri);
+        console.log('Selected image URI:', uri);
+      } else {
+        console.log('Image selection was canceled');
+      }
+    };
+
   const handleUpdateUser = async () => {
     if (nombre === '' || edad === '' || tipoDiscapacidad.length === 0 || preferenciasVista.length === 0) {
       Alert.alert('Error', 'Todos los campos son obligatorios');
       return;
     }
+
     const updatedData = {};
 
     if (nombre !== originalData.nombre) updatedData.nombre = nombre;
@@ -125,6 +145,7 @@ export default function EditUser({route, navigation }) {
 
     if (Object.keys(updatedData).length === 0) {
       Alert.alert('Info', 'No se han realizado cambios');
+      navigation.navigate('UsersManagement');
       return;
     }
 
@@ -160,7 +181,7 @@ export default function EditUser({route, navigation }) {
         />
       </View>
       
-      <Text style={styles.label}>Diversidad funcional</Text>
+      <Text style={styles.labelS1}>Diversidad funcional</Text>
       <MultiSelect
         items={[
           { id: 'Por defecto', name: 'Por defecto' },
@@ -178,9 +199,10 @@ export default function EditUser({route, navigation }) {
         styleTextDropdownSelected={{ color: '#000' }}
         submitButtonColor="#90EE90"
         submitButtonTextColor="#000"
+        fontSize={20}
       />
 
-      <Text style={styles.label}>Preferencia de vista</Text>
+      <Text style={styles.labelS2}>Preferencia de vista</Text>
       <MultiSelect
         items={[
           { id: 'Por defecto', name: 'Por defecto' },
@@ -197,11 +219,13 @@ export default function EditUser({route, navigation }) {
         styleTextDropdownSelected={{ color: '#000' }}
         submitButtonColor="#90EE90"
         submitButtonTextColor="#000"
+        fontSize={20}
       />
 
     <View style={styles.fileInputContainer}>
-      <Button title="Select File"/>
-    </View>
+          <Text style={styles.label}>Foto Avatar</Text>
+            <Button title="Seleccionar Imagen" onPress={pickImage} />
+          </View> 
 
       <View style={styles.pickerContainer}>
       <Text style={styles.label}>Contraseña</Text>
@@ -241,41 +265,66 @@ const styles = StyleSheet.create({
     padding: 40,
     backgroundColor: '#D9EFFF', 
   },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    textAlign: 'center',
-  },
-  inputContainer: {
-    marginBottom: 30,
-    marginTop: 5,
-  },
-  label: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 5,
-  },
   input: {
-    height: 40,
-    borderColor: 'gray',
-    borderWidth: 1,
+    height: 60,
+    borderWidth: 2,
     borderRadius: 5,
-    paddingLeft: 8,
+    paddingLeft: 10,
     backgroundColor: '#fff',
-    fontSize: 20,
+    fontSize: 22,
     marginBottom: 12,
+  },
+  MultiSelect: {
+    height: 60,
+    borderColor: 'gray',
+    borderWidth: 3,
+    paddingLeft: 8,
+    marginBottom: 20,
   },
   fileInputContainer: {
     marginBottom: 20,
-    marginTop: 20,
+    marginTop: 40,
     alignSelf: 'flex-start',
   },
-  MultiSelect: {
+  fileInput: {
     height: 40,
     borderColor: 'gray',
     borderWidth: 1,
     paddingLeft: 8,
+  },
+  pickerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 50,
+    marginTop: 30,
+  },
+  picker: {
+    height: 60,
+    width: 200,
+    backgroundColor: '#ffff',
+    marginHorizontal: 10,
+  },
+  pickerItem: {
+    color: '#000',
+  },
+  label: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  labelS1: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    marginBottom: 25,
+  },
+  labelS2: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    marginBottom: 25,
+    marginTop: 30,
+  },
+  inputContainer: {
+    marginBottom: 30,
   },
   buttonContainer: {
     alignItems: 'center',
@@ -283,24 +332,13 @@ const styles = StyleSheet.create({
   },
   updateButton: {
     backgroundColor: '#FEF28A', 
-    paddingVertical: 15,
-    paddingHorizontal: 40,
+    paddingVertical: 25,
+    paddingHorizontal: 50,
     borderRadius: 50,
   },
   updateButtonText: {
     color: '#000',
-    fontSize: 16,
+    fontSize: 30,
     fontWeight: 'bold',
-  },
-  pickerContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  picker: {
-    height: 40,
-    width: 90,
-    backgroundColor: '#ffff',
-    marginHorizontal: 10,
   },
 });

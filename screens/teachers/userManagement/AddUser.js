@@ -32,6 +32,7 @@ export default function AddUser({ navigation }) {
   const [preferenciasVista, setPreferenciasVista] = useState([]);
   const [fotoAvatar, setFotoAvatar] = useState(null);
   const [selectedImage, setSelectedImage] = useState(null);
+  const [tareasCompletadas, setTareasCompletadas] = useState(0);
 
   const items = [
     { id: 'Por defecto', name: 'Por defecto' },
@@ -94,12 +95,13 @@ export default function AddUser({ navigation }) {
       alert('La edad no puede estar vacía', '');
       return;
     } else if (tipoDiscapacidad.length === 0) {
-      alert('Debes seleccionar al menos un tipo de discapacidad', '');
+      alert('Debes seleccionar al menos un tipo de diversidad funcional', '');
       return;
     } else if (preferenciasVista.length === 0) {
       alert('Debes seleccionar al menos una preferencia de vista', '');
       return;
     }
+    
 
     if (isNaN(edad)) {
       alert('La edad debe ser un número', '');
@@ -126,6 +128,7 @@ export default function AddUser({ navigation }) {
         preferenciasVista,
         fotoAvatar: fotoAvatarUrl,
         historialTareas: [],
+        tareasCompletadas: Number(tareasCompletadas),
         contrasenaVisual,
       });
       Alert.alert('Éxito', 'Alumno agregado exitosamente');
@@ -133,11 +136,12 @@ export default function AddUser({ navigation }) {
       setNombre('');
       setEdad('');
       setTipoDiscapacidad([]);
-      setPreferenciasVista([]);
+      setPreferenciasVista(['Por defecto']);
       setContrasena1('0');
       setContrasena2('0');
       setFotoAvatar(null);
       setSelectedImage(null);
+      setTareasCompletadas(0);
 
       navigation.navigate('UsersManagement');
     } catch (error) {
@@ -149,11 +153,11 @@ export default function AddUser({ navigation }) {
   return (
     <View style={styles.container}>
       <View style={styles.inputContainer}>
-        <Text style={styles.label}>Nombre</Text>
+        <Text style={styles.label}>Nombre y apellidos</Text>
 
         <TextInput
           style={styles.input}
-          placeholder="Nombre"
+          placeholder="Nombre y apellidos"
           value={nombre}
           onChangeText={setNombre}
         />
@@ -169,7 +173,7 @@ export default function AddUser({ navigation }) {
         />
       </View>
 
-      <Text style={styles.label}>Diversidad funcional</Text>
+      <Text style={styles.labelS1}>Diversidad funcional</Text>
       <MultiSelect
         items={items}
         uniqueKey="id"
@@ -182,9 +186,10 @@ export default function AddUser({ navigation }) {
         styleTextDropdownSelected={{ color: '#000' }}
         submitButtonColor="#90EE90"
         submitButtonTextColor="#000"
+        fontSize={20}
       />
       
-      <Text style={styles.label}>Preferencia de vista</Text>
+      <Text style={styles.labelS2}>Preferencia de vista</Text>
       <MultiSelect
         items={preferenciasItems}
         uniqueKey="id"
@@ -197,6 +202,7 @@ export default function AddUser({ navigation }) {
         styleTextDropdownSelected={{ color: '#000' }}
         submitButtonColor="#90EE90"
         submitButtonTextColor="#000"
+        fontSize={20}
       />
 
       <View style={styles.fileInputContainer}>
@@ -211,7 +217,7 @@ export default function AddUser({ navigation }) {
           selectedValue={contrasena1}
           style={styles.picker}
           onValueChange={(itemValue) => setContrasena1(itemValue)}
-          itemStyle={styles.pickerItem} // Añade esta línea
+          itemStyle={styles.pickerItem}
         >
           {fruitOptions.map((fruit) => (
             <Picker.Item key={fruit.id} label={fruit.name} value={fruit.id} />
@@ -247,24 +253,25 @@ const styles = StyleSheet.create({
     backgroundColor: '#D9EFFF', 
   },
   input: {
-    height: 40,
-    borderColor: 'gray',
-    borderWidth: 1,
+    height: 60,
+    borderWidth: 2,
     borderRadius: 5,
-    paddingLeft: 8,
+    paddingLeft: 10,
     backgroundColor: '#fff',
-    fontSize: 20,
+    fontSize: 22,
     marginBottom: 12,
   },
   MultiSelect: {
-    height: 40,
+    height: 60,
     borderColor: 'gray',
-    borderWidth: 1,
+    borderWidth: 3,
+    borderRadius: 5,
     paddingLeft: 8,
+    marginBottom: 20,
   },
   fileInputContainer: {
     marginBottom: 20,
-    marginTop: 20,
+    marginTop: 40,
     alignSelf: 'flex-start',
   },
   fileInput: {
@@ -276,21 +283,33 @@ const styles = StyleSheet.create({
   pickerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 80,
+    marginTop: 30,
   },
   picker: {
-    height: 40,
-    width: 90,
+    height: 60,
+    width: 200,
     backgroundColor: '#ffff',
     marginHorizontal: 10,
   },
   pickerItem: {
-    color: '#000', // Asegúrate de que el color del texto sea visible
+    color: '#000',
   },
   label: {
-    fontSize: 20,
+    fontSize: 28,
     fontWeight: 'bold',
-    marginBottom: 5,
+    marginBottom: 10,
+  },
+  labelS1: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    marginBottom: 25,
+  },
+  labelS2: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    marginBottom: 25,
+    marginTop: 30,
   },
   inputContainer: {
     marginBottom: 30,
@@ -301,13 +320,13 @@ const styles = StyleSheet.create({
   },
   addButton: {
     backgroundColor: '#FEF28A', 
-    paddingVertical: 15,
-    paddingHorizontal: 40,
+    paddingVertical: 25,
+    paddingHorizontal: 50,
     borderRadius: 50,
   },
   addButtonText: {
     color: '#000',
-    fontSize: 16,
+    fontSize: 30,
     fontWeight: 'bold',
   },
 });

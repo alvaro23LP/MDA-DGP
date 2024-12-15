@@ -75,6 +75,7 @@ export default function HomeScreen({ navigation}) {
                   }
                   style={styles.userImage}
                 />
+
                 <Text style={styles.userName}>{student.nombre}</Text>
               </View>
 

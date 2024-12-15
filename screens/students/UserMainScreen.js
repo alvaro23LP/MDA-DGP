@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Dimensions, Image } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { getFirestore, doc, getDoc, collection, getDocs } from 'firebase/firestore';
+import { getFirestore, doc, getDoc, collection, getDocs, updateDoc } from 'firebase/firestore';
 import { initializeApp } from 'firebase/app';
 import { firebaseConfig } from '../../services/firebaseConfig';
 
@@ -26,6 +26,29 @@ export default function UserScreen({ navigation, route }) {
         navigation.setOptions({
           headerShown: false, // Oculta el encabezado
         });
+
+        const resetTareasCompletadas = async () => {
+            try {
+                console.log('Iniciando reset de tareas completadas');
+                const studentsSnapshot = await getDocs(collection(db, 'Estudiantes'));
+                
+                for (const doc of studentsSnapshot.docs) {
+                    const studentData = doc.data();
+                    const studentRef = doc.ref;
+                    await updateDoc(studentRef, { tareasCompletadas: 5 });
+                    console.log(`Actualizando tareasCompletadas para el documento ${doc.id}`);
+    
+
+                }
+                
+            } catch (error) {
+                console.error('Error reseteando tareas completadas:', error);
+            }
+        };
+  
+        const intervalId = setInterval(resetTareasCompletadas, 100);
+  
+        return () => clearInterval(intervalId);
     }, [navigation]);
 
     useEffect(() => {
@@ -142,7 +165,6 @@ export default function UserScreen({ navigation, route }) {
                 <Text style={{ color: '#fff', fontSize: largeScale(20), marginRight: scale(10) }}>SALIR</Text>
                 <Icon name="exit" size={largeScale(30)} color="#fff" />
             </TouchableOpacity>
-            {renderTareas()}
         </View>
     );
 }
