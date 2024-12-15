@@ -4,6 +4,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import { getFirestore, doc, getDoc, collection, getDocs, updateDoc } from 'firebase/firestore';
 import { initializeApp } from 'firebase/app';
 import { firebaseConfig } from '../../services/firebaseConfig';
+import { format, differenceInDays } from 'date-fns';
 
 // Inicializa Firebase
 initializeApp(firebaseConfig);
@@ -54,106 +55,143 @@ export default function UserScreen({ navigation, route }) {
     useEffect(() => {
         const fetchPreferences = async () => {
             const userDoc = await getDoc(doc(db, 'Estudiantes', studentId));
-            const userData = userDoc.data();
-            setStudentName(userData.nombre); 
-            setPreferenciasVista(userData.preferenciasVista);
+            if (userDoc.exists()) {
+                const userData = userDoc.data();
+                setStudentName(userData.nombre); 
+                setPreferenciasVista(userData.preferenciasVista);
 
-            // Obtener las tareas del campo agenteTareas
-            const tareasMap = userData.agendaTareas || {};
-            const tareasList = [];
+                // Obtener las tareas del campo agenteTareas
+                const tareasMap = userData.agendaTareas || {};
+                const tareasList = [];
 
-            if(tareasMap == undefined) console.log('No hay tareas');
+                console.log('tareasMap', tareasMap);
+                //for (const key in tareasMap) {
+                const tareasPromises = Object.keys(tareasMap).map(async (key) => {
+                    if (tareasMap.hasOwnProperty(key)) {
+                        // Obtener los datos de la agendaTareas del alumno
+                        const tarea = tareasMap[key];
+                        const tareaDocRef = tarea.idTarea; 
+                        const fechaInicio = tarea.fechaInicio.toDate();
+                        const fechaLimite = tarea.fechaLimite.toDate();
+                        const diasRestantes = differenceInDays(fechaLimite, new Date());                        
 
-            for (const key in tareasMap) {
-                if (tareasMap.hasOwnProperty(key)) {
-                    // Obtener los datos de la agendaTareas del alumno
-                    const tarea = tareasMap[key];
-                    const tareaDocRef = tarea.idTarea; 
-                    const completada = tarea.completada;
-                    const tipoTarea = tarea.tipoTarea;
-                    // Obtener los datos de la tarea
-                    const tareaDoc = await getDoc(tareaDocRef);
-                    const tareaData = tareaDoc.data();
-                    const tareaObj = {
-                        ...tarea,
-                        titulo: tareaData.titulo,
-                        descripcion: tareaData.descripcion,
-                        imagenes: tareaData.imagenes,
-                        fechaInicio: tarea.fechaInicio.toDate().toLocaleDateString(),
-                        fechaLimite: tarea.fechaLimite.toDate().toLocaleDateString(),
-                        fechaCompletada: tarea.fechaCompletada ? tarea.fechaCompletada.toDate().toLocaleDateString() : null,
-                        //completada: completada,
-                        tipoTarea: tareaData.tipoTarea,
-                    
-                    };
-
-                    if (tareaData.tipoTarea === 'Tarea por pasos') {
-                        const pasos = tareaData.Pasos || {};
-                        tareaObj.Pasos = pasos;
+                        // Obtener los datos de la tarea
+                        const tareaDoc = await getDoc(tareaDocRef);
+                        if (tareaDoc.exists()) {
+                            const tareaData = tareaDoc.data();
+                            const tareaObj = {
+                                id: tareaDoc.id,
+                                ...tarea,
+                                titulo: tareaData.titulo,
+                                fechaInicio: format(fechaInicio, 'dd/MM/yyyy'), 
+                                fechaLimite: `${format(fechaLimite, 'dd/MM/yyyy')}`, 
+                                restante: `(${diasRestantes} días restantes)`, 
+                                tipoTarea: tareaData.tipoTarea,
+                            };
+                            tareasList.push(tareaObj);
+                        } else {
+                        }
                     }
-                    tareasList.push(tareaObj);
-                }
-            }
-            
+                });
 
-            setTareas(tareasList);
+                await Promise.all(tareasPromises);
+                setTareas(tareasList);
+            } else {
+                console.log('No se encontró el documento del estudiante.');
+            }
         };
         fetchPreferences();
     }, [studentId]);
 
 
-    const renderTareas = () => {
-        /*  if (tareas.length === 0) {
-            return <Text style={styles.noTareasText}>¡¡ Enhorabuena {studentName} !! {"\n"} No hay tareas</Text>;
-        } */
-        if (preferenciasVista == "Normal") {
-            return tareas.map((tarea, index) => {
-                if (tarea.tipoTarea == 'Recogida de material') {
-                    return (
-                        <View key={index} style={styles.tareaContainer}>
-                            <Text style={styles.tareaTitulo}>{tarea.titulo}</Text>
-                            <Text style={styles.tareaDescripcion}>{tarea.descripcion}</Text>
-                            <Text style={styles.tareaFecha}>Inicio: {tarea.fechaInicio}</Text>
-                            <Text style={styles.tareaFecha}>Límite: {tarea.fechaLimite}</Text>
-                            { tarea.completada && <Text style={styles.tareaFecha}>Completada: {tarea.fechaCompletada}</Text>}
-                        </View>
-                    );
-                } else if (tarea.tipoTarea == 'Tarea por pasos') {
-                    return (
-                        <View key={index} style={styles.tareaContainer}>
-                            <Text style={styles.tareaTitulo}>{tarea.titulo}</Text>
-                            {tarea.Pasos && Object.keys(tarea.Pasos).map((pasoKey, pasoIndex) => {
-                                const paso = tarea.Pasos[pasoKey];
-                                console.log('paso:', paso);
-                                return (
-                                    <View key={pasoIndex} style={styles.pasoContainer}>
-                                        <Text style={styles.pasoTitulo}>Paso {pasoIndex + 1}: {paso.Descripción}</Text>
-                                        {paso.imagenPictograma && <Image source={{ uri: paso.imagenPictograma }} style={styles.pasoImagen} />}
-                                        {paso.imagenReal && <Image source={{ uri: paso.imagenReal }} style={styles.pasoImagen} />}
-                                    </View>
-                                );
-                            })}
-                            <Text style={styles.tareaFecha}>Inicio: {tarea.fechaInicio}</Text>
-                            <Text style={styles.tareaFecha}>Límite: {tarea.fechaLimite}</Text>
-                            {tarea.fechaCompletada && <Text style={styles.tareaFecha}>Completada: {tarea.fechaCompletada}</Text>}
-                        </View>
-                    );
-                }
-            });
-        } else if (preferenciasVista == 'Pictograma') {
-            return tareas.map((tarea, index) => (
-                <View key={index} style={styles.tareaContainer}>
-                    <Text style={styles.tareaTitulo}>{tarea.titulo}</Text>
-                    {tarea.imagenes && tarea.imagenes.map((imagen, imgIndex) => (
-                        <Image key={imgIndex} source={{ uri: imagen }} style={styles.tareaImagen} />
-                    ))}
-                    <Text style={styles.tareaFecha}>Inicio: {tarea.fechaInicio}</Text>
-                    <Text style={styles.tareaFecha}>Límite: {tarea.fechaLimite}</Text>
-                    { tarea.completada && <Text style={styles.tareaFecha}>Completada: {tarea.fechaCompletada}</Text>}
-                </View>
-            ));
+    const getImageForTaskType = (tipoTarea) => {
+        const preferencia = Array.isArray(preferenciasVista) ? preferenciasVista[0] : preferenciasVista;
+
+        if (preferencia === 'texto') {
+            return null; 
+        } else if (preferencia === 'pictograma') {
+            switch (tipoTarea) {
+                case 'Recogida de material':
+                    return require('../../images/tijeras.png');
+                case 'Tarea por pasos':
+                    return require('../../images/pasosLogo.png'); 
+                case 'Fotocopias':
+                    return require('../../images/plastificar.png'); 
+                case 'Tarea de menú':
+                    return require('../../images/menú.png'); 
+                default:
+                    return require('../../images/user1.png'); 
+            }
+        } else {
+            switch (tipoTarea) {
+                case 'Recogida de material':
+                    return require('../../images/materialReal.jpg');
+                case 'Tarea por pasos':
+                    return require('../../images/pasosLogo.png'); 
+                case 'Fotocopias':
+                    return require('../../images/impresoraReal.jpg'); 
+                case 'Tarea Menu':
+                    return require('../../images/menú.png'); 
+                default:
+                    return require('../../images/user1.png'); 
+            }
         }
-        return <Text style={styles.noTareasText}>¡¡ Enhorabuena {studentName} !! {"\n"} No hay tareas</Text>;;
+    };
+
+    const getNavigationRouteForTaskType = (tipoTarea) => {
+        switch (tipoTarea) {
+            case 'Recogida de material':
+                return'Recoger Material';
+            case 'Tarea por pasos':
+                return 'UserStepsTask';
+            case 'Fotocopias':
+                return 'ShowFotocopia';
+            case 'Tarea Menu':
+                return 'UserMenuTask';
+            default:
+                return 'Home'; // Ruta por defecto
+        }
+    };
+    const renderTareas = () => {
+        if (tareas.length === 0) {
+            return (
+                <View style={styles.noTareasContainer}>
+                    <Image
+                        source={require('../../images/sí.png')}
+                        style={styles.noTareaImage}
+                    />
+                    <Text style={styles.noTareasText}>¡¡ Enhorabuena {studentName} !! {"\n"} No hay tareas</Text>
+                </View>
+            );
+        } else {
+            return tareas.map((tarea, index) => {
+                const navigationRoute = getNavigationRouteForTaskType(tarea.tipoTarea);
+                const preferencia = Array.isArray(preferenciasVista) ? preferenciasVista[0] : preferenciasVista;
+
+                return (
+                    <View style={styles.listaTareas}>
+                        <TouchableOpacity key={index} style={styles.tareaContainer} onPress={() => navigation.navigate(navigationRoute, { studentId: studentId, idTarea: tarea.id })}>
+                            <Image
+                                source={getImageForTaskType(tarea.tipoTarea)}
+                                style={styles.tareaImage}
+                            />
+                            <View style={styles.tareaTexto}>
+                                <Text style={styles.tareaTitulo}>{tarea.titulo}</Text>
+                                {(preferencia === 'Normal' || preferencia === 'texto') ? (
+                                    <>
+                                        <Text style={styles.tareaFecha}>Inicio: {tarea.fechaInicio}</Text>
+                                        <Text style={styles.tareaFecha}>Límite: {tarea.fechaLimite + ' ' + tarea.restante}</Text>
+                                    </>
+                                ) : (
+                                    <Text style={styles.tareaFecha}>{tarea.restante}</Text>
+                                )}
+                            </View>
+                        </TouchableOpacity>
+                    </View>
+                );
+            });
+
+        }
     };
 
 
@@ -204,60 +242,63 @@ const styles = StyleSheet.create({
         borderWidth: 2,
     },
 
-    tareaTitulo: {
-        fontSize: largeScale(30),
-        fontWeight: 'bold',
-        color: '#424242',
-    },
-    tareaDescripcion: {
-        fontSize: largeScale(20),
-        color: '#424242',
-    },
-    tareaFecha: {
-        fontSize: largeScale(25),
-        color: '#666',
+    listaTareas: {
+        paddingBottom: largeScale(50),
     },
     tareaContainer: {
-        marginBottom: largeScale(20),
+        flexDirection: 'row',
+        padding: largeScale(12),
+        backgroundColor: '#fff',
+        borderRadius: largeScale(10),
+        borderWidth: 2,
+        borderColor: '#aaa',
+        width: '90%',
+        alignSelf: 'center',
+        justifyContent: 'space-around',
+        alignItems: 'center',
+    },
+    tareaTexto: {
         padding: largeScale(10),
         backgroundColor: '#fff',
         borderRadius: largeScale(10),
-        borderWidth: 1,
-        borderColor: '#ddd',
-        width: '90%',
         alignSelf: 'center',
+        width: '70%',
     },
-    tareaCompletada: {
-        backgroundColor: '#d4edda',
-        borderColor: '#c3e6cb',
+    tareaImage: {
+        width: largeScale(120),
+        aspectRatio: 1,
+        marginRight: largeScale(10),
     },
-    tareaImagen: {
-        width: largeScale(30),
-        height: largeScale(30),
-        marginTop: largeScale(5),
-    },
-    pasoContainer: {
-        marginTop: largeScale(10),
-    },
-    pasoTitulo: {
-        fontSize: largeScale(25),
+    tareaTitulo: {
+        fontSize: largeScale(30),
         fontWeight: 'bold',
-        color: '#424242',
+        color: '#000',
     },
-    pasoDescripcion: {
-        fontSize: largeScale(14),
-        color: '#666',
+    tareaFecha: {
+        fontSize: largeScale(25),
+        color: '#000',
     },
-    pasoImagen: {
-        width: largeScale(30),
-        height: largeScale(30),
-        marginTop: largeScale(5),
+
+    noTareasContainer: {
+        flex: "column",
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#FFF',
+        padding: largeScale(35),
+        borderRadius: largeScale(20),
+        borderWidth: 2,
     },
     noTareasText: {
-        fontSize: largeScale(18),
-        color: '#424242',
+        fontSize: largeScale(30),
+        color: '#000',
         textAlign: 'center',
-        marginTop: largeScale(20),
+        backgroundColor: '#FFF',
+        padding: largeScale(25),
+    },
+    noTareaImage: {
+        padding: largeScale(5),
+        width: largeScale(350),
+        height: largeScale(350),
     },
 
 });

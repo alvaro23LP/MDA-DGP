@@ -1,8 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, Image, Alert, Dimensions } from 'react-native';
 import { getFirestore, doc, getDoc } from 'firebase/firestore';
+import Icon from 'react-native-vector-icons/Ionicons';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { getApp } from 'firebase/app';
+
+
+// Obtener el ancho de la pantalla
+const { width, height } = Dimensions.get('window');
+
+// Función de escalado en función del ancho de pantalla
+const scale = (size) => (width < 375 ? size : size * (width / 375));
+const largeScale = (size) => (width > 800 ? size * 1.5 : size);
 
 const fruitImages = {
   Uvas: require('../images/uva.png'),
@@ -36,6 +45,7 @@ export default function PasswordUser() {
 
   const [selectedFruits, setSelectedFruits] = useState([]);
   const [password, setPassword] = useState([]); // Contraseña visual del estudiante
+  const [firstSelectedFruit, setFirstSelectedFruit] = useState(null);
 
   useEffect(() => {
     const fetchPassword = async () => {
@@ -60,9 +70,19 @@ export default function PasswordUser() {
 
     navigation.setOptions({
       title: 'Selecciona la contraseña',
-      headerStyle: { backgroundColor: '#1565C0', height: 100 },
+      headerStyle: { backgroundColor: '#1565C0', height: scale(70) },
       headerTintColor: '#fff',
-      headerTitleStyle: { fontWeight: 'bold', fontSize: 35 },
+      headerTitleStyle: { fontWeight: 'bold', fontSize: scale(20) },
+      headerTitleAlign: 'center',
+      headerLeft: () => null,
+      headerRight: () => (
+        <TouchableOpacity
+          style={styles.buttonExit}
+          onPress={() => navigation.navigate('Home')}
+        >
+          <Text style={styles.buttonExitText}>Salir</Text>
+        </TouchableOpacity>
+      )
     });
   }, [navigation, studentId]);
 
@@ -70,6 +90,10 @@ export default function PasswordUser() {
     if (selectedFruits.length < 2) {
       const newSelection = [...selectedFruits, fruitId];
       setSelectedFruits(newSelection);
+
+      if (newSelection.length === 1) {
+        setFirstSelectedFruit(fruitId);
+      }
 
       if (newSelection.length === 2) {
         console.log('Contraseña almacenada:', password);
@@ -86,20 +110,25 @@ export default function PasswordUser() {
           Alert.alert('Ups, contraseña incorrecta.');
         }
         setSelectedFruits([]); // Reinicia la selección
+        setFirstSelectedFruit(null);
       }
     }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.selectPasswordText}>Selecciona la contraseña</Text>
+      {/* <Text style={styles.selectPasswordText}>Selecciona la contraseña</Text> */}
       
+
       <View style={styles.fruitContainer}>
         <View style={styles.fruitGrid}>
           {fruitOptions.map((fruit) => (
             <TouchableOpacity
               key={fruit.id}
-              style={styles.fruitIcon}
+              style={[
+                styles.fruitIcon,
+                firstSelectedFruit === fruit.id && styles.selectedFruitIcon
+              ]}
               onPress={() => handleFruitSelection(fruit.id)}
             >
               <Image 
@@ -123,11 +152,35 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: 20,
   },
+  buttonExit: { 
+    position: 'absolute',
+    top: largeScale(30),
+    right: largeScale(20),
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'red',
+    padding: largeScale(10),
+    borderColor: 'black',
+    borderWidth: 1,
+    width: '80%',
+    height: '60%',
+  },
+  buttonExitText: {
+    color: '#fff',
+    fontSize: scale(15),
+    fontWeight: 'bold',
+    fontshadowColor: 'black',
+    textShadowOffset: { width: 3, height: 3 },
+    textShadowRadius: 3,
+  },
   selectPasswordText: {
+    padding: 30,
+    backgroundColor: '#FFF',
+    borderRadius: 20,
     fontSize: 24,
     fontWeight: 'bold',
     color: '#000',
-    marginBottom: 20,
+    marginBottom: 30,
   },
   fruitContainer: {
     backgroundColor: '#FFFFFF',
@@ -140,9 +193,13 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     justifyContent: 'space-between',
   },
+  selectedFruitIcon: {
+    backgroundColor: '#88dd99',
+    borderColor: 'lightgreen',
+  },
   fruitIcon: {
-    width: '30%',
-    aspectRatio: 1,
+    width: scale(100),
+    height: scale(85),
     backgroundColor: '#FFDDC1',
     alignItems: 'center',
     justifyContent: 'center',
@@ -150,7 +207,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   fruitImage: {
-    width: '40%',            // Tamaño reducido para que se vea completa
+    width: '60%',            // Tamaño reducido para que se vea completa
     height: undefined,       // Altura ajustada automáticamente
     aspectRatio: 1,          // Mantiene proporción cuadrada
     borderRadius: 10,        // Redondeo de esquinas

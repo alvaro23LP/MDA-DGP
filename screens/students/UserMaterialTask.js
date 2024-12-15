@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Dimensions, Switch } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Dimensions, Switch, Image } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 import { getFirestore, doc, getDoc, updateDoc } from 'firebase/firestore';
 import { initializeApp } from 'firebase/app';
 import { firebaseConfig } from '../../services/firebaseConfig';
+import { ImageStore } from 'react-native';
+import { max } from 'date-fns';
 
 // Inicializa Firebase
 initializeApp(firebaseConfig);
@@ -17,12 +19,39 @@ const { width, height } = Dimensions.get('window');
 const scale = (size) => (width < 375 ? size : size * (width / 375));
 const largeScale = (size) => (width > 800 ? size * 1.5 : size);
 
+const materialImages = {
+    Lapices: require('../../images/lapicesReal.jpg'),
+    Pinceles: require('../../images/pincelesReal.png'),
+    Gomas: require('../../images/gomaReal.jpg'),
+    Celo: require('../../images/celoReal.jpg'),
+    Témpera: require('../../images/temperaReal.jpg'),
+    Pegamento: require('../../images/pegamentoReal.jpg'),
+    Tijeras: require('../../images/tijerasReal.jpg'),
+    Plastilina: require('../../images/plastilinaReal.jpeg'),
+    Cartulina: require('../../images/cartulinaReal.jpg'),
+    Anillas: require('../../images/anillasReal.jpg'),
+};
+
+const materialPictograms = {
+    Lapices: require('../../images/lápiz.png'),
+    Pinceles: require('../../images/pincel.png'),
+    Gomas: require('../../images/goma.png'),
+    Celo: require('../../images/celo.png'),
+    Témpera: require('../../images/avatar_1.png'),
+    Pegamento: require('../../images/pegamento.png'),
+    Tijeras: require('../../images/tijeras.png'),
+    Plastilina: require('../../images/plastilina.png'),
+    Cartulina: require('../../images/cartulina.png'),
+    Anillas: require('../../images/anillas.png'),
+};
+
 export default function UserMaterialTask({ navigation, route }) {
     const { studentId } = route.params; 
     const [tareas, setTareas] = useState([]);
     const [studentName, setStudentName] = useState('');
     const [showAllMaterials, setShowAllMaterials] = useState(false);
     const [buttonPosition, setButtonPosition] = useState('right'); // Definir buttonPosition en el estado
+    const [preferenciasVista, setPreferenciasVista] = useState(null);
 
 
     useEffect(() => {
@@ -48,6 +77,8 @@ export default function UserMaterialTask({ navigation, route }) {
             const userDoc = await getDoc(doc(db, 'Estudiantes', studentId));
             const userData = userDoc.data();
             setStudentName(userData.nombre);
+            setPreferenciasVista(userData.preferenciasVista);
+
             // Obtener las tareas del campo agendaTareas
             const tareasMap = userData.agendaTareas || {};
             const tareasList = [];
@@ -96,26 +127,35 @@ export default function UserMaterialTask({ navigation, route }) {
         setButtonPosition(buttonPosition === 'right' ? 'left' : 'right');
     };
 
+    const preferencia = Array.isArray(preferenciasVista) ? preferenciasVista[0] : preferenciasVista;
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>{studentName}</Text>
             <View style={styles.contenedorTarea}>
                 {tareas.map(tarea => (
                     <View key={tarea.id} style={styles.contendorMaterialesVista}>
-                        {Object.keys(tarea.materiales).slice(showAllMaterials ? 7 : 0, showAllMaterials ? undefined : 7).map((materialKey, index) => (
+                        {Object.keys(tarea.materiales).slice(showAllMaterials ? 6 : 0, showAllMaterials ? undefined : 6).map((materialKey, index) => (
                             <View key={index} style={styles.unidadMaterial}>
-                                <View style={styles.textoMaterial}>
-                                    <Text 
-                                        style={[styles.tituloMaterial, 
-                                        tarea.materiales[materialKey].completada && styles.materialTextCompleted]}>
-                                        {materialKey}:
-                                    </Text>
-                                    <Text style={[
-                                        styles.descripcionMaterial,
-                                        tarea.materiales[materialKey].completada && styles.materialTextCompleted]}>
-                                        {tarea.materiales[materialKey].Descripcion}
-                                    </Text>
+                                <View style={styles.derechaMaterial}>
+                                    <Image
+                                        source={preferencia === 'Pictograma' ? materialPictograms[materialKey] : materialImages[materialKey]}
+                                        style={preferencia === 'Texto' ? styles.hidden : styles.tareaImage}
+                                    />
+                                    <View style={styles.textoMaterial}>
+                                        <Text 
+                                            style={[styles.tituloMaterial, 
+                                            tarea.materiales[materialKey].completada && styles.materialTextCompleted]}>
+                                            {materialKey}:
+                                        </Text>
+                                        <Text style={[
+                                            styles.descripcionMaterial,
+                                            tarea.materiales[materialKey].completada && styles.materialTextCompleted]}
+                                            numberOfLines={0} // Permite que el texto se ajuste en varias líneas
+                                            ellipsizeMode="tail">
+                                            {tarea.materiales[materialKey].Descripcion}
+                                        </Text>
+                                    </View>
                                 </View>
+
 
                                 <Switch
                                       style={styles.materialSwitch}
@@ -154,7 +194,11 @@ const styles = StyleSheet.create({
     },
     buttonExitText: {
         color: '#fff',
-        fontSize: scale(10),
+        fontSize: scale(15),
+        fontWeight: 'bold',
+        fontshadowColor: 'black',
+        textShadowOffset: { width: 3, height: 3 },
+        textShadowRadius: 3,
     },
     contenedorTarea: {
         flex: 1,
@@ -183,8 +227,21 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         backgroundColor: '#f9f9f9',
     },
+    derechaMaterial: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'left',
+        maxWidth: '70%',
+    },
+    tareaImage: {
+        width: largeScale(80),
+        aspectRatio: 1, // Mantener la proporción de la imagen
+        //marginRight: largeScale(-100),
+    },
     textoMaterial: {
         flexDirection: 'column',
+        flexShrink: 1,
+        
     },
     tituloMaterial: {
         fontSize: largeScale(28),
@@ -232,5 +289,8 @@ const styles = StyleSheet.create({
     },
     buttonLeft: {
         left: largeScale(30),
+    },
+    hidden: {
+        display: 'none',
     },
 });

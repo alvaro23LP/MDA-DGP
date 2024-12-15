@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, Image,button, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Image, Dimensions } from 'react-native';
 import { getFirestore, collection, getDocs } from 'firebase/firestore';
 import { initializeApp } from 'firebase/app';
 import { firebaseConfig } from '../services/firebaseConfig';
@@ -7,6 +7,13 @@ import { firebaseConfig } from '../services/firebaseConfig';
 // Inicializa Firebase
 initializeApp(firebaseConfig);
 const db = getFirestore();
+
+// Obtener el ancho de la pantalla
+const { width, height } = Dimensions.get('window');
+
+// Función de escalado en función del ancho de pantalla
+const scale = (size) => (width < 375 ? size : size * (width / 375));
+const largeScale = (size) => (width > 800 ? size * 1.5 : size);
 
 export default function HomeScreen({ navigation}) {
   const [students, setStudents] = useState([]);
@@ -18,6 +25,7 @@ export default function HomeScreen({ navigation}) {
       headerStyle: { backgroundColor: '#1565C0', height: 100 },
       headerTintColor: '#fff',
       headerTitleStyle: { fontWeight: 'bold', fontSize: 35 },
+      headerTitleAlign: 'center',
     });
 
     // Función para obtener todos los estudiantes
@@ -51,13 +59,19 @@ export default function HomeScreen({ navigation}) {
     navigation.navigate('LoginPage');
   };
 
-  const handleExtra = (id) => () => {
-    navigation.navigate('Recoger Material', { studentId: id });
-  };
+  const getFontSize = (name) => { //Funcion para ajustar nombre en funcion de su longitud
+    if (name.length > 20) {       // para que no se salga del cuadro
+        return scale(9);
+    } else if (name.length > 10) {
+        return scale(11);
+    } else {
+        return scale(12);
+    }
+};
 
   return (
     <View style={styles.container}>
-      <Text style={styles.selectUserText}>Elige tu usuario</Text>
+      {/* <Text style={styles.selectUserText}>Elige tu usuario</Text> */}
 
       <View style={styles.userContainer}>
           {students.map((student) => (
@@ -76,7 +90,8 @@ export default function HomeScreen({ navigation}) {
                   style={styles.userImage}
                 />
 
-                <Text style={styles.userName}>{student.nombre}</Text>
+                <Text style={[styles.userName, { fontSize: getFontSize(student.nombre) }]}>{student.nombre}</Text>
+
               </View>
 
             </TouchableOpacity>
@@ -89,10 +104,6 @@ export default function HomeScreen({ navigation}) {
 
       <TouchableOpacity style={styles.ExtraButton2} onPress={() => navigation.navigate('ShowFotocopia', { idAlumno: 'valorIdAlumno', idTarea: 'ykR7kuaIs1ps8aj5o03f' })}>
         <Text style={styles.buttonText}>Pantalla Tarea Fotocopias</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity style={styles.ExtraButton} onPress={handleExtra('HzvSSyDOgYzhvWrdc6Y6')}>
-        <Text style={styles.buttonText}>Pantalla Recogida Material Alumnos</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
@@ -117,6 +128,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: 40,
+    paddingTop: largeScale(200),
   },
   selectUserText: {
     fontSize: 24,
@@ -133,13 +145,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'center',
+    borderColor: '#1565C0',
+    borderWidth: 1,
   },
   userIcon: {
-    width: 100,
-    height: 130,
-    backgroundColor: '#D3D3D3',
+    width: scale(75),
+    height: scale(90),
+    backgroundColor: '#e8e8e8',
+    padding: 4,
     borderRadius: 15,
-    margin: 10,
+    margin: scale(5),
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -148,11 +163,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   userImage: {
-    width: 80,
-    height: 80,
+    width: scale(50),
+    height: scale(50),  
     borderRadius: 10,
-    borderColor: '#aaa',
-    borderWidth: 2,
+    borderColor: '#1565C0',
+    borderWidth: 3,
+  },
+  userName: {
+    fontWeight: 'bold',
+    color: '#000',
+    marginTop: 10,
   },
   loginButton: {
     position: 'absolute',
@@ -174,20 +194,9 @@ const styles = StyleSheet.create({
     textShadowRadius: 3, 
   },
 
-  ExtraButton: {
-    position: 'absolute',
-    top: 15,
-    left: 15,
-    backgroundColor: '#1565C0',
-    textShadowColor: '#000',
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    borderRadius: 5,
-  },
-
   ExtraButton2: {
     position: 'absolute',
-    top: 70,
+    top: 20,
     left: 15,
     backgroundColor: '#1565C0',
     textShadowColor: '#000',
@@ -198,7 +207,7 @@ const styles = StyleSheet.create({
 
   ExtraButton3: {
     position: 'absolute',
-    top: 125,
+    top: 70,
     left: 15,
     backgroundColor: '#1565C0',
     textShadowColor: '#000',
@@ -209,7 +218,7 @@ const styles = StyleSheet.create({
 
   ExtraButton4: {
     position: 'absolute',
-    top: 180,
+    top: 120,
     left: 15,
     backgroundColor: '#1565C0',
     textShadowColor: '#000',
