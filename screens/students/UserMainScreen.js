@@ -124,7 +124,7 @@ export default function UserScreen({ navigation, route }) {
             case 'Fotocopias':
                 return 'ShowFotocopia';
             case 'Tarea Menu':
-                return 'UserMenuTask';
+                return 'AssigmentMenuClass';
             default:
                 return 'Home'; // Ruta por defecto
         }

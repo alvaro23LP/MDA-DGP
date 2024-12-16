@@ -20,7 +20,8 @@ initializeApp(firebaseConfig);
 const db = getFirestore();
 
 // Obtener el ancho de la pantalla
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
+
 const scale = (size) => (width < 375 ? size : size * (width / 375));
 
 export default function TaskAssignment({ navigation, route }) {
@@ -254,14 +255,18 @@ const assignTask = async () => {
         onSelectedItemsChange={(selected) => setPreferenciasVista(selected)}
         selectedItems={preferenciasVista}
         selectText="Escoger preferencia"
-        styleDropdownMenuSubsection={styles.dropdown}
+        style={styles.inputButton}
+        textInputProps={{
+          style: { fontSize: scale(8), color: '#000' } // Establecer tamaño y color del texto
+        }}
       />
 
       {/* Fecha límite */}
       <Text style={styles.label}>Fecha Límite</Text>
       <TextInput
-        style={styles.input}
-        placeholder="dd/mm/yyyy"
+        style={styles.inputButton}
+        placeholderTextColor='#000' // Cambiar el color del placeholder
+        placeholder="DD/MM/YYYY"
         value={manualDate}
         onChangeText={setManualDate}
       />
@@ -277,74 +282,74 @@ const assignTask = async () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    padding: scale(16),
+    justifyContent: 'center',
     backgroundColor: '#D9EFFF',
   },
   label: {
+    fontSize: scale(18),
     fontWeight: 'bold',
+    marginBottom: scale(8),
     color: '#1565C0',
-    marginBottom: 5,
-    fontSize: 16,
-  },
-  input: {
-    backgroundColor: '#fff',
-    borderColor: '#1565C0',
-    borderWidth: 1,
-    borderRadius: 5,
-    padding: 10,
-    marginBottom: 20,
-    width: '100%',
   },
   inputButton: {
-    backgroundColor: '#fff',
-    borderColor: '#1565C0',
     borderWidth: 1,
-    borderRadius: 5,
-    padding: 10,
-    marginBottom: 20,
+    borderColor: '#1565C0',
+    padding: scale(12),
+    marginBottom: scale(16),
+    borderRadius: scale(5),
     justifyContent: 'center',
+    backgroundColor: '#fff',
   },
   inputText: {
     color: '#000',
+    fontSize: scale(16),
+  },
+  modalContainer: {
+    flex: 1,
+    backgroundColor: '#D9EFFF',
+    padding: scale(16),
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#1565C0',
+    backgroundColor: '#fff',
+    padding: scale(12),
+    borderRadius: scale(5),
+    marginVertical: scale(8),
+  },
+  listItem: {
+    padding: scale(12),
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+  },
+  closeButton: {
+    backgroundColor: '#FEF28A',
+    padding: scale(12),
+    borderRadius: scale(5),
+    marginTop: scale(16),
+    alignItems: 'center',
+    borderColor: '#424242',
+  },
+  textButton: {
+    color: '#000',
+    fontSize: scale(16),
+  },
+  multiSelect: {
+    borderWidth: 1,
+    borderColor: '#1565C0',
+    marginVertical: scale(8),
+    padding: scale(12),
+    borderRadius: scale(5),
   },
   button: {
     backgroundColor: '#FEF28A',
     alignItems: 'center',
     justifyContent: 'center',
-    marginVertical: 10,
-    padding: 15,
-    borderRadius: 10,
+    marginVertical: scale(10),
+    padding: scale(15),
+    borderRadius: scale(5),
     borderWidth: 2,
-    borderColor: '#424242',
-  },
-  textButton: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#424242',
-  },
-  modalContainer: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: '#D9EFFF',
-  },
-  closeButton: {
-    marginTop: 20,
-    backgroundColor: '#FEF28A',
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: 40,
-    borderRadius: 5,
-    borderWidth: 1,
-    borderColor: '#424242',
-  },
-  listItem: {
-    padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
-  },
-  dropdown: {
-    borderWidth: 1,
-    borderColor: '#1565C0',
-    borderRadius: 5,
+    borderColor: '#000',
   },
 });

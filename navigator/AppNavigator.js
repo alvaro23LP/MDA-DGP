@@ -13,6 +13,7 @@ import ShowFotocopia from '../screens/students/ShowFotocopia';
 import UserMaterialTask from '../screens/students/UserMaterialTask';
 import UserMenuTask from '../screens/students/UserMenuTask';
 import UserStepsTask from '../screens/students/UserStepsTask';
+import AssigmentMenuClass from '../screens/students/AssignmentMenuClass';
 
 // Pantallas de profesores
 import LoginPage from '../screens/teachers/LoginPageTeachers';
@@ -150,6 +151,11 @@ export default function AppNavigator({ isLoading}) {
         <Stack.Screen
           name="UserMenuTask"
           component={UserMenuTask}
+        />
+
+        <Stack.Screen
+          name="AssigmentMenuClass"
+          component={AssigmentMenuClass}
         />
 
 

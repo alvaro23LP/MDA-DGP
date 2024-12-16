@@ -3,7 +3,6 @@ import { View, Text, StyleSheet, TouchableOpacity, Image, FlatList, Dimensions }
 import { getFirestore, doc, getDoc, updateDoc } from 'firebase/firestore';
 import { initializeApp } from 'firebase/app';
 import { firebaseConfig } from '../../services/firebaseConfig';
-import Icon from 'react-native-vector-icons/Ionicons';
 
 // Inicializa Firebase
 initializeApp(firebaseConfig);
@@ -22,59 +21,46 @@ const imageMap = {
 // Dimensiones para escalado
 const { width } = Dimensions.get('window');
 const scale = (size) => (width < 375 ? size : size * (width / 375));
-const largeScale = (size) => (width > 800 ? size * 1.5 : size);
 
 export default function UserMenuTask({ route, navigation }) {
-  const { studentId, idTarea } = route.params || {};
+  const { studentId, idTarea, className, onComplete } = route.params || {};
 
   const [classData, setClassData] = useState(null);
-  const [currentClassIndex, setCurrentClassIndex] = useState(0);
-  const [classNames, setClassNames] = useState([]);
 
   useEffect(() => {
     navigation.setOptions({
-      title: '      Menu',
+      title: className || 'Clase',
       headerStyle: { backgroundColor: '#1565C0', height: scale(70) },
       headerTintColor: '#fff',
       headerTitleStyle: { fontWeight: 'bold', fontSize: scale(20) },
-      headerLeft: () => null,
-      headerRight: () => (
+      headerLeft: () => (
         <TouchableOpacity
-          style={styles.buttonExit}
-          onPress={() => navigation.navigate('Home')}
+          style={styles.buttonBack}
+          onPress={() => navigation.goBack()}
         >
-          <Text style={styles.buttonExitText}>Salir</Text>
+          <Text style={styles.buttonBackText}>Atrás</Text>
         </TouchableOpacity>
       ),
     });
-  }, [navigation]);
+  }, [navigation, className]);
 
   useEffect(() => {
-    if (!idTarea) {
-      alert('No se ha proporcionado el ID de la tarea.');
+    if (!idTarea || !className) {
+      alert('No se ha proporcionado la información necesaria.');
       return;
     }
-    fetchClassesAndMenus(0);
-  }, [idTarea]);
+    fetchClassData();
+  }, [idTarea, className]);
 
-  const fetchClassesAndMenus = async (classIndex) => {
+  const fetchClassData = async () => {
     try {
       const taskDocRef = doc(db, 'Tareas', idTarea);
       const taskDoc = await getDoc(taskDocRef);
 
       if (taskDoc.exists()) {
         const taskData = taskDoc.data();
-        const classKeys = Object.keys(taskData.Clases).sort();
-        setClassNames(classKeys);
-
-        if (classKeys.length > 0) {
-          const sortedMenuData = Object.entries(taskData.Clases[classKeys[classIndex]])
-            .sort((a, b) => a[0].localeCompare(b[0]));
-
-          setClassData({ className: classKeys[classIndex], menus: sortedMenuData });
-        } else {
-          setClassData(null);
-        }
+        const menus = Object.entries(taskData.Clases[className] || {}).sort((a, b) => a[0].localeCompare(b[0]));
+        setClassData({ className, menus });
       } else {
         setClassData(null);
       }
@@ -83,27 +69,11 @@ export default function UserMenuTask({ route, navigation }) {
     }
   };
 
-  const handlePreviousClass = () => {
-    if (currentClassIndex > 0) {
-      const newIndex = currentClassIndex - 1;
-      setCurrentClassIndex(newIndex);
-      fetchClassesAndMenus(newIndex);
-    }
-  };
-
-  const handleNextClass = () => {
-    if (currentClassIndex < classNames.length - 1) {
-      const newIndex = currentClassIndex + 1;
-      setCurrentClassIndex(newIndex);
-      fetchClassesAndMenus(newIndex);
-    }
-  };
-
   const handleCounterChange = async (menuKey, change) => {
     const updatedMenus = classData.menus.map(([key, menuData]) => {
       if (key === menuKey) {
         const updatedMenuData = [...menuData];
-        updatedMenuData[2] = updatedMenuData[2] + change;
+        updatedMenuData[2] += change;
         return [key, updatedMenuData];
       }
       return [key, menuData];
@@ -118,11 +88,18 @@ export default function UserMenuTask({ route, navigation }) {
       const updatedMenuData = menuToUpdate[1];
 
       await updateDoc(taskDocRef, {
-        [`Clases.${classNames[currentClassIndex]}.${menuKey}`]: updatedMenuData,
+        [`Clases.${className}.${menuKey}`]: updatedMenuData,
       });
     } catch (error) {
       console.error('Error actualizando el contador en la base de datos:', error);
     }
+  };
+
+  const handleComplete = () => {
+    if (onComplete) {
+      onComplete();
+    }
+    navigation.goBack();
   };
 
   const renderMenuItem = ({ item }) => {
@@ -159,40 +136,21 @@ export default function UserMenuTask({ route, navigation }) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>{classData ? classData.className : 'Clase no encontrada'}</Text>
+      <Text style={styles.title}>{classData ? classData.className : 'Cargando...'}</Text>
 
-      <View style={styles.mainContent}>
-        <TouchableOpacity
-          style={styles.arrowLeft}
-          onPress={handlePreviousClass}
-          disabled={currentClassIndex === 0}
-        >
-          <Icon
-            name="arrow-back-circle"
-            size={largeScale(70)}
-            color={currentClassIndex === 0 ? '#ccc' : '#1565C0'}
-          />
-        </TouchableOpacity>
+      <FlatList
+        data={classData ? classData.menus : []}
+        keyExtractor={(item) => item[0]}
+        renderItem={renderMenuItem}
+        style={styles.menuList}
+      />
 
-        <FlatList
-          data={classData ? classData.menus : []}
-          keyExtractor={(item) => item[0]}
-          renderItem={renderMenuItem}
-          style={styles.menuList}
-        />
-
-        <TouchableOpacity
-          style={styles.arrowRight}
-          onPress={handleNextClass}
-          disabled={currentClassIndex === classNames.length - 1}
-        >
-          <Icon
-            name="arrow-forward-circle"
-            size={largeScale(70)}
-            color={currentClassIndex === classNames.length - 1 ? '#ccc' : '#1565C0'}
-          />
-        </TouchableOpacity>
-      </View>
+      <TouchableOpacity
+        style={styles.completeButton}
+        onPress={handleComplete}
+      >
+        <Text style={styles.completeButtonText}>Completar</Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -204,36 +162,20 @@ const styles = StyleSheet.create({
     padding: scale(15),
   },
   title: {
-    fontSize: largeScale(30),
+    fontSize: scale(30),
     fontWeight: 'bold',
     color: '#424242',
     marginBottom: scale(10),
     textAlign: 'center',
   },
-  buttonExit: {
-    marginRight: scale(10),
-    paddingVertical: scale(5),
-    paddingHorizontal: scale(10),
-    backgroundColor: 'red',
-    borderRadius: scale(5),
-  },
-  buttonExitText: {
-    color: '#fff',
-    fontSize: scale(14),
-    fontWeight: 'bold',
-  },
-  mainContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
   menuList: {
     flex: 1,
-    marginHorizontal: scale(10),
+    marginTop: scale(5),
   },
   menuItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: scale(10),
+    padding: scale(5),
     marginBottom: scale(4),
     backgroundColor: '#fff',
     borderRadius: scale(10),
@@ -270,10 +212,30 @@ const styles = StyleSheet.create({
     marginHorizontal: scale(10),
     color: '#424242',
   },
-  arrowLeft: {
-    marginRight: scale(10),
-  },
-  arrowRight: {
+  buttonBack: {
     marginLeft: scale(10),
+    paddingVertical: scale(5),
+    paddingHorizontal: scale(10),
+    backgroundColor: '#FF7043',
+    borderRadius: scale(5),
+  },
+  buttonBackText: {
+    color: '#fff',
+    fontSize: scale(14),
+    fontWeight: 'bold',
+  },
+  completeButton: {
+    marginTop: scale(5), // Reduce el margen superior
+    paddingVertical: scale(5), // Reduce la altura
+    backgroundColor: '#1565C0',
+    borderRadius: scale(8),
+    alignItems: 'center',
+    alignSelf: 'center',
+    width: scale(100), // Reduce el ancho
+  },
+  completeButtonText: {
+    color: '#fff',
+    fontSize: scale(13), // Reduce el tamaño del texto
+    fontWeight: 'bold',
   },
 });
