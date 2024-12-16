@@ -33,7 +33,7 @@ export default function UserMenuTask({ route, navigation }) {
       headerStyle: { backgroundColor: '#1565C0', height: scale(70) },
       headerTintColor: '#fff',
       headerTitleStyle: { fontWeight: 'bold', fontSize: scale(20) },
-      headerLeft: () => (
+      headerRight: () => (
         <TouchableOpacity
           style={styles.buttonBack}
           onPress={() => navigation.goBack()}
@@ -97,7 +97,7 @@ export default function UserMenuTask({ route, navigation }) {
 
   const handleComplete = () => {
     if (onComplete) {
-      onComplete();
+      onComplete(className); // Pasa el nombre de la clase completada
     }
     navigation.goBack();
   };
@@ -213,7 +213,6 @@ const styles = StyleSheet.create({
     color: '#424242',
   },
   buttonBack: {
-    marginLeft: scale(10),
     paddingVertical: scale(5),
     paddingHorizontal: scale(10),
     backgroundColor: '#FF7043',
@@ -225,17 +224,20 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   completeButton: {
-    marginTop: scale(5), // Reduce el margen superior
-    paddingVertical: scale(5), // Reduce la altura
-    backgroundColor: '#1565C0',
-    borderRadius: scale(8),
+    marginTop: scale(20), // Ajuste del margen superior
+    paddingVertical: scale(15), // Ajuste de altura
+    paddingHorizontal: scale(10), // Ajuste horizontal
+    backgroundColor: '#FFF59D', // Amarillo claro
+    borderRadius: scale(5), // Esquinas más pequeñas
     alignItems: 'center',
     alignSelf: 'center',
-    width: scale(100), // Reduce el ancho
+    width: scale(300), // Ancho similar al del botón Aceptar
+    borderWidth: 2, // Borde más grueso, similar al de las clases
+    borderColor: '#000', // Borde negro
   },
   completeButtonText: {
-    color: '#fff',
-    fontSize: scale(13), // Reduce el tamaño del texto
+    color: '#000', // Texto negro
+    fontSize: scale(18),
     fontWeight: 'bold',
   },
 });

@@ -13,9 +13,10 @@ const { width } = Dimensions.get('window');
 const scale = (size) => (width < 375 ? size : size * (width / 375));
 
 export default function AssignmentMenuClass({ route, navigation }) {
-  const { studentId, idTarea, onComplete } = route.params || {};
+  const { studentId, idTarea } = route.params || {};
 
   const [classes, setClasses] = useState([]);
+  const [completedClasses, setCompletedClasses] = useState([]);
 
   useEffect(() => {
     navigation.setOptions({
@@ -23,7 +24,7 @@ export default function AssignmentMenuClass({ route, navigation }) {
       headerStyle: { backgroundColor: '#1565C0', height: scale(70) },
       headerTintColor: '#fff',
       headerTitleStyle: { fontWeight: 'bold', fontSize: scale(20) },
-      headerLeft: () => (
+      headerRight: () => ( // Botón en la esquina superior derecha
         <TouchableOpacity
           style={styles.buttonBack}
           onPress={() => navigation.goBack()}
@@ -64,21 +65,25 @@ export default function AssignmentMenuClass({ route, navigation }) {
       studentId,
       idTarea,
       className,
-      onComplete: () => {
-        if (onComplete) onComplete();
-        fetchClasses();
+      onComplete: (completedClass) => {
+        setCompletedClasses((prev) => [...prev, completedClass]);
       },
     });
   };
 
-  const renderClassItem = ({ item }) => (
-    <TouchableOpacity
-      style={styles.classItem}
-      onPress={() => handleClassSelect(item)}
-    >
-      <Text style={styles.classText}>{item}</Text>
-    </TouchableOpacity>
-  );
+  const renderClassItem = ({ item }) => {
+    const isCompleted = completedClasses.includes(item);
+    return (
+      <View style={[styles.outerWrapper, isCompleted && styles.outerWrapperCompleted]}>
+        <TouchableOpacity
+          style={styles.classItem}
+          onPress={() => handleClassSelect(item)}
+        >
+          <Text style={styles.classText}>{item}</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -106,7 +111,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#D9EFFF',
     padding: scale(15),
-    justifyContent: 'center', // Centra verticalmente
   },
   title: {
     fontSize: scale(30),
@@ -116,17 +120,27 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   classList: {
-    alignItems: 'center', // Centra horizontalmente los botones
+    alignItems: 'center',
   },
+  // Contenedor externo
+  outerWrapper: {
+    marginBottom: scale(20), // Espaciado entre las clases
+    padding: scale(4), // Espaciado interno para separar el borde verde
+  },
+  outerWrapperCompleted: {
+    borderWidth: 10, // Borde más grueso
+    borderColor: 'green', // Borde verde
+    borderRadius: scale(15),
+  },
+  // Contenido de la clase
   classItem: {
-    width: scale(200), // Ancho del botón
+    width: scale(200),
     padding: scale(15),
-    marginBottom: scale(15),
     backgroundColor: '#fff',
     borderRadius: scale(10),
     borderWidth: 2,
     borderColor: '#1565C0',
-    alignItems: 'center', // Centra el texto dentro del botón
+    alignItems: 'center',
   },
   classText: {
     fontSize: scale(18),
@@ -135,7 +149,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   buttonBack: {
-    marginLeft: scale(10),
+    marginRight: scale(10), // Cambia posición a la derecha
     paddingVertical: scale(5),
     paddingHorizontal: scale(10),
     backgroundColor: '#FF7043',
@@ -148,16 +162,19 @@ const styles = StyleSheet.create({
   },
   acceptButton: {
     marginTop: scale(20),
-    paddingVertical: scale(10),
-    backgroundColor: '#1565C0',
-    borderRadius: scale(10),
+    paddingVertical: scale(15), // Ajuste de altura
+    paddingHorizontal: scale(10), // Ajuste horizontal
+    backgroundColor: '#FFF59D', // Amarillo claro
+    borderRadius: scale(5), // Esquinas más pequeñas
     alignItems: 'center',
-    alignSelf: 'center', // Centra el botón "Aceptar"
-    width: scale(150), // Ancho del botón
+    alignSelf: 'center',
+    width: scale(300), // Ancho similar a la imagen
+    borderWidth: 2, // Borde más grueso, similar al de las clases
+    borderColor: '#000', // Borde negro
   },
   acceptButtonText: {
-    color: '#fff',
+    color: '#000', // Texto negro
     fontSize: scale(18),
     fontWeight: 'bold',
-  },
+  },  
 });

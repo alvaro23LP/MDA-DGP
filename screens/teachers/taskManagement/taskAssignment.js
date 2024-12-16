@@ -4,7 +4,7 @@ import {
   Text,
   StyleSheet,
   TextInput,
-  TouchableOpacity, 
+  TouchableOpacity,
   FlatList,
   Modal,
 } from 'react-native';
@@ -111,49 +111,48 @@ export default function TaskAssignment({ navigation, route }) {
   };
 
   // Asignar tarea al estudiante
-const assignTask = async () => {
-  if (!taskTitle || !selectedStudent || preferenciasVista.length === 0 || !manualDate) {
-    alert('Por favor completa todos los campos.');
-    return;
-  }
+  const assignTask = async () => {
+    if (!taskTitle || !selectedStudent || preferenciasVista.length === 0 || !manualDate) {
+      alert('Por favor completa todos los campos.');
+      return;
+    }
 
-  if (!isValidDate(manualDate)) {
-    alert('Por favor ingresa una fecha válida en el formato dd/mm/yyyy.');
-    return;
-  }
+    if (!isValidDate(manualDate)) {
+      alert('Por favor ingresa una fecha válida en el formato dd/mm/yyyy.');
+      return;
+    }
 
-  try {
-    const studentDoc = doc(db, 'Estudiantes', selectedStudent);
-    const studentData = students.find((student) => student.id === selectedStudent);
+    try {
+      const studentDoc = doc(db, 'Estudiantes', selectedStudent);
+      const studentData = students.find((student) => student.id === selectedStudent);
 
-    const [day, month, year] = manualDate.split('/');
-    const fechaLimite = new Date(year, month - 1, day);
+      const [day, month, year] = manualDate.split('/');
+      const fechaLimite = new Date(year, month - 1, day);
 
-    // Crear una referencia al documento de la tarea
-    const taskRef = doc(db, 'Tareas', taskTitle);
+      // Crear una referencia al documento de la tarea
+      const taskRef = doc(db, 'Tareas', taskTitle);
 
-    await updateDoc(studentDoc, {
-      agendaTareas: [
-        ...(studentData.agendaTareas || []),
-        {
-          idTarea: taskRef, // Guardar como referencia
-          fechaInicio: new Date(),
-          fechaLimite: fechaLimite,
-        },
-      ],
-    });
+      await updateDoc(studentDoc, {
+        agendaTareas: [
+          ...(studentData.agendaTareas || []),
+          {
+            idTarea: taskRef, // Guardar como referencia
+            fechaInicio: new Date(),
+            fechaLimite: fechaLimite,
+          },
+        ],
+      });
 
-    alert('Tarea asignada correctamente.');
-    setTaskTitle('');
-    setSelectedStudent('');
-    setPreferenciasVista([]);
-    setManualDate('');
-  } catch (error) {
-    console.error('Error al asignar tarea:', error);
-    alert('Hubo un problema al asignar la tarea.');
-  }
-};
-
+      alert('Tarea asignada correctamente.');
+      setTaskTitle('');
+      setSelectedStudent('');
+      setPreferenciasVista([]);
+      setManualDate('');
+    } catch (error) {
+      console.error('Error al asignar tarea:', error);
+      alert('Hubo un problema al asignar la tarea.');
+    }
+  };
 
   // Filtros dinámicos
   const filterTasks = (text) => {
@@ -255,10 +254,18 @@ const assignTask = async () => {
         onSelectedItemsChange={(selected) => setPreferenciasVista(selected)}
         selectedItems={preferenciasVista}
         selectText="Escoger preferencia"
-        style={styles.inputButton}
+        style={styles.multiSelect}
         textInputProps={{
-          style: { fontSize: scale(8), color: '#000' } // Establecer tamaño y color del texto
+          style: { fontSize: scale(18), color: '#000' } // Aumenta el tamaño del texto
         }}
+        tagRemoveIconColor="#1565C0"
+        tagBorderColor="#1565C0"
+        tagTextColor="#1565C0"
+        selectedItemTextColor="#fff"
+        selectedItemIconColor="#fff"
+        itemTextColor="#000"
+        displayKey="name"
+        submitButtonColor="#1565C0"
       />
 
       {/* Fecha límite */}
@@ -287,23 +294,23 @@ const styles = StyleSheet.create({
     backgroundColor: '#D9EFFF',
   },
   label: {
-    fontSize: scale(18),
+    fontSize: scale(20),
     fontWeight: 'bold',
-    marginBottom: scale(8),
+    marginBottom: scale(10),
     color: '#1565C0',
   },
   inputButton: {
     borderWidth: 1,
     borderColor: '#1565C0',
-    padding: scale(12),
-    marginBottom: scale(16),
-    borderRadius: scale(5),
+    padding: scale(15),
+    marginBottom: scale(20),
+    borderRadius: scale(10),
     justifyContent: 'center',
     backgroundColor: '#fff',
   },
   inputText: {
     color: '#000',
-    fontSize: scale(16),
+    fontSize: scale(18),
   },
   modalContainer: {
     flex: 1,
@@ -316,10 +323,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     padding: scale(12),
     borderRadius: scale(5),
-    marginVertical: scale(8),
+    marginVertical: scale(10),
+    fontSize: scale(18), // Aumentar el tamaño del texto
   },
   listItem: {
-    padding: scale(12),
+    padding: scale(15),
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
   },
@@ -333,14 +341,16 @@ const styles = StyleSheet.create({
   },
   textButton: {
     color: '#000',
-    fontSize: scale(16),
+    fontSize: scale(18),
   },
   multiSelect: {
     borderWidth: 1,
     borderColor: '#1565C0',
-    marginVertical: scale(8),
-    padding: scale(12),
-    borderRadius: scale(5),
+    marginVertical: scale(10),
+    padding: scale(15),
+    borderRadius: scale(10),
+    height: scale(70), // Aumentar la altura del input de multiSelect
+    justifyContent: 'center',
   },
   button: {
     backgroundColor: '#FEF28A',
@@ -348,7 +358,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginVertical: scale(10),
     padding: scale(15),
-    borderRadius: scale(5),
+    borderRadius: scale(10),
     borderWidth: 2,
     borderColor: '#000',
   },
