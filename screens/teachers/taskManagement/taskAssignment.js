@@ -110,45 +110,49 @@ export default function TaskAssignment({ navigation, route }) {
   };
 
   // Asignar tarea al estudiante
-  const assignTask = async () => {
-    if (!taskTitle || !selectedStudent || preferenciasVista.length === 0 || !manualDate) {
-      alert('Por favor completa todos los campos.');
-      return;
-    }
+const assignTask = async () => {
+  if (!taskTitle || !selectedStudent || preferenciasVista.length === 0 || !manualDate) {
+    alert('Por favor completa todos los campos.');
+    return;
+  }
 
-    if (!isValidDate(manualDate)) {
-      alert('Por favor ingresa una fecha válida en el formato dd/mm/yyyy.');
-      return;
-    }
+  if (!isValidDate(manualDate)) {
+    alert('Por favor ingresa una fecha válida en el formato dd/mm/yyyy.');
+    return;
+  }
 
-    try {
-      const studentDoc = doc(db, 'Estudiantes', selectedStudent);
-      const studentData = students.find((student) => student.id === selectedStudent);
+  try {
+    const studentDoc = doc(db, 'Estudiantes', selectedStudent);
+    const studentData = students.find((student) => student.id === selectedStudent);
 
-      const [day, month, year] = manualDate.split('/');
-      const fechaLimite = new Date(year, month - 1, day);
+    const [day, month, year] = manualDate.split('/');
+    const fechaLimite = new Date(year, month - 1, day);
 
-      await updateDoc(studentDoc, {
-        agendaTareas: [
-          ...(studentData.agendaTareas || []),
-          {
-            idTarea: `/Tareas/${taskTitle}`,
-            fechaInicio: new Date(),
-            fechaLimite: fechaLimite,
-          },
-        ],
-      });
+    // Crear una referencia al documento de la tarea
+    const taskRef = doc(db, 'Tareas', taskTitle);
 
-      alert('Tarea asignada correctamente.');
-      setTaskTitle('');
-      setSelectedStudent('');
-      setPreferenciasVista([]);
-      setManualDate('');
-    } catch (error) {
-      console.error('Error al asignar tarea:', error);
-      alert('Hubo un problema al asignar la tarea.');
-    }
-  };
+    await updateDoc(studentDoc, {
+      agendaTareas: [
+        ...(studentData.agendaTareas || []),
+        {
+          idTarea: taskRef, // Guardar como referencia
+          fechaInicio: new Date(),
+          fechaLimite: fechaLimite,
+        },
+      ],
+    });
+
+    alert('Tarea asignada correctamente.');
+    setTaskTitle('');
+    setSelectedStudent('');
+    setPreferenciasVista([]);
+    setManualDate('');
+  } catch (error) {
+    console.error('Error al asignar tarea:', error);
+    alert('Hubo un problema al asignar la tarea.');
+  }
+};
+
 
   // Filtros dinámicos
   const filterTasks = (text) => {
