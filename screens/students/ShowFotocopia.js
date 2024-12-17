@@ -30,7 +30,7 @@ export default function ShowFotocopia({navigation,route}){
     const [tipo, setTipo] = useState('');
     const [tipoColor, setTipoColor] = useState('');
     const { idTarea } = route.params;
-    const {idAlumno} = route.params;
+    const {studentId} = route.params;
     const [studentData, setStudentData] = useState({});
     const [prefTexto, setPrefTexto] = useState(false);
     const [prefPictograma, setPrefPictograma] = useState(false);
@@ -76,7 +76,7 @@ export default function ShowFotocopia({navigation,route}){
         const getStudentData = async () => 
         {
             try{
-                const studentDoc = await getDoc(doc(db, 'Estudiantes', idAlumno));
+                const studentDoc = await getDoc(doc(db, 'Estudiantes', studentId));
                 if(studentDoc.exists()){
                     const data = studentDoc.data();
                     setStudentData(data);
@@ -109,7 +109,7 @@ export default function ShowFotocopia({navigation,route}){
         getTaskData();
 
            
-    }, [navigation, idTarea, idAlumno]);
+    }, [navigation, idTarea, studentId]);
 
    
 
