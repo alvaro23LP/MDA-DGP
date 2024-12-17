@@ -20,7 +20,7 @@ initializeApp(firebaseConfig);
 const db = getFirestore();
 
 // Obtener el ancho de la pantalla
-const { width, height } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
 const scale = (size) => (width < 375 ? size : size * (width / 375));
 
@@ -148,6 +148,7 @@ export default function TaskAssignment({ navigation, route }) {
       setSelectedStudent('');
       setPreferenciasVista([]);
       setManualDate('');
+      navigation.goBack();
     } catch (error) {
       console.error('Error al asignar tarea:', error);
       alert('Hubo un problema al asignar la tarea.');
@@ -258,11 +259,11 @@ export default function TaskAssignment({ navigation, route }) {
         textInputProps={{
           style: { fontSize: scale(18), color: '#000' } // Aumenta el tamaño del texto
         }}
-        tagRemoveIconColor="#1565C0"
-        tagBorderColor="#1565C0"
-        tagTextColor="#1565C0"
-        selectedItemTextColor="#fff"
-        selectedItemIconColor="#fff"
+        tagRemoveIconColor="red"
+        tagBorderColor="green"
+        tagTextColor="green"
+        selectedItemTextColor="green"
+        selectedItemIconColor="#000"
         itemTextColor="#000"
         displayKey="name"
         submitButtonColor="#1565C0"
@@ -279,7 +280,13 @@ export default function TaskAssignment({ navigation, route }) {
       />
 
       {/* Botón Aceptar */}
-      <TouchableOpacity style={styles.button} onPress={assignTask}>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => {
+          assignTask(); // Ejecuta la función assignTask
+        
+        }}
+      >
         <Text style={styles.textButton}>Aceptar</Text>
       </TouchableOpacity>
     </View>
@@ -302,7 +309,7 @@ const styles = StyleSheet.create({
   inputButton: {
     borderWidth: 1,
     borderColor: '#1565C0',
-    padding: scale(15),
+    padding: scale(10),
     marginBottom: scale(20),
     borderRadius: scale(10),
     justifyContent: 'center',
@@ -329,7 +336,7 @@ const styles = StyleSheet.create({
   listItem: {
     padding: scale(15),
     borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
+    borderBottomColor: '#000',
   },
   closeButton: {
     backgroundColor: '#FEF28A',
@@ -337,7 +344,8 @@ const styles = StyleSheet.create({
     borderRadius: scale(5),
     marginTop: scale(16),
     alignItems: 'center',
-    borderColor: '#424242',
+    borderColor: '#000',
+    borderWidth: 2,
   },
   textButton: {
     color: '#000',
@@ -345,7 +353,7 @@ const styles = StyleSheet.create({
   },
   multiSelect: {
     borderWidth: 1,
-    borderColor: '#1565C0',
+    borderColor: '#000',
     marginVertical: scale(10),
     padding: scale(15),
     borderRadius: scale(10),
@@ -356,9 +364,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#FEF28A',
     alignItems: 'center',
     justifyContent: 'center',
-    marginVertical: scale(10),
+    marginVertical: scale(5),
     padding: scale(15),
-    borderRadius: scale(10),
+    borderRadius: scale(8),
     borderWidth: 2,
     borderColor: '#000',
   },

@@ -11,6 +11,7 @@ const db = getFirestore();
 // Dimensiones para escalado
 const { width } = Dimensions.get('window');
 const scale = (size) => (width < 375 ? size : size * (width / 375));
+const largeScale = (size) => (width > 800 ? size * 1.5 : size);
 
 export default function AssignmentMenuClass({ route, navigation }) {
   const { studentId, idTarea } = route.params || {};
@@ -24,14 +25,15 @@ export default function AssignmentMenuClass({ route, navigation }) {
       headerStyle: { backgroundColor: '#1565C0', height: scale(70) },
       headerTintColor: '#fff',
       headerTitleStyle: { fontWeight: 'bold', fontSize: scale(20) },
-      headerRight: () => ( // Botón en la esquina superior derecha
-        <TouchableOpacity
-          style={styles.buttonBack}
-          onPress={() => navigation.goBack()}
-        >
-          <Text style={styles.buttonBackText}>Atrás</Text>
-        </TouchableOpacity>
-      ),
+      headerLeft: () => null,
+      headerRight: () => (
+          <TouchableOpacity
+              style={styles.buttonExit}
+              onPress={() => navigation.navigate('Home')}
+          >
+              <Text style={styles.buttonExitText}>Salir</Text>
+          </TouchableOpacity>
+      )
     });
   }, [navigation]);
 
@@ -100,7 +102,7 @@ export default function AssignmentMenuClass({ route, navigation }) {
         style={styles.acceptButton}
         onPress={() => navigation.goBack()}
       >
-        <Text style={styles.acceptButtonText}>Aceptar</Text>
+        <Text style={styles.acceptButtonText}>Completar Tarea</Text>
       </TouchableOpacity>
     </View>
   );
@@ -148,17 +150,26 @@ const styles = StyleSheet.create({
     color: '#1565C0',
     textAlign: 'center',
   },
-  buttonBack: {
-    marginRight: scale(10), // Cambia posición a la derecha
-    paddingVertical: scale(5),
-    paddingHorizontal: scale(10),
-    backgroundColor: '#FF7043',
-    borderRadius: scale(6),
+  buttonExit: { 
+    position: 'absolute',
+    top: largeScale(20),
+    right: largeScale(20),
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'red',
+    padding: largeScale(10),
+    borderColor: 'black',
+    borderWidth: 1,
+    width: '30%',
+    height: '60%',
   },
-  buttonBackText: {
-    color: '#fff',
-    fontSize: scale(14),
-    fontWeight: 'bold',
+  buttonExitText: {
+      color: '#fff',
+      fontSize: scale(15),
+      fontWeight: 'bold',
+      fontshadowColor: 'black',
+      textShadowOffset: { width: 3, height: 3 },
+      textShadowRadius: 3,
   },
   acceptButton: {
     marginTop: scale(20),
@@ -168,7 +179,7 @@ const styles = StyleSheet.create({
     borderRadius: scale(5), // Esquinas más pequeñas
     alignItems: 'center',
     alignSelf: 'center',
-    width: scale(300), // Ancho similar a la imagen
+    width: scale(200), // Ancho similar a la imagen
     borderWidth: 2, // Borde más grueso, similar al de las clases
     borderColor: '#000', // Borde negro
   },

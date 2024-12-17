@@ -21,6 +21,7 @@ const imageMap = {
 // Dimensiones para escalado
 const { width } = Dimensions.get('window');
 const scale = (size) => (width < 375 ? size : size * (width / 375));
+const largeScale = (size) => (width > 800 ? size * 1.5 : size);
 
 export default function UserMenuTask({ route, navigation }) {
   const { studentId, idTarea, className, onComplete } = route.params || {};
@@ -30,17 +31,18 @@ export default function UserMenuTask({ route, navigation }) {
   useEffect(() => {
     navigation.setOptions({
       title: className || 'Clase',
-      headerStyle: { backgroundColor: '#1565C0', height: scale(70) },
+      headerStyle: { backgroundColor: '#1565C0', height: scale(60) },
       headerTintColor: '#fff',
       headerTitleStyle: { fontWeight: 'bold', fontSize: scale(20) },
+      headerLeft: () => null,
       headerRight: () => (
-        <TouchableOpacity
-          style={styles.buttonBack}
-          onPress={() => navigation.goBack()}
-        >
-          <Text style={styles.buttonBackText}>Atrás</Text>
-        </TouchableOpacity>
-      ),
+          <TouchableOpacity
+              style={styles.buttonExit}
+              onPress={() => navigation.navigate('Home')}
+          >
+              <Text style={styles.buttonExitText}>Salir</Text>
+          </TouchableOpacity>
+      )
     });
   }, [navigation, className]);
 
@@ -149,7 +151,7 @@ export default function UserMenuTask({ route, navigation }) {
         style={styles.completeButton}
         onPress={handleComplete}
       >
-        <Text style={styles.completeButtonText}>Completar</Text>
+        <Text style={styles.completeButtonText}>Aceptar</Text>
       </TouchableOpacity>
     </View>
   );
@@ -175,10 +177,10 @@ const styles = StyleSheet.create({
   menuItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: scale(5),
+    padding: scale(4),
     marginBottom: scale(4),
     backgroundColor: '#fff',
-    borderRadius: scale(10),
+    borderRadius: scale(8),
     borderWidth: 2,
     borderColor: '#1565C0',
   },
@@ -199,7 +201,7 @@ const styles = StyleSheet.create({
   counterButton: {
     backgroundColor: '#FEF28A',
     padding: scale(5),
-    borderRadius: scale(5),
+    borderRadius: scale(4),
     borderWidth: 2,
     borderColor: '#1565C0',
   },
@@ -212,26 +214,36 @@ const styles = StyleSheet.create({
     marginHorizontal: scale(10),
     color: '#424242',
   },
-  buttonBack: {
-    paddingVertical: scale(5),
-    paddingHorizontal: scale(10),
-    backgroundColor: '#FF7043',
-    borderRadius: scale(5),
+  buttonExit: { 
+    position: 'absolute',
+    top: largeScale(20),
+    right: largeScale(20),
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'red',
+    padding: largeScale(10),
+    borderColor: 'black',
+    borderWidth: 1,
+    width: '30%',
+    height: '60%',
   },
-  buttonBackText: {
-    color: '#fff',
-    fontSize: scale(14),
-    fontWeight: 'bold',
+  buttonExitText: {
+      color: '#fff',
+      fontSize: scale(15),
+      fontWeight: 'bold',
+      fontshadowColor: 'black',
+      textShadowOffset: { width: 3, height: 3 },
+      textShadowRadius: 3,
   },
   completeButton: {
-    marginTop: scale(20), // Ajuste del margen superior
-    paddingVertical: scale(15), // Ajuste de altura
+    marginTop: scale(10), // Ajuste del margen superior
+    paddingVertical: scale(7), // Ajuste de altura
     paddingHorizontal: scale(10), // Ajuste horizontal
     backgroundColor: '#FFF59D', // Amarillo claro
-    borderRadius: scale(5), // Esquinas más pequeñas
+    borderRadius: scale(4), // Esquinas más pequeñas
     alignItems: 'center',
     alignSelf: 'center',
-    width: scale(300), // Ancho similar al del botón Aceptar
+    width: scale(200), // Ancho similar al del botón Aceptar
     borderWidth: 2, // Borde más grueso, similar al de las clases
     borderColor: '#000', // Borde negro
   },
