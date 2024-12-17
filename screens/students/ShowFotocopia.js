@@ -6,9 +6,13 @@ import {useState, useEffect } from 'react';
 import { getFirestore, getDoc, doc } from 'firebase/firestore';
 import { initializeApp } from 'firebase/app';
 import { firebaseConfig } from '../../services/firebaseConfig';
+import AceptButton from '../../componentes/AceptButton';
 
-const fotocopiaImage = require('../../images/fotocopia.png'); 
-const plastificarImage = require('../../images/plastificar.png');
+const fotocopiaImage = require('../../images/fotocopias/fotocopia.png'); 
+const plastificarImage = require('../../images/fotocopias/plastificar.png');
+const okImage = require('../../images/fotocopias/hecho.png');
+const colorImage = require('../../images/fotocopias/color.png');
+const blancoNegroImage = require('../../images/fotocopias/blancoNegro.png');
 
 
 // Inicializa Firebase
@@ -21,16 +25,17 @@ const { width } = Dimensions.get('window');
 const scale = (size) => (width < 375 ? size : size * (width / 375));
 
 
-
-
-
-
 export default function ShowFotocopia({navigation,route}){
     const [cantidad, setCantidad] = useState('');
     const [tipo, setTipo] = useState('');
     const [tipoColor, setTipoColor] = useState('');
     const { idTarea } = route.params;
-
+    const {idAlumno} = route.params;
+    const [studentData, setStudentData] = useState({});
+    const [prefTexto, setPrefTexto] = useState(false);
+    const [prefPictograma, setPrefPictograma] = useState(false);
+    
+    
 
     useEffect(() => {
         // Configura las opciones del encabezado
@@ -67,28 +72,88 @@ export default function ShowFotocopia({navigation,route}){
                 Alert.alert('Error', 'Hubo un problema al obtener los datos de la tarea. Inténtalo de nuevo.');
             }
         };
+
+        const getStudentData = async () => 
+        {
+            try{
+                const studentDoc = await getDoc(doc(db, 'Estudiantes', idAlumno));
+                if(studentDoc.exists()){
+                    const data = studentDoc.data();
+                    setStudentData(data);
+                    
+                    for(let i=0; i <data.preferenciasVista.length; i++){
+                        
+                        if(data.preferenciasVista[i] === 'Texto'){
+                            setPrefTexto(true);
+                        }
+                
+                        if(data.preferenciasVista[i] === 'Pictograma'){
+                            setPrefPictograma(true);
+                        }
+                    
+                    }
+                    
+                }else{
+                    console.log('No se encontró al alumno');
+                    Alert.alert('Error', 'No se encontró al alumno con el ID proporcionado.');
+                }
     
+            }catch(error){
+                console.error('Error al obtener los datos del alumno:', error);
+                Alert.alert('Error', 'Hubo un problema al obtener los datos del alumno. Inténtalo de nuevo.');
+            }
+        
+        };
+    
+        getStudentData();
         getTaskData();
+
            
-      }, [navigation, idTarea]);
+    }, [navigation, idTarea, idAlumno]);
+
+   
 
 
-      const selectedImage = tipo === 'Fotocopia' ? fotocopiaImage : plastificarImage;
+    
 
-      
-
-      
-
+    const selectedImage = tipo === 'Fotocopia' ? fotocopiaImage : plastificarImage;
+    const selectedColor = tipoColor === 'Color' ? colorImage : blancoNegroImage;
+    
       return(
         <View style={{backgroundColor:'#D9EFFF', flex:1 }}>
 
             <View style={styles.container}>
                 {/* Pictograma fotocopia y plastificar https://arasaac.org/pictograms/search/fotocopia  https://arasaac.org/pictograms/search/plastificar*/}
-                <Image source={selectedImage} style={{width: scale(200), height: scale(200), marginVertical:scale(20)}}/>
-                <View style={styles.textContainer}><Text style={styles.text}>{tipo}</Text></View>
+                
+                <View style={styles.container1}>
+                    {prefPictograma &&
+                        <Image source={selectedImage} style={{width: scale(140), height: scale(140)}}/>
+                    }
+                    {prefTexto &&
+                    <View style={styles.textContainer}><Text style={styles.text}>{tipo}</Text></View>
+                    }
+                </View>
+
+                
                 <View style={styles.textContainer}><Text style={styles.text}>{cantidad}</Text></View>
 
-                <View style={styles.textContainer}><Text style={styles.text}>{tipoColor}</Text></View>
+                <View style={styles.container2}>
+
+                    {prefPictograma &&
+                        <Image source={selectedColor} style={{width: scale(110), height: scale(110), marginHorizontal:scale(20)}}/>
+                    }
+                    {prefTexto &&
+                    <View style={styles.textContainer2}><Text style={styles.text}>{tipoColor}</Text></View>
+                    }
+                </View>
+
+
+                <AceptButton
+                    prefPictograma={prefPictograma}
+                    prefTexto={prefTexto}
+                    navigate={navigation}
+                />
+                
 
             </View>
 
@@ -115,18 +180,70 @@ const styles = StyleSheet.create({
         borderColor:'#1565C0',
         
     },
+
+    container1: {
+        padding: 10,
+        borderWidth: 2,
+        borderColor: '#424242',
+        borderRadius: 10,
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginVertical: scale(10),
+    },
+
+    container2: {
+        padding: 10,
+        borderWidth: 2,
+        borderColor: '#424242',
+        borderRadius: 10,
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginVertical: scale(10),
+    },
+
     textContainer: {
         borderWidth: 3,
         borderRadius: 10,
         borderColor: '#1565C0',
-        margin: 20,
+        marginHorizontal: scale(15),
+    },
+    textContainer2: {
+        borderWidth: 3,
+        borderRadius: 10,
+        borderColor: '#1565C0',
+        marginHorizontal: scale(20),
     },
 
     text: {
         marginVertical: scale(10),
-        marginHorizontal: scale(30),
-        fontSize: scale(20), 
+        marginHorizontal: scale(20),
+        fontSize: scale(15), 
         color: '#424242',
         fontWeight: 'bold'
     },
+
+   
+
+    Button: {
+        flexDirection: 'row',
+        backgroundColor: '#9df4a5',
+        borderWidth: 3,
+        borderColor: '#424242',
+        borderRadius: 10, 
+        alignItems: 'center'
+        
+    },
+
+    textButton: {
+        marginHorizontal: scale(20),
+        fontSize: scale(20), 
+        color: '#424242', 
+        fontWeight: 'bold'
+        
+    }
+
+    
+
 });

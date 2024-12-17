@@ -6,6 +6,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import HomeScreen from '../screens/HomeScreen';
 import PasswordUser from '../screens/PasswordUser';
 import LoadingScreen from '../screens/LoadingScreen';
+import RefuerzoPositivo from '../screens/RefuerzoPositivo';
 
 //Pantallas de estudiantes
 import UserScreen from '../screens/students/UserMainScreen';
@@ -49,6 +50,12 @@ export default function AppNavigator({ isLoading}) {
           name="Home"
           component={HomeScreen}
           //options={{ headerShown: false }}
+        />
+
+        <Stack.Screen
+          name="RefuerzoPositivo"
+          component={RefuerzoPositivo}
+          options={{ headerShown: false }}
         />
 
         {/* Pantallas de profesores */}
