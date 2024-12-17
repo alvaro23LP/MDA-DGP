@@ -8,6 +8,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import editIcon from '../../../images/edit.png';
 import deleteIcon from '../../../images/eliminar_alumno.png';
 import avatarIcon from '../../../images/avatar_1.png';
+import graficaIcon from '../../../images/grafica.png';
 
 // Obtener el ancho de la pantalla
 const { width } = Dimensions.get('window');
@@ -90,6 +91,9 @@ export default function UsersManagement({ navigation }) {
           />
             <Text style={styles.userText}>{item.nombre}</Text>
             <View style={styles.iconContainer}>
+            <TouchableOpacity onPress={() => navigation.navigate('GraphicUser', { userId: item.id })}>
+                <Image source={graficaIcon} style={styles.graphIcon} />
+              </TouchableOpacity>
               <TouchableOpacity onPress={() => navigation.navigate('EditUser', { userId: item.id })}>
                 <Image source={editIcon} style={styles.editIcon} />
               </TouchableOpacity>
@@ -123,11 +127,11 @@ const styles = StyleSheet.create({
   },
   addButtonText: {
     color: '#000',
-    fontSize: 18,
+    fontSize: 28,
     fontWeight: 'bold',
   },
   title: {
-    fontSize: 24,
+    fontSize: 40,
     fontWeight: 'bold',
     marginBottom: 20,
     textAlign: 'center',
@@ -148,7 +152,7 @@ const styles = StyleSheet.create({
   },
   userText: {
     color: '#000',
-    fontSize: 18,
+    fontSize: 28,
     flex: 1,
   },
   iconContainer: {
@@ -157,14 +161,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   editIcon: {
-    width: 36, // Aumenta el tamaño del icono de editar
-    height: 36, // Aumenta el tamaño del icono de editar
-    marginLeft: 20,
-    marginRight: 10, // Añade margen derecho para separar los iconos
+    width: 42,
+    height: 42,
+    marginRight: 20,
+  },
+  graphIcon: {
+    width: 42,
+    height: 42,
+    marginRight: 25,
   },
   deleteIcon: {
-    width: 36, // Aumenta el tamaño del icono de borrar
-    height: 36, // Aumenta el tamaño del icono de borrar
+    width: 42,
+    height: 42,
   },
   listContent: {
     paddingBottom: 20,

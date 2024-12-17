@@ -27,6 +27,7 @@ export default function UserScreen({ navigation, route }) {
         navigation.setOptions({
           headerShown: false, // Oculta el encabezado
         });
+
     }, [navigation]);
 
     useEffect(() => {
@@ -180,7 +181,6 @@ export default function UserScreen({ navigation, route }) {
                 <Text style={{ color: '#fff', fontSize: largeScale(20), marginRight: scale(10) }}>SALIR</Text>
                 <Icon name="exit" size={largeScale(30)} color="#fff" />
             </TouchableOpacity>
-            {renderTareas()}
         </View>
     );
 }
