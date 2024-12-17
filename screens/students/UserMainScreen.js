@@ -93,7 +93,7 @@ export default function UserScreen({ navigation, route }) {
                 case 'Tarea por pasos':
                     return require('../../images/pasosLogo.png'); 
                 case 'Fotocopias':
-                    return require('../../images/plastificar.png'); 
+                    return require('../../images/fotocopias/plastificar.png'); 
                 case 'Tarea de menú':
                     return require('../../images/menú.png'); 
                 default:
