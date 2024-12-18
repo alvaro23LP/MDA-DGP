@@ -152,6 +152,8 @@ export default function ShowFotocopia({navigation,route}){
                     prefPictograma={prefPictograma}
                     prefTexto={prefTexto}
                     navigate={navigation}
+                    idStudent={studentId}
+                    idTarea={idTarea}
                 />
                 
 
