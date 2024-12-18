@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, Alert, ScrollView, TouchableOpacity, Image } from 'react-native';
 import { getFirestore, doc, getDoc, updateDoc } from 'firebase/firestore';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { initializeApp } from 'firebase/app';
 import { firebaseConfig } from '../../../services/firebaseConfig';
 import MultiSelect from 'react-native-multiple-select';
 import { Picker } from '@react-native-picker/picker';
-import { launchImageLibrary } from 'react-native-image-picker';
+import * as ImagePicker from 'expo-image-picker';
+import { uploadAvatarToCloudinary } from '../../../services/cloudinary';
+
 
 // Inicializa Firebase
 initializeApp(firebaseConfig);
@@ -36,6 +38,15 @@ export default function EditUser({route, navigation }) {
       headerTitleStyle: { fontWeight: 'bold', fontSize: 35 },
 
     });
+
+    // Solicita permisos para acceder a la galería de imágenes
+        (async () => {
+          const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+          if (status !== 'granted') {
+            alert('Se requieren permisos para acceder a la galería de imágenes.');
+          }
+        })();
+
   }, [navigation]);
   
   const { userId } = route.params;
@@ -45,7 +56,7 @@ export default function EditUser({route, navigation }) {
   const [contrasena2, setContrasena2] = useState('0');
   const [tipoDiscapacidad, setTipoDiscapacidad] = useState([]);
   const [preferenciasVista, setPreferenciasVista] = useState([]);
-  const [fotoAvatar, setFotoAvatar] = useState(null);
+  const [fotoAvatar, setSelectedImage] = useState(null);
 
   const [originalData, setOriginalData] = useState({});
 
@@ -73,7 +84,7 @@ export default function EditUser({route, navigation }) {
               ? userData.preferenciasVista.split(',').map(item => item.trim()) 
               : []
           );          
-          setFotoAvatar(userData.fotoAvatar);
+          setSelectedImage(userData.fotoAvatar);
           setOriginalData(userData);
         } else {
           Alert.alert('Error', 'No se encontró el usuario');
@@ -87,45 +98,32 @@ export default function EditUser({route, navigation }) {
     loadUserData();
   }, [userId]);
 
-  const handleFileChange = async () => {
-    launchImageLibrary({}, async (response) => {
-      if (response.didCancel) {
-        console.log('User cancelled image picker');
-      } else if (response.error) {
-        console.log('ImagePicker Error: ', response.error);
-      } else {
-        const source = { uri: response.assets[0].uri };
-        setFotoAvatar(source.uri);
-
-        // Subir la imagen a Firebase Storage
-        const responseBlob = await fetch(source.uri);
-        const blob = await responseBlob.blob();
-        const storageRef = ref(storage, `avatars/${userId}`);
-        await uploadBytes(storageRef, blob);
-
-        // Obtener la URL de descarga de la imagen
-        const downloadURL = await getDownloadURL(storageRef);
-        setFotoAvatar(downloadURL);
-      }
-    });
-  };
+  
 
   const pickImage = async () => {
-      let result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: [ImagePicker.MediaType.Images],
-        allowsEditing: true,
-        aspect: [4, 3],
-        quality: 1,
+      console.log('Opening image picker...');
+      // Solicitar permiso para acceder a la galería
+      const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+  
+      if (!permissionResult.granted) {
+        alert('Se requiere permiso para acceder a la galería');
+        return;
+      }
+  
+      // Abrir la galería para seleccionar una imagen
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images, // Solo imágenes
+        allowsEditing: true, // Permitir recortar la imagen
+        aspect: [4, 3], // Relación de aspecto opcional
+        quality: 1, // Calidad de la imagen (1 = máxima calidad)
       });
   
-      console.log('ImagePicker result:', result);
-  
-      if (!result.canceled && result.assets && result.assets.length > 0) {
-        const uri = result.assets[0].uri;
-        setSelectedImage(uri);
-        console.log('Selected image URI:', uri);
+      if (!result.canceled) {
+        // Almacenar la URI de la imagen seleccionada
+        setSelectedImage(result.assets[0].uri);
+        console.log(result.assets[0].uri);
       } else {
-        console.log('Image selection was canceled');
+        console.log('Selección de imagen cancelada');
       }
     };
 
@@ -149,7 +147,12 @@ export default function EditUser({route, navigation }) {
     if (preferenciasVista !== originalData.preferenciasVista) 
       updatedData.preferenciasVista = Array.isArray(preferenciasVista) ? preferenciasVista.join(', ') : preferenciasVista;
 
-    if (fotoAvatar !== originalData.fotoAvatar) updatedData.fotoAvatar = fotoAvatar;
+    if (fotoAvatar !== originalData.fotoAvatar){
+      const uploadResult = await uploadAvatarToCloudinary(fotoAvatar);
+      let fotoAvatarUrl = null;
+      fotoAvatarUrl = uploadResult.secure_url;
+      updatedData.fotoAvatar = fotoAvatarUrl;
+    }
     
 
     if (Object.keys(updatedData).length === 0) {
@@ -243,10 +246,15 @@ export default function EditUser({route, navigation }) {
         fontSize={20}
       />
 
-    <View style={styles.fileInputContainer}>
-          <Text style={styles.label}>Foto Avatar</Text>
-            <Button title="Seleccionar Imagen" onPress={pickImage} />
-          </View> 
+    <View style={{ flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center'}}>
+            <View style={{ marginRight: 50 }}>
+              <Text style={styles.label}>Foto Avatar</Text>
+              <Button title="Seleccionar Imagen" onPress={pickImage} />
+            </View>
+            {fotoAvatar && (
+              <Image source={{ uri: fotoAvatar }} style={styles.avatarImage} />
+            )}
+    </View>
 
       <View style={styles.pickerContainer}>
       <Text style={styles.label}>Contraseña</Text>
@@ -361,5 +369,11 @@ const styles = StyleSheet.create({
     color: '#000',
     fontSize: 30,
     fontWeight: 'bold',
+  },
+  avatarImage: {
+    width: 120,
+    height: 100,
+    marginTop: 30,
+    borderRadius: 10,
   },
 });

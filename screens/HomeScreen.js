@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Image, Dimensions } from 'react-native';
 import { getFirestore, collection, getDocs } from 'firebase/firestore';
 import { initializeApp } from 'firebase/app';
 import { firebaseConfig } from '../services/firebaseConfig';
+import { useFocusEffect } from '@react-navigation/native';
 
 // Inicializa Firebase
 initializeApp(firebaseConfig);
@@ -28,23 +29,28 @@ export default function HomeScreen({ navigation}) {
       headerTitleAlign: 'center',
     });
 
-    // Función para obtener todos los estudiantes
-    const fetchStudents = async () => {
-      try {
-        const studentsCollection = collection(db, 'Estudiantes');
-        const studentSnapshot = await getDocs(studentsCollection);
-        const studentsList = studentSnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setStudents(studentsList);
-      } catch (error) {
-        console.error('Error fetching students:', error);
-      }
-    };
-
-    fetchStudents();
   }, [navigation]);
+
+  // Función para obtener todos los estudiantes
+  const fetchStudents = async () => {
+    try {
+      const studentsCollection = collection(db, 'Estudiantes');
+      const studentSnapshot = await getDocs(studentsCollection);
+      const studentsList = studentSnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setStudents(studentsList);
+    } catch (error) {
+      console.error('Error fetching students:', error);
+    }
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchStudents();
+    }, [])
+  );
 
   // mostrar contenido de la lista de estudiantes
   // useEffect(() => {
