@@ -9,7 +9,7 @@ Repositorio del proyecto desarrollado en MDA y DGP en la UGR.
 - Instalar todas las depencias ```npm install```
 - Instalación limpia ```rm -rf node_modules/``` y **SOLO en caso de haber actualizaciado las dependencias en *package.json* Y SI LO ANTERIOR NO FUNCIONA** ```rm -rf package-lock.json```  ---> Tras esto hacer ```npm install```
 - Agrupar todas las funciones de acceso a la BD en un solo archivo
-
+- Lanzar en emulador con la cli: ```emulator -avd Medium_Tablet_API_35``` (añadir emulator al PATH previamente)
 
 
 ## **CAMBIOS PENDIENTES:**

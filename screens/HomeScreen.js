@@ -116,8 +116,8 @@ export default function HomeScreen({ navigation}) {
       
 
       {/* estudiante PruebaDavid y tarea por pasos */}
-      <TouchableOpacity style={styles.ExtraButton4} onPress={() => navigation.navigate('UserStepsTask', { idAlumno: 'JNPHNDw2nCF9vbqVdcEN', idTarea: 'OReKtR3EGKxb8oWSBKwc' })}> 
-        <Text style={styles.buttonText}>Pantalla Tarea por pasos</Text>
+      <TouchableOpacity style={styles.ExtraButton4} onPress={() => navigation.navigate('AddUser', { idAlumno: 'JNPHNDw2nCF9vbqVdcEN', idTarea: 'OReKtR3EGKxb8oWSBKwc' })}> 
+        <Text style={styles.buttonText}>AÑADIR USER</Text>
       </TouchableOpacity>
 
     </View>
