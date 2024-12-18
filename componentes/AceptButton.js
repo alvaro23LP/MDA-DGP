@@ -9,9 +9,8 @@ const scale = (size) => (width < 375 ? size : size * (width / 375));
 
 
 
-
 //Se le pasan los buleando de las preferencias de vista del usuraio
-const AceptButton = ({ prefPictograma, prefTexto, navigate }) => {
+const AceptButton = ({ prefPictograma, prefTexto, navigate, buttonStyle, textStyle, imageStyle }) => {
 
     const handleButtonPress = (navigate) => {
         navigate.navigate('RefuerzoPositivo');
@@ -22,18 +21,18 @@ const AceptButton = ({ prefPictograma, prefTexto, navigate }) => {
 
 
     return (
-        <TouchableOpacity style={styles.button} onPress={() => handleButtonPress(navigate)}>
+        <TouchableOpacity style={ buttonStyle} onPress={() => handleButtonPress(navigate)}>
             {prefPictograma && (
-                <Image source={okImage} style={{ width: scale(100), height: scale(100), marginVertical: scale(5) }} />
+                <Image source={okImage} style={ imageStyle} />
             )}
             {prefTexto && (
-                <Text style={styles.textButton}>Hecho</Text>
+                <Text style={ textStyle}>Hecho</Text>
             )}
         </TouchableOpacity>
     );
 };
 
-const styles = StyleSheet.create({
+/* const styles = StyleSheet.create({
     button: {
         flexDirection: 'row',
         backgroundColor: '#9df4a5',
@@ -51,6 +50,6 @@ const styles = StyleSheet.create({
         fontWeight: 'bold'
         
     }
-});
+}); */
 
 export default AceptButton;

@@ -23,12 +23,6 @@ export default function UserScreen({ navigation, route }) {
     const [tareas, setTareas] = useState([]);
     const [studentName, setStudentName] = useState('');
 
-    useEffect(() => {
-        navigation.setOptions({
-          headerShown: false, // Oculta el encabezado
-        });
-
-    }, [navigation]);
 
     useEffect(() => {
         const fetchPreferences = async () => {
@@ -81,6 +75,29 @@ export default function UserScreen({ navigation, route }) {
         fetchPreferences();
     }, [studentId]);
 
+    useEffect(() => {
+        navigation.setOptions({
+            title: 'Tareas de ' + studentName,
+            headerStyle: { backgroundColor: '#1565C0', height: scale(70) }, 
+            headerTintColor: '#fff', // Color del texto
+            headerTitleStyle: { 
+                fontWeight: 'bold', 
+                fontSize: scale(20), 
+                textShadowColor: '#000', 
+                textShadowOffset: { width: 3, height: 3 }, 
+                textShadowRadius: 7,
+            }, 
+            headerTitleAlign: 'center', 
+            headerLeft: () => null,
+            headerRight: () => (
+                <TouchableOpacity style={styles.buttonExit} onPress={() => navigation.navigate('Home')}>
+                    <Text style={{ color: '#fff', fontSize: largeScale(25), marginRight: scale(10) }}>SALIR</Text>
+                    <Icon name="home" size={largeScale(40)} color="#fff" />
+                </TouchableOpacity>
+            ),
+        });
+
+    }, [navigation, studentName]);
 
     const getImageForTaskType = (tipoTarea) => {
         const preferencia = Array.isArray(preferenciasVista) ? preferenciasVista[0] : preferenciasVista;
@@ -149,10 +166,15 @@ export default function UserScreen({ navigation, route }) {
                 return (
                     <View style={styles.listaTareas}>
                         <TouchableOpacity key={index} style={styles.tareaContainer} onPress={() => navigation.navigate(navigationRoute, { studentId: studentId, idTarea: tarea.id })}>
-                            <Image
-                                source={getImageForTaskType(tarea.tipoTarea)}
-                                style={styles.tareaImage}
-                            />
+                            {(getImageForTaskType(tarea.tipoTarea) != null) ? (
+                                <Image
+                                    source={getImageForTaskType(tarea.tipoTarea)}
+                                    style={styles.tareaImage}
+                                />
+                            ) : (
+                            <></>
+                            )}
+                            
                             <View style={styles.tareaTexto}>
                                 <Text style={styles.tareaTitulo}>{tarea.titulo}</Text>
                                 {(preferencia === 'Normal' || preferencia === 'texto') ? (
@@ -175,12 +197,11 @@ export default function UserScreen({ navigation, route }) {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>TAREAS</Text>
 
-            <TouchableOpacity style={styles.buttonExit} onPress={() => navigation.navigate('Home')}>
+            {/* <TouchableOpacity style={styles.buttonExit} onPress={() => navigation.navigate('Home')}>
                 <Text style={{ color: '#fff', fontSize: largeScale(20), marginRight: scale(10) }}>SALIR</Text>
                 <Icon name="exit" size={largeScale(30)} color="#fff" />
-            </TouchableOpacity>
+            </TouchableOpacity> */}
             {renderTareas()}
         </View>
     );
@@ -210,8 +231,7 @@ const styles = StyleSheet.create({
     },
     buttonExit: { 
         position: 'absolute',
-        top: largeScale(50),
-        right: largeScale(20),
+        right: largeScale(20), 
         flexDirection: 'row', 
         alignItems: 'center',
         backgroundColor: 'red',
@@ -222,7 +242,7 @@ const styles = StyleSheet.create({
     },
 
     listaTareas: {
-        paddingBottom: largeScale(50),
+        paddingBottom: largeScale(45),
     },
     tareaContainer: {
         flexDirection: 'row',

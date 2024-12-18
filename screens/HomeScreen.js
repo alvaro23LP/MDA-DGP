@@ -22,9 +22,15 @@ export default function HomeScreen({ navigation}) {
     // Configura las opciones del encabezado
     navigation.setOptions({
       title: 'Inicio de sesión de usuario',
-      headerStyle: { backgroundColor: '#1565C0', height: 100 },
+      headerStyle: { backgroundColor: '#1565C0', height: scale(70) },
       headerTintColor: '#fff',
-      headerTitleStyle: { fontWeight: 'bold', fontSize: 35 },
+      headerTitleStyle: { 
+        fontWeight: 'bold', 
+        fontSize: scale(20), 
+        textShadowColor: '#000', 
+        textShadowOffset: { width: 3, height: 3 }, 
+        textShadowRadius: 7,
+      }, 
       headerTitleAlign: 'center',
     });
 
@@ -141,25 +147,24 @@ const styles = StyleSheet.create({
     marginTop: 100,
   },
   userContainer: {
-    backgroundColor: '#FFFFFF',
     padding: 15,
     borderRadius: 20,
     marginBottom: 200,
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'center',
-    borderColor: '#1565C0',
-    borderWidth: 1,
   },
   userIcon: {
     width: scale(75),
     height: scale(90),
-    backgroundColor: '#e8e8e8',
+    backgroundColor: '#fff',
     padding: 4,
     borderRadius: 15,
-    margin: scale(5),
+    margin: scale(6),
     alignItems: 'center',
     justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: '#1565C0',
   },
   userIconContent: {
     alignItems: 'center',
@@ -170,7 +175,7 @@ const styles = StyleSheet.create({
     height: scale(50),  
     borderRadius: 10,
     borderColor: '#1565C0',
-    borderWidth: 3,
+    borderWidth: 1,
   },
   userName: {
     fontWeight: 'bold',
