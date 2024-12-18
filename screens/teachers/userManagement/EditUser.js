@@ -63,8 +63,16 @@ export default function EditUser({route, navigation }) {
           setEdad(userData.edad);
           setContrasena1(userData.contrasenaVisual[0]);
           setContrasena2(userData.contrasenaVisual[1]);
-          setTipoDiscapacidad(userData.tipoDiscapacidad);
-          setPreferenciasVista(userData.preferenciasVista);
+          setTipoDiscapacidad(
+            userData.tipoDiscapacidad 
+              ? userData.tipoDiscapacidad.split(',').map(item => item.trim()) 
+              : []
+          );
+          setPreferenciasVista(
+            userData.preferenciasVista 
+              ? userData.preferenciasVista.split(',').map(item => item.trim()) 
+              : []
+          );          
           setFotoAvatar(userData.fotoAvatar);
           setOriginalData(userData);
         } else {
@@ -135,13 +143,14 @@ export default function EditUser({route, navigation }) {
 
     if (contrasena1 !== originalData.contrasenaVisual[0] || contrasena2 !== originalData.contrasenaVisual[1]) updatedData.contrasenaVisual = [contrasena1, contrasena2];
 
-    if (tipoDiscapacidad !== originalData.tipoDiscapacidad) updatedData.tipoDiscapacidad = tipoDiscapacidad;
+    if (tipoDiscapacidad !== originalData.tipoDiscapacidad) 
+      updatedData.tipoDiscapacidad = Array.isArray(tipoDiscapacidad) ? tipoDiscapacidad.join(', ') : tipoDiscapacidad; // Convierte array a string  
 
-    if (preferenciasVista !== originalData.preferenciasVista) updatedData.preferenciasVista = preferenciasVista;
+    if (preferenciasVista !== originalData.preferenciasVista) 
+      updatedData.preferenciasVista = Array.isArray(preferenciasVista) ? preferenciasVista.join(', ') : preferenciasVista;
 
     if (fotoAvatar !== originalData.fotoAvatar) updatedData.fotoAvatar = fotoAvatar;
     
-
 
     if (Object.keys(updatedData).length === 0) {
       Alert.alert('Info', 'No se han realizado cambios');
@@ -157,6 +166,18 @@ export default function EditUser({route, navigation }) {
       console.error('Error al actualizar el alumno: ', error);
       Alert.alert('Error', 'No se pudo actualizar el alumno');
     }
+  };
+
+  const handleSelectionChange = (selectedItems) => {
+    // Solo mantenemos el último seleccionado
+    selectedItems = selectedItems.slice(-1);
+    setPreferenciasVista(selectedItems);
+  };
+
+  const handleSelectionChange2 = (selectedItems) => {
+    // Solo mantenemos el último seleccionado
+    selectedItems = selectedItems.slice(-1);
+    setTipoDiscapacidad(selectedItems);
   };
 
   return (
@@ -186,11 +207,11 @@ export default function EditUser({route, navigation }) {
         items={[
           { id: 'Por defecto', name: 'Por defecto' },
           { id: 'Visual', name: 'Visual' },
-          { id: 'Auditiva', name: 'Auditiva' },
+          { id: 'Cognitiva', name: 'Cognitiva' },
           { id: 'Motriz', name: 'Motriz' },
         ]}
         uniqueKey="id"
-        onSelectedItemsChange={selectedItems => setTipoDiscapacidad(selectedItems)}
+        onSelectedItemsChange={selectedItems => handleSelectionChange2(selectedItems)}
         selectedItems={tipoDiscapacidad}
         selectText="Selecciona diversidad funcional"
         submitButtonText="Seleccionar"
@@ -207,11 +228,11 @@ export default function EditUser({route, navigation }) {
         items={[
           { id: 'Por defecto', name: 'Por defecto' },
           { id: 'Pictograma', name: 'Pictograma' },
-          { id: 'Sonido', name: 'Sonido' },
+          { id: 'Imagenes reales', name: 'Imagenes reales' },
           { id: 'Texto', name: 'Texto' },
         ]}
         uniqueKey="id"
-        onSelectedItemsChange={selectedItems => setPreferenciasVista(selectedItems)}
+        onSelectedItemsChange={selectedItems => handleSelectionChange(selectedItems)}
         selectedItems={preferenciasVista}
         selectText="Selecciona Preferencias de Vista"
         styleDropdownMenuSubsection={styles.MultiSelect}

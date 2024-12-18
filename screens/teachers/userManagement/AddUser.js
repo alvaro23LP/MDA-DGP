@@ -28,23 +28,23 @@ export default function AddUser({ navigation }) {
   const [edad, setEdad] = useState('');
   const [contrasena1, setContrasena1] = useState('0');
   const [contrasena2, setContrasena2] = useState('0');
-  const [tipoDiscapacidad, setTipoDiscapacidad] = useState([]);
-  const [preferenciasVista, setPreferenciasVista] = useState([]);
+  const [tipoDiscapacidad, setTipoDiscapacidad] = useState(['Por defecto']);
+  const [preferenciasVista, setPreferenciasVista] = useState(['Por defecto']);
   const [fotoAvatar, setFotoAvatar] = useState(null);
   const [selectedImage, setSelectedImage] = useState(null);
   const [tareasCompletadas, setTareasCompletadas] = useState(0);
 
-  const items = [
+  const diversidadItems = [
     { id: 'Por defecto', name: 'Por defecto' },
     { id: 'Visual', name: 'Visual' },
-    { id: 'Auditiva', name: 'Auditiva' },
+    { id: 'Congnitiva', name: 'Cognitiva' },
     { id: 'Motriz', name: 'Motriz' },
   ];
 
   const preferenciasItems = [
     { id: 'Por defecto', name: 'Por defecto' },
     { id: 'Pictograma', name: 'Pictograma' },
-    { id: 'Sonido', name: 'Sonido' },
+    { id: 'Imagenes reales', name: 'Imagenes reales' },
     { id: 'Texto', name: 'Texto' },
   ];
   
@@ -124,8 +124,8 @@ export default function AddUser({ navigation }) {
       await addDoc(collection(getFirestore(), 'Estudiantes'), {
         nombre,
         edad,
-        tipoDiscapacidad,
-        preferenciasVista,
+        tipoDiscapacidad: Array.isArray(tipoDiscapacidad) ? tipoDiscapacidad.join(', ') : tipoDiscapacidad, // Convierte array a string  
+        preferenciasVista: Array.isArray(preferenciasVista) ? preferenciasVista.join(', ') : preferenciasVista, // Convierte array a string  
         fotoAvatar: fotoAvatarUrl,
         historialTareas: [],
         tareasCompletadas: Number(tareasCompletadas),
@@ -135,7 +135,7 @@ export default function AddUser({ navigation }) {
       // Limpiar el formulario después de agregar el usuario
       setNombre('');
       setEdad('');
-      setTipoDiscapacidad([]);
+      setTipoDiscapacidad('');
       setPreferenciasVista(['Por defecto']);
       setContrasena1('0');
       setContrasena2('0');
@@ -148,6 +148,18 @@ export default function AddUser({ navigation }) {
       Alert.alert('Error', 'No se pudo agregar el alumno');
       console.error('Error al agregar el alumno: ', error);
     }
+  };
+
+   const handleSelectionChange = (selectedItems) => {
+    // Solo mantenemos el último seleccionado
+    selectedItems = selectedItems.slice(-1);
+    setPreferenciasVista(selectedItems);
+  };
+
+  const handleSelectionChange2 = (selectedItems) => {
+    // Solo mantenemos el último seleccionado
+    selectedItems = selectedItems.slice(-1);
+    setTipoDiscapacidad(selectedItems);
   };
 
   return (
@@ -173,27 +185,27 @@ export default function AddUser({ navigation }) {
         />
       </View>
 
-      <Text style={styles.labelS1}>Diversidad funcional</Text>
-      <MultiSelect
-        items={items}
-        uniqueKey="id"
-        onSelectedItemsChange={selectedItems => setTipoDiscapacidad(selectedItems)}
-        selectedItems={tipoDiscapacidad}
-        selectText="Selecciona diversidad funcional"
-        submitButtonText="Seleccionar"
+      <Text style={styles.labelS1}>Diversidad funcional</Text> 
+      <MultiSelect 
+        items={diversidadItems} 
+        uniqueKey="id" 
+        onSelectedItemsChange={selectedItems => handleSelectionChange2(selectedItems)} 
+        selectedItems={tipoDiscapacidad} 
+        selectText="Selecciona diversidad funcional" 
+        submitButtonText="Seleccionar" 
         styleDropdownMenuSubsection={styles.MultiSelect}
-        styleTextDropdown={{ color: '#000' }}
-        styleTextDropdownSelected={{ color: '#000' }}
-        submitButtonColor="#90EE90"
-        submitButtonTextColor="#000"
-        fontSize={20}
+        styleTextDropdown={{ color: '#000' }} 
+        styleTextDropdownSelected={{ color: '#000' }} 
+        submitButtonColor="#90EE90" 
+        submitButtonTextColor="#000" 
+        fontSize={20} 
       />
       
       <Text style={styles.labelS2}>Preferencia de vista</Text>
       <MultiSelect
         items={preferenciasItems}
         uniqueKey="id"
-        onSelectedItemsChange={selectedItems => setPreferenciasVista(selectedItems)}
+        onSelectedItemsChange={selectedItems => handleSelectionChange(selectedItems)}
         selectedItems={preferenciasVista}
         selectText="Selecciona Preferencias de vista"
         submitButtonText="Seleccionar"
