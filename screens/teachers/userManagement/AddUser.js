@@ -68,22 +68,49 @@ export default function AddUser({ navigation }) {
 
   const db = getFirestore();
 
+  // const pickImage = async () => {
+  //   let result = await ImagePicker.launchImageLibraryAsync({
+  //     mediaTypes: [ImagePicker.MediaType.Images],
+  //     allowsEditing: true,
+  //     aspect: [4, 3],
+  //     quality: 1,
+  //   });
+
+  //   console.log('ImagePicker result:', result);
+
+  //   if (!result.canceled && result.assets && result.assets.length > 0) {
+  //     const uri = result.assets[0].uri;
+  //     setSelectedImage(uri);
+  //     console.log('Selected image URI:', uri);
+  //   } else {
+  //     console.log('Image selection was canceled');
+  //   }
+  // };
+
   const pickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: [ImagePicker.MediaType.Images],
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
+    console.log('Opening image picker...');
+    // Solicitar permiso para acceder a la galería
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (!permissionResult.granted) {
+      alert('Se requiere permiso para acceder a la galería');
+      return;
+    }
+
+    // Abrir la galería para seleccionar una imagen
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images, // Solo imágenes
+      allowsEditing: true, // Permitir recortar la imagen
+      aspect: [4, 3], // Relación de aspecto opcional
+      quality: 1, // Calidad de la imagen (1 = máxima calidad)
     });
 
-    console.log('ImagePicker result:', result);
-
-    if (!result.canceled && result.assets && result.assets.length > 0) {
-      const uri = result.assets[0].uri;
-      setSelectedImage(uri);
-      console.log('Selected image URI:', uri);
+    if (!result.canceled) {
+      // Almacenar la URI de la imagen seleccionada
+      setSelectedImage(result.assets[0].uri);
+      console.log(result.assets[0].uri);
     } else {
-      console.log('Image selection was canceled');
+      console.log('Selección de imagen cancelada');
     }
   };
 
@@ -217,11 +244,15 @@ export default function AddUser({ navigation }) {
         fontSize={20}
       />
 
-      <View style={styles.fileInputContainer}>
-      <Text style={styles.label}>Foto Avatar</Text>
-        <Button title="Seleccionar Imagen" onPress={pickImage} />
-        {selectedImage && <Image source={{ uri: selectedImage }} style={{ width: 200, height: 200 }} />}
-      </View> 
+      <View style={{ flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center'}}>
+        <View style={{ marginRight: 50 }}>
+          <Text style={styles.label}>Foto Avatar</Text>
+          <Button title="Seleccionar Imagen" onPress={pickImage} />
+        </View>
+        {selectedImage && (
+          <Image source={{ uri: selectedImage }} style={styles.avatarImage} />
+        )}
+      </View>
 
       <View style={styles.pickerContainer}>
         <Text style={styles.label}>Contraseña</Text>
@@ -340,5 +371,11 @@ const styles = StyleSheet.create({
     color: '#000',
     fontSize: 30,
     fontWeight: 'bold',
+  },
+  avatarImage: {
+    width: 120,
+    height: 120,
+    marginTop: 16,
+    borderRadius: 10,
   },
 });
