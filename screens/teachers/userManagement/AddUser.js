@@ -99,9 +99,9 @@ export default function AddUser({ navigation }) {
 
     // Abrir la galería para seleccionar una imagen
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images, // Solo imágenes
+      mediaTypes: ['images'], // Solo imágenes
       allowsEditing: true, // Permitir recortar la imagen
-      aspect: [4, 3], // Relación de aspecto opcional
+      aspect: [1, 1], // Relación de aspecto opcional
       quality: 1, // Calidad de la imagen (1 = máxima calidad)
     });
 

@@ -3,10 +3,11 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import { Dimensions } from 'react-native';
 import React, { useState } from 'react';
 import { useEffect } from 'react';
-import { launchImageLibrary } from 'react-native-image-picker';
+import * as ImagePicker from 'expo-image-picker';
 import { getFirestore, collection, addDoc } from 'firebase/firestore';
 import { initializeApp } from 'firebase/app';
 import { firebaseConfig } from '../../../services/firebaseConfig';
+import { uploadStepImageToCloudinary } from '../../../services/cloudinary';
 
 // Inicializa Firebase
 initializeApp(firebaseConfig);
@@ -36,51 +37,79 @@ export default function StepsTask({ navigation }) {
         });
     }, [navigation]);
 
+    const imgPorDefecto = Image.resolveAssetSource(require('../../../images/no-image-icon.png')).uri;
     const [stepMap, setStepMap] = useState(new Map());
     const [stepNumber, setStepNumber] = useState(1);
+    const [stepTitle, setStepTitle] = useState('');
     const [stepDescription, setStepDescription] = useState('');
-    const [stepImage, setStepImage] = useState('');
+    const [stepImage, setStepImage] = useState(imgPorDefecto);
     const [currentStepNumber, setCurrentStepNumber] = useState(1);
 
-    const selectImage = () => {
-        console.log('Entra en la funcion seleccionar imagen');
-        launchImageLibrary({}, (response) => {
-            if (response.didCancel) {
-                console.log('User cancelled image picker');
-            } else if (response.error) {
-                console.log('ImagePicker Error: ', response.error);
-            } else {
-                const source = { uri: response.assets[0].uri };
-                setStepImage(source.uri);
-            }
+    const pickImage = async () => {
+        console.log('Opening image picker...');
+        // Solicitar permiso para acceder a la galería
+        const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    
+        if (!permissionResult.granted) {
+          alert('Se requiere permiso para acceder a la galería');
+          return;
+        }
+    
+        // Abrir la galería para seleccionar una imagen
+        const result = await ImagePicker.launchImageLibraryAsync({
+          mediaTypes: ['images'], // Solo imágenes
+          allowsEditing: true, // Permitir recortar la imagen
+          aspect: [1, 1], // Relación de aspecto opcional
+          quality: 1, // Calidad de la imagen (1 = máxima calidad)
         });
-    };
+    
+        if (!result.canceled) {
+          // Almacenar la URI de la imagen seleccionada
+          setStepImage(result.assets[0].uri);
+          console.log(result.assets[0].uri);
+        } else {
+          console.log('Selección de imagen cancelada');
+        }
+      };
 
     const addStep = () => {
         if (!stepDescription) { // ***************   || !stepImage
             alert('Por favor, agrega una descripción y una imagen para el paso.');
             return;
         }
+        if (!stepTitle) {
+            alert('Por favor, agrega un título para el paso.');
+            return;
+        }
 
         setStepMap((prevStepMap) => {
-            prevStepMap.set(currentStepNumber, { description: stepDescription, image: stepImage });
+            prevStepMap.set(currentStepNumber, { title: stepTitle, description: stepDescription, image: stepImage });
             return prevStepMap;
         });
 
         setStepNumber((prevStepNumber) => prevStepNumber + 1);
         setCurrentStepNumber((prevCurrentStepNumber) => prevCurrentStepNumber + 1);
 
+        setStepTitle('');
         setStepDescription('');
-        setStepImage('');
+        setStepImage(imgPorDefecto);
     };
 
-    // useEffect(() => {
-    //     console.log('Cambia stepNumber:', stepNumber);
-    // }, [stepNumber]);
-
-    // useEffect(() => {
-    //     console.log('Cambia currentStepNumber:', currentStepNumber);
-    // }, [currentStepNumber]);
+    const getStepURL = async (imageUri) => {
+        try {
+            let fotoPasoUrl = null;
+            if (imageUri === imgPorDefecto) {
+                console.log('No image URI provided');
+                return '';
+            }
+            const uploadResult = await uploadStepImageToCloudinary(imageUri);
+            fotoPasoUrl = uploadResult.secure_url;
+            return fotoPasoUrl;
+        } catch (error) {
+            Alert.alert('Error', 'Ha habido un error al subir las imagenes');
+            console.error('Error al subir la imagen:', error);
+        }
+    };
 
     const saveTaskInDB = async () => {
         if (stepMap.size === 0) {
@@ -89,10 +118,11 @@ export default function StepsTask({ navigation }) {
         }
 
         const parsedSteps = {};
-        stepMap.forEach((value, key) => {
+        stepMap.forEach(async (value, key) => {
             parsedSteps[key] = {
+                Titulo: value.title,
                 Instrucciones: value.description,
-                Imagen: value.image
+                Imagen: await getStepURL(value.image),
             };
         });
 
@@ -149,22 +179,33 @@ export default function StepsTask({ navigation }) {
     };
 
     return (
-        <View style={{ backgroundColor: '#D9EFFF', flex: 1 }}>
+        <View style={{ backgroundColor: '#D9EFFF', flex: 1, alignItems: 'center' }}>
             <View style={styles.informationContainer}>
-                <View style={styles.inputContainer}>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '100%' }}>
-                        <Text style={styles.title}>Paso {currentStepNumber}</Text>
-                        <Text style={styles.title}>Totales {stepNumber}</Text>
-                    </View>
-                    <TouchableOpacity style={styles.button} onPress={selectImage}>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '100%', marginBottom: 20 }}>
+                    <Text style={styles.title}>Paso {currentStepNumber}</Text>
+                    <Text style={styles.title}>Totales {stepNumber}</Text>
+                </View>
+                <TextInput
+                    style={[styles.input, styles.inputDescripcion]}
+                    placeholder="Titulo"
+                    value={stepTitle}
+                    onChangeText={setStepTitle}
+                />
+                <TextInput
+                    style={[styles.input2, styles.inputDescripcion, { height: 150 }]}
+                    placeholder="Instrucciones"
+                    value={stepDescription}
+                    onChangeText={setStepDescription}
+                    multiline={true}
+                    numberOfLines={4}
+                />
+                <View style={{ flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center' }}>
+                    <TouchableOpacity style={styles.button2} onPress={pickImage}>
                         <Text style={styles.textButton}>Agregar Imagen</Text>
                     </TouchableOpacity>
-                    <TextInput
-                        style={[styles.input, styles.inputDescripcion]}
-                        placeholder="Instrucciones"
-                        value={stepDescription}
-                        onChangeText={setStepDescription}
-                    />
+                    {stepImage && (
+                        <Image source={{ uri: stepImage }} style={styles.avatarImage} />
+                    )}
                 </View>
             </View>
 
@@ -212,32 +253,37 @@ export default function StepsTask({ navigation }) {
 
 const styles = StyleSheet.create({
     informationContainer: {
-        justifyContent: 'center',
-        alignItems: 'center',
+        justifyContent: 'flex-start',
+        alignItems: 'center', 
         backgroundColor: '#D9EFFF',
-        margin: scale(20),
+        margin: scale(10),
         borderRadius: scale(10),
         borderWidth: 4,
         borderColor: '#1565C0',
-        height: height * 0.35,
-    },
-    inputContainer: {
-        justifyContent: 'center',
-        alignItems: 'flex-start',
-        backgroundColor: '#D9EFFF',
-        borderColor: '#1565C0',
-        height: height * 0.17,
-        width: '80%',
+        height: height * 0.45, 
+        width: '90%', 
+        paddingHorizontal: scale(15),
+        paddingVertical: scale(10),
     },
     input: {
         height: 60,
         borderColor: '#1565C0',
         borderWidth: 2,
-        marginVertical: 30,
+        marginVertical: 10,
         paddingHorizontal: 18,
         borderRadius: 10,
         backgroundColor: '#fff',
         fontSize: scale(14),
+    },
+    input2: {
+        height: 60,
+        borderColor: '#1565C0',
+        borderWidth: 2,
+        marginVertical: 10,
+        paddingHorizontal: 18,
+        borderRadius: 10,
+        backgroundColor: '#fff',
+        fontSize: scale(12),
     },
     inputDescripcion: {
         width: '100%',
@@ -258,6 +304,20 @@ const styles = StyleSheet.create({
         backgroundColor: '#FEF28A',
         borderColor: '#424242',
         width: '55%',
+    },
+    button2: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 13,
+        margin: 10,
+        borderStyle: 'solid',
+        borderWidth: 3,
+        borderRadius: 30,
+        marginTop: 50,
+        backgroundColor: '#FEF28A',
+        borderColor: '#424242',
+        width: '55%',
+        marginRight: 50,
     },
     textButton: {
         fontSize: scale(15),
@@ -281,5 +341,13 @@ const styles = StyleSheet.create({
         marginTop: 20,
         width: '100%',
         backgroundColor: '#D9EFFF',
+    },
+    avatarImage: {
+        width: 150,
+        height: 150,
+        marginTop: 16,
+        borderRadius: 10,
+        borderColor: '#1565C0',
+        borderWidth: 3,
     },
 });
