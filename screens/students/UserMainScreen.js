@@ -50,17 +50,23 @@ export default function UserScreen({ navigation, route }) {
                         // Obtener los datos de la tarea
                         const tareaDoc = await getDoc(tareaDocRef);
                         if (tareaDoc.exists()) {
+                            
                             const tareaData = tareaDoc.data();
-                            const tareaObj = {
-                                id: tareaDoc.id,
-                                ...tarea,
-                                titulo: tareaData.titulo,
-                                fechaInicio: format(fechaInicio, 'dd/MM/yyyy'), 
-                                fechaLimite: `${format(fechaLimite, 'dd/MM/yyyy')}`, 
-                                restante: `(${diasRestantes} días restantes)`, 
-                                tipoTarea: tareaData.tipoTarea,
-                            };
-                            tareasList.push(tareaObj);
+
+                            if(tareasMap[key].fechaCompletada === undefined ){
+
+                                const tareaObj = {
+                                    id: tareaDoc.id,
+                                    ...tarea,
+                                    titulo: tareaData.titulo,
+                                    fechaInicio: format(fechaInicio, 'dd/MM/yyyy'), 
+                                    fechaLimite: `${format(fechaLimite, 'dd/MM/yyyy')}`, 
+                                    restante: `(${diasRestantes} días restantes)`, 
+                                    tipoTarea: tareaData.tipoTarea,
+                                };
+                                tareasList.push(tareaObj);
+
+                            }
                         } else {
                         }
                     }

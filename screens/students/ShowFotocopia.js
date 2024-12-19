@@ -154,7 +154,9 @@ export default function ShowFotocopia({navigation,route}){
                         navigate={navigation}
                         idStudent={studentId}
                         idTarea={idTarea}
-                        styles={styles}
+                        buttonstyle={styles.aceptButton}
+                        imageStyle={styles.imageButton}
+                        textStyle={styles.textAceptButton}
                     />
 
                 </View>
