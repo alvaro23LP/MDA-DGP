@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import AppNavigator from './navigator/AppNavigator';
+import { LogBox } from 'react-native';
 
+// Ignora todos los warnings
+LogBox.ignoreAllLogs();
 
 export default function App() {
   const [isLoading, setIsLoading] = useState(true);

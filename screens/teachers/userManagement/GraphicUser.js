@@ -71,12 +71,16 @@ export default function GraphicUser({route, navigation }) {
 
   const reiniciarValores = async () => {
     try {
-        const usersInfo = await getDocs(collection(db, 'Estudiantes'));
+        const usersInfo = await getDoc(doc(db, 'Estudiantes', userId));
 
-        usersInfo.forEach(async (doc) => {
-            const studentRef = doc.ref;
-            await updateDoc(studentRef, { tareasCompletadas: 0 });
-        });
+        if (usersInfo.exists()) {
+            await updateDoc(doc(db, 'Estudiantes', userId), {
+                tareasCompletadas: 0,
+            });
+
+            setTareasCompletadas(0);
+        }
+
         console.log('Valores de tareasCompletadas reiniciados a 0 para todos los estudiantes');
         navigation.navigate('UsersManagement');
     } catch (error) {
@@ -85,33 +89,32 @@ export default function GraphicUser({route, navigation }) {
 };
 
     const data = {
-        labels: [nombre, 'Alumnos'],
+        labels: [nombre, 'Media alumnos'],
         datasets: [
             {
                 data: [tareasCompletadas, mediaTareasCompletadas]
             }
         ]
+
     };
 
     const chartConfig = {
         backgroundColor: '#D9EFFF',
         backgroundGradientFrom: '#D9EFFF',
         backgroundGradientTo: '#D9EFFF',
-        color: (opacity = 1) => `rgba(255, 43, 255, 1)`,
+        color: (opacity = 1) => `rgba(0, 0, 255, 0.7)`,
         strokeWidth: 10, // optional, default 3
-        barPercentage: 2.5,
+        barPercentage: 6,
         useShadowColorFromDataset: false, // optional
-        decimalPlaces: 0, // optional, default 2
-        labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`, // Color de las etiquetas
-        style: {
-            borderRadius: 22,
-        },
+        decimalPlaces: 2, // optional, default 2
+        labelColor: (opacity = 1) => `rgba(1, 0, 0, ${opacity})`, // Color de las etiquetas
+        
         propsForBackgroundLines: {
-            strokeWidth: 2, // Elimina las líneas de fondo
+            strokeWidth: 1.4, // Elimina las líneas de fondo
         },
         propsForLabels: {
             fontSize: 16, // Tamaño de fuente más grande para las etiquetas
-            fontWeight: 'bold'
+            fontWeight: 'bold',
         },
         propsForVerticalLabels: {
             fontSize: 28, // Tamaño de fuente más pequeño para las etiquetas verticales
@@ -122,16 +125,17 @@ export default function GraphicUser({route, navigation }) {
 
     return (
         <View style={styles.container}>
+            <Text style={styles.title}>Gráfica de Tareas</Text>
             <BarChart
                 data={data}
                 width={screenWidth}
-                height={screenHeight/1.4}
+                height={screenHeight/1.6}
                 chartConfig={chartConfig}
                 fromZero={true} // Start the chart from zero
             />
             <View style={styles.buttonContainer}>
                 <TouchableOpacity style={styles.button} onPress={reiniciarValores}>
-                    <Text style={styles.userText}>Reiniciar Valores</Text>
+                    <Text style={styles.userText}>Reiniciar contador de {nombre}</Text>
                 </TouchableOpacity>
             </View>
 
@@ -158,6 +162,16 @@ const styles = StyleSheet.create({
     },
     buttonContainer: {
         alignItems: 'center',
-        marginLeft: 1
+        marginLeft: 1,
+        marginBottom: 2,
       },
+
+      title: {
+        fontSize: 40,
+        fontWeight: 'bold',
+        marginBottom: 75,
+        marginTop: 50,
+        textAlign: 'center',
+      },
+
   });
