@@ -34,6 +34,7 @@ export default function ShowFotocopia({navigation,route}){
     const [studentData, setStudentData] = useState({});
     const [prefTexto, setPrefTexto] = useState(false);
     const [prefPictograma, setPrefPictograma] = useState(false);
+    const [prefImagenesReales, setPrefImagenesReales] = useState(false);
     
     
 
@@ -81,17 +82,16 @@ export default function ShowFotocopia({navigation,route}){
                     const data = studentDoc.data();
                     setStudentData(data);
                     
-                    for(let i=0; i <data.preferenciasVista.length; i++){
-                        
-                        if(data.preferenciasVista[i] === 'Texto'){
-                            setPrefTexto(true);
-                        }
-                
-                        if(data.preferenciasVista[i] === 'Pictograma'){
-                            setPrefPictograma(true);
-                        }
-                    
+                    if(data.preferenciasVista === 'Pictograma' || data.preferenciasVista === 'Por defecto'){
+                        setPrefPictograma(true);
                     }
+                    else if(data.preferenciasVista === 'Texto'){
+                        setPrefTexto(true);
+                    }
+                    else if(data.preferenciasVista === 'Imagenes reales'){
+                        setPrefImagenesReales(true);
+                    }
+
                     
                 }else{
                     console.log('No se encontró al alumno');
@@ -129,9 +129,9 @@ export default function ShowFotocopia({navigation,route}){
                     {prefPictograma &&
                         <Image source={selectedImage} style={{width: scale(140), height: scale(140)}}/>
                     }
-                    {prefTexto &&
+                    
                     <View style={styles.textContainer}><Text style={styles.text}>{tipo}</Text></View>
-                    }
+                    
                 </View>
 
                 
@@ -142,19 +142,22 @@ export default function ShowFotocopia({navigation,route}){
                     {prefPictograma &&
                         <Image source={selectedColor} style={{width: scale(110), height: scale(110), marginHorizontal:scale(20)}}/>
                     }
-                    {prefTexto &&
+                    
                     <View style={styles.textContainer2}><Text style={styles.text}>{tipoColor}</Text></View>
-                    }
+                    
                 </View>
 
+                <View style={styles.containerButton}>
 
-                <AceptButton
-                    prefPictograma={prefPictograma}
-                    prefTexto={prefTexto}
-                    navigate={navigation}
-                    idStudent={studentId}
-                    idTarea={idTarea}
-                />
+                    <AceptButton
+                        prefPictograma={prefPictograma}
+                        navigate={navigation}
+                        idStudent={studentId}
+                        idTarea={idTarea}
+                        styles={styles}
+                    />
+
+                </View>
                 
 
             </View>
@@ -224,11 +227,16 @@ const styles = StyleSheet.create({
         fontSize: scale(15), 
         color: '#424242',
         fontWeight: 'bold'
+    }, 
+
+    containerButton: {
+        justifyContent: 'flex-end',
+        marginBottom: scale(20),
+        alignItems: 'center',
     },
 
-   
-
-    Button: {
+    aceptButton: {
+        
         flexDirection: 'row',
         backgroundColor: '#9df4a5',
         borderWidth: 3,
@@ -238,12 +246,18 @@ const styles = StyleSheet.create({
         
     },
 
-    textButton: {
+    textAceptButton: {
         marginHorizontal: scale(20),
         fontSize: scale(20), 
         color: '#424242', 
         fontWeight: 'bold'
         
+    },
+
+    imageButton: {
+        width: scale(100),
+        height: scale(100),
+        marginHorizontal: scale(5)
     }
 
     

@@ -18,7 +18,7 @@ const scale = (size) => (width < 375 ? size : size * (width / 375));
 
 
 //Se le pasan los buleando de las preferencias de vista del usuraio
-const AceptButton = ({ prefPictograma, prefTexto, navigate, idStudent, idTarea }) => {
+const AceptButton = ({ prefPictograma, navigate, idStudent, idTarea, styles }) => {
     
     // Función para formatear la fecha: dd/mm/yyyy hora:minutos:segundos
     const formatFechaSimple = (date) => {
@@ -77,18 +77,18 @@ const AceptButton = ({ prefPictograma, prefTexto, navigate, idStudent, idTarea }
 
 
     return (
-        <TouchableOpacity style={styles.button} onPress={() => handleButtonPress(navigate)}>
+        <TouchableOpacity style={styles.aceptButton} onPress={() => handleButtonPress(navigate)}>
             {prefPictograma && (
-                <Image source={okImage} style={{ width: scale(100), height: scale(100), marginVertical: scale(5) }} />
+                <Image source={okImage} style={styles.imageButton} />
             )}
-            {prefTexto && (
-                <Text style={styles.textButton}>Hecho</Text>
-            )}
+            
+            <Text style={styles.textAceptButton}>Hecho</Text>
+            
         </TouchableOpacity>
     );
 };
 
-const styles = StyleSheet.create({
+/*const styles = StyleSheet.create({
     button: {
         flexDirection: 'row',
         backgroundColor: '#9df4a5',
@@ -106,6 +106,6 @@ const styles = StyleSheet.create({
         fontWeight: 'bold'
         
     }
-});
+});*/
 
 export default AceptButton;
