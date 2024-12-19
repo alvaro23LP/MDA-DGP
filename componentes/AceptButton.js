@@ -1,5 +1,5 @@
 import React from 'react';
-import { TouchableOpacity, Text, Image, StyleSheet } from 'react-native';
+import { TouchableOpacity, Text, Image } from 'react-native';
 import { Dimensions } from 'react-native';
 import { getFirestore, getDoc, doc,updateDoc,increment } from 'firebase/firestore';
 import { initializeApp } from 'firebase/app';
@@ -16,9 +16,8 @@ const scale = (size) => (width < 375 ? size : size * (width / 375));
 
 
 
-
 //Se le pasan los buleando de las preferencias de vista del usuraio
-const AceptButton = ({ prefPictograma, navigate, idStudent, idTarea, styles }) => {
+const AceptButton = ({ prefPictograma, navigate, idStudent, idTarea, buttonstyle,imageStyle,textStyle }) => {
     
     // Función para formatear la fecha: dd/mm/yyyy hora:minutos:segundos
     const formatFechaSimple = (date) => {
@@ -77,35 +76,17 @@ const AceptButton = ({ prefPictograma, navigate, idStudent, idTarea, styles }) =
 
 
     return (
-        <TouchableOpacity style={styles.aceptButton} onPress={() => handleButtonPress(navigate)}>
+        <TouchableOpacity style={buttonstyle} onPress={() => handleButtonPress(navigate)}>
             {prefPictograma && (
-                <Image source={okImage} style={styles.imageButton} />
+                <Image source={okImage} style={imageStyle} />
             )}
             
-            <Text style={styles.textAceptButton}>Hecho</Text>
+            <Text style={textStyle}>Hecho</Text>
             
         </TouchableOpacity>
     );
 };
 
-/*const styles = StyleSheet.create({
-    button: {
-        flexDirection: 'row',
-        backgroundColor: '#9df4a5',
-        borderWidth: 3,
-        borderColor: '#424242',
-        borderRadius: 10, 
-        alignItems: 'center'
-        
-    },
 
-    textButton: {
-        marginHorizontal: scale(20),
-        fontSize: scale(20), 
-        color: '#424242', 
-        fontWeight: 'bold'
-        
-    }
-});*/
 
 export default AceptButton;
