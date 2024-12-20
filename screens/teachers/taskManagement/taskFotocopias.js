@@ -141,7 +141,7 @@ export default function TaskFotocopias({navigation})
             <View style={{marginVertical:scale(100), width: '70%'}}>
                 
                 <TouchableOpacity style={styles.button} onPress={createAndAssignTask} >
-                    <Text style={styles.textButton}> Asignar y Crear </Text>
+                    <Text style={styles.textButton}> Crear y asignar </Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity style={styles.button} onPress={createTask}>

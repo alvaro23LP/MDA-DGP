@@ -4,6 +4,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import { getFirestore, doc, getDoc } from 'firebase/firestore';
 import { initializeApp } from 'firebase/app';
 import { firebaseConfig } from '../../services/firebaseConfig';
+import AceptButton from '../../componentes/AceptButton';
 
 // Inicializa Firebase
 initializeApp(firebaseConfig);
@@ -20,22 +21,20 @@ export default function UserStepsTask({ navigation, route }) {
   const { studentId, idTarea } = route.params; 
   const [taskData, setTaskData] = useState(null);
   const [currentStep, setCurrentStep] = useState(1);
+  const [prefPictograma, setPrefPictograma] = useState(false);
 
   useEffect(() => {
     navigation.setOptions({
-      title: 'Tarea de Pasos',
-      headerStyle: { backgroundColor: '#1565C0', height: scale(70) },
-      headerTintColor: '#fff',
-      headerTitleStyle: { fontWeight: 'bold', fontSize: scale(20) },
-      headerLeft: () => null,
-      headerRight: () => (
-        <TouchableOpacity
-          style={styles.buttonExit}
-          onPress={() => navigation.navigate('Home')}
-        >
-          <Text style={styles.buttonExitText}>Salir</Text>
+      title: 'Tarea por pasos',
+      headerStyle: { backgroundColor: '#1565C0', height: scale(70) }, // Color de fondo y tamaño del encabezado
+      headerTintColor: '#fff', // Color del texto
+      headerTitleStyle: { fontWeight: 'bold', fontSize: scale(20) }, // Estilo del título
+      headerTitleAlign: 'center', // Centrar el título
+      headerLeft: () => (
+        <TouchableOpacity style={{ marginLeft: scale(20) }} onPress={() => navigation.goBack()}>
+          <Icon name="arrow-back" size={scale(40)} color="#fff" />
         </TouchableOpacity>
-      )
+      ),
     });
 
     const fetchTaskData = async (taskId) => {
@@ -59,6 +58,34 @@ export default function UserStepsTask({ navigation, route }) {
       setTaskData(data);
     };
 
+    const getStudentData = async () => {
+      try {
+        const studentDoc = await getDoc(doc(db, 'Estudiantes', studentId));
+        if (studentDoc.exists()) {
+          const data = studentDoc.data();
+
+          if (data.preferenciasVista === 'Pictograma' || data.preferenciasVista === 'Por defecto' || data.preferenciasVista === 'Imagenes reales') {
+            setPrefPictograma(true);
+          }
+          else if (data.preferenciasVista === 'Texto') {
+            setPrefTexto(true);
+          }
+
+
+        } else {
+          console.log('No se encontró al alumno');
+          Alert.alert('Error', 'No se encontró al alumno con el ID proporcionado.');
+        }
+
+      } catch (error) {
+        console.error('Error al obtener los datos del alumno:', error);
+        Alert.alert('Error', 'Hubo un problema al obtener los datos del alumno. Inténtalo de nuevo.');
+      }
+
+    };
+
+
+    getStudentData();
     loadTaskData();
   }, [navigation]);
 
@@ -120,9 +147,15 @@ export default function UserStepsTask({ navigation, route }) {
 
       </View>
       {currentStep === Object.keys(taskData.pasos).length && (
-        <TouchableOpacity style={styles.completeButton} onPress={showNextStep}>
-          <Icon name="checkmark-circle" size={scale(50)} color="#1565C0" />
-        </TouchableOpacity>
+        <AceptButton
+          prefPictograma={prefPictograma}
+          navigate={navigation}
+          idStudent={studentId}
+          idTarea={idTarea}
+          buttonstyle={styles.aceptButton}
+          imageStyle={styles.imageButton}
+          textStyle={styles.textAceptButton}
+        />
       )}
     </View>
   );
@@ -202,4 +235,23 @@ const styles = StyleSheet.create({
   hidden: {
     opacity: 0,
   },
+  aceptButton: {        
+    flexDirection: 'row',
+    backgroundColor: '#9df4a5',
+    borderWidth: 3,
+    borderColor: '#424242',
+    borderRadius: 10,
+    alignItems: 'center'
+  },
+  textAceptButton: {
+    marginHorizontal: scale(20),
+    fontSize: scale(20),
+    color: '#424242',
+    fontWeight: 'bold'
+  },
+  imageButton: {
+    width: scale(100),
+    height: scale(100),
+    marginHorizontal: scale(5)
+  }
 });

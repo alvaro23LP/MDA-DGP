@@ -138,10 +138,11 @@ export default function MaterialTaskTeacher({navigation}) {
                 <TouchableOpacity style={styles.button} onPress={addMaterial}>
                     <Text style={styles.textButton}>Añadir Material</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.button} onPress={createAndAssignTask}>
-                    <Text style={styles.textButton}>Crear y asignar</Text>
-                </TouchableOpacity>
+
                 <View style={styles.buttonContainer2}>
+                    <TouchableOpacity style={styles.button} onPress={createAndAssignTask}>
+                        <Text style={styles.textButton}>Crear y asignar</Text>
+                    </TouchableOpacity>
                     <TouchableOpacity style={styles.button} onPress={createTask}>
                         <Text style={styles.textButton}>Crear tarea</Text>
                     </TouchableOpacity>

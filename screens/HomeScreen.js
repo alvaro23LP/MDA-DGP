@@ -112,7 +112,7 @@ export default function HomeScreen({ navigation}) {
         <Text style={styles.buttonText}>Iniciar Sesión Administrador/Profesor</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.ExtraButton2} onPress={() => navigation.navigate('ShowFotocopia', { idAlumno: 'Jv6he3AJR8CaDQyzqZUT', idTarea: 'ykR7kuaIs1ps8aj5o03f' })}>
+      {/* <TouchableOpacity style={styles.ExtraButton2} onPress={() => navigation.navigate('ShowFotocopia', { idAlumno: 'Jv6he3AJR8CaDQyzqZUT', idTarea: 'ykR7kuaIs1ps8aj5o03f' })}>
         <Text style={styles.buttonText}>Pantalla Tarea Fotocopias</Text>
       </TouchableOpacity>
 
@@ -127,10 +127,10 @@ export default function HomeScreen({ navigation}) {
       </TouchableOpacity>
       
 
-      {/* estudiante PruebaDavid y tarea por pasos */}
+      
       <TouchableOpacity style={styles.ExtraButton4} onPress={() => navigation.navigate('StepsTask', { idAlumno: 'JNPHNDw2nCF9vbqVdcEN', idTarea: 'OReKtR3EGKxb8oWSBKwc' })}> 
         <Text style={styles.buttonText}>AÑADIR TAREA PASOS</Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
 
     </View>
   );

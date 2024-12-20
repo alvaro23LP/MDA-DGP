@@ -10,7 +10,6 @@ import AceptButton from '../../componentes/AceptButton';
 
 const fotocopiaImage = require('../../images/fotocopias/fotocopia.png'); 
 const plastificarImage = require('../../images/fotocopias/plastificar.png');
-const okImage = require('../../images/fotocopias/hecho.png');
 const colorImage = require('../../images/fotocopias/color.png');
 const blancoNegroImage = require('../../images/fotocopias/blancoNegro.png');
 

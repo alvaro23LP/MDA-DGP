@@ -114,7 +114,7 @@ export default function EditUser({route, navigation }) {
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images, // Solo imágenes
         allowsEditing: true, // Permitir recortar la imagen
-        aspect: [4, 3], // Relación de aspecto opcional
+        aspect: [1, 1], // Relación de aspecto opcional
         quality: 1, // Calidad de la imagen (1 = máxima calidad)
       });
   
@@ -371,7 +371,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   avatarImage: {
-    width: 120,
+    width: 100,
     height: 100,
     marginTop: 30,
     borderRadius: 10,
