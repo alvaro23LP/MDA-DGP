@@ -65,18 +65,12 @@ export default function UserStepsTask({ navigation, route }) {
   const showNextStep = () => {
     if (taskData && currentStep < Object.keys(taskData.pasos).length) {
       setCurrentStep(currentStep + 1);
-    } else {
-      Alert.alert(
-        'Tarea completada',
-        'Has completado la tarea',
-        [
-          {
-            text: 'OK',
-            onPress: () => navigation.navigate('UserScreen', { studentId: studentId }),
-          },
-        ],
-        { cancelable: false }
-      );
+    } 
+  };
+  
+  const showPreviousStep = () => {
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1);
     }
   };
 
@@ -89,18 +83,47 @@ export default function UserStepsTask({ navigation, route }) {
   }
 
   const currentStepData = taskData.pasos[currentStep] || {};
-  const stepImage = currentStepData.Imagen || require('../../images/no-image-icon.png');
+  const stepTitle = currentStepData.Titulo || 'Paso sin título';
   const stepDescription = currentStepData.Instrucciones || 'No hay descripción disponible';
+  const stepImage = currentStepData.Imagen || require('../../images/no-image-icon.png');
 
   return (
     <View style={styles.container}>
       <View style={styles.stepContainer}>
-        <Image source={typeof stepImage === 'string' ? { uri: stepImage } : stepImage} style={styles.stepImage} />
+        <Text style={styles.stepTitle}>{stepTitle}</Text>   
+        <View style={styles.arrowButtonContainer}>
+          <TouchableOpacity
+            style={currentStep === 1 ? styles.hidden : styles.arrowLeft}
+            onPress={showPreviousStep}
+            disabled={currentStep === 1}
+          >
+            <Icon
+              name="arrow-back-circle"
+              size={scale(50)}
+              color="#1565C0"
+            />
+          </TouchableOpacity>
+          <Image source={typeof stepImage === 'string' ? { uri: stepImage } : stepImage} style={styles.stepImage} />
+          <TouchableOpacity
+            style={currentStep === Object.keys(taskData.pasos).length ? styles.hidden : styles.arrowRight}
+            onPress={showNextStep}
+            disabled={currentStep === Object.keys(taskData.pasos).length}
+          >
+            <Icon
+              name="arrow-forward-circle"
+              size={scale(50)}
+              color="#1565C0"
+            />
+          </TouchableOpacity>
+        </View>
         <Text style={styles.stepDescription}>{stepDescription}</Text>
+
+      </View>
+      {currentStep === Object.keys(taskData.pasos).length && (
         <TouchableOpacity style={styles.completeButton} onPress={showNextStep}>
           <Icon name="checkmark-circle" size={scale(50)} color="#1565C0" />
         </TouchableOpacity>
-      </View>
+      )}
     </View>
   );
 }
@@ -111,28 +134,35 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#D9EFFF',
-    padding: largeScale(10),
+    padding: largeScale(0),
   },
   stepContainer: {
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#fff',
-    padding: scale(20),
+    padding: scale(0),
     borderRadius: scale(10),
     borderWidth: 2,
     borderColor: '#1565C0',
-    width: '80%',
+    width: '95%',
+    marginBottom: scale(20),
   },
   stepImage: {
     width: scale(200),
     height: scale(200),
-    marginBottom: scale(20),
   },
   stepDescription: {
-    fontSize: scale(18),
+    fontSize: scale(14),
     color: '#424242',
     textAlign: 'center',
     marginBottom: scale(20),
+  },
+  stepTitle: {
+    fontSize: scale(18),
+    color: '#424242',
+    textAlign: 'center',
+    marginBottom: scale(10),
+    fontWeight: 'bold',
   },
   completeButton: {
     alignItems: 'center',
@@ -159,5 +189,17 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     width: '30%',
     height: '60%',
+  },
+  arrowButtonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 20,
+    width: '100%',
+    backgroundColor: '#fff',
+    marginBottom: scale(20),
+  },
+  hidden: {
+    opacity: 0,
   },
 });

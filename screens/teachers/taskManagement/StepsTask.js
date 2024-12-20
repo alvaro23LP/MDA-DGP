@@ -118,13 +118,21 @@ export default function StepsTask({ navigation }) {
         }
 
         const parsedSteps = {};
-        stepMap.forEach(async (value, key) => {
+        // stepMap.forEach(async (value, key) => {
+        //     parsedSteps[key] = {
+        //         Titulo: value.title,
+        //         Instrucciones: value.description,
+        //         Imagen: await getStepURL(value.image),
+        //     };
+        // });
+
+        for (const [key, value] of stepMap) {
             parsedSteps[key] = {
                 Titulo: value.title,
                 Instrucciones: value.description,
                 Imagen: await getStepURL(value.image),
             };
-        });
+        }
 
         const taskData = {
             pasos: parsedSteps,
