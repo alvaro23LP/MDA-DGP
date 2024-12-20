@@ -119,7 +119,7 @@ export default function HomeScreen({ navigation}) {
       <TouchableOpacity
         style={styles.ExtraButton3}
         onPress={() => navigation.navigate('AssigmentMenuClass', {
-          idTarea: 'kyPBZo38maFbjVwcWupy',
+          idTarea: 'zEnTMWmm9DdhyeTYkYCd',
           onComplete: () => console.log('Clase completada.'),
         })}
       >

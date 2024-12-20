@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, FlatList, Dimensions } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons'; // Importa Icon para la flecha
+import Icon from 'react-native-vector-icons/Ionicons';
 import { getFirestore, doc, getDoc, updateDoc } from 'firebase/firestore';
 import { initializeApp } from 'firebase/app';
 import { firebaseConfig } from '../../services/firebaseConfig';
@@ -9,7 +9,7 @@ import { firebaseConfig } from '../../services/firebaseConfig';
 initializeApp(firebaseConfig);
 const db = getFirestore();
 
-// Mapa estático de imágenes
+// Mapas de imágenes
 const pictogramas = {
   Menu1: require('../../images/Menu.png'),
   Menu2: require('../../images/NoCarne.png'),
@@ -29,52 +29,67 @@ const imagenes_reales = {
 };
 
 const dedos = {
-  1: require('../../images/Menu.png'),
-  2: require('../../images/NoCarne.png'),
-  3: require('../../images/Triturado.png'),
-  4: require('../../images/FrutaTriturada.png'),
-  5: require('../../images/yogur_natillas.png'),
+  1: require('../../images/pictograma_mano/uno.png'),
+  2: require('../../images/pictograma_mano/dos.png'),
+  3: require('../../images/pictograma_mano/tres.png'),
+  4: require('../../images/pictograma_mano/cuatro.png'),
+  5: require('../../images/pictograma_mano/cinco.png'),
+  6: require('../../images/pictograma_mano/seis.png'),
+  7: require('../../images/pictograma_mano/siete.png'),
 };
 
-
-// Dimensiones para escalado
+// Escalado de diseño
 const { width } = Dimensions.get('window');
 const scale = (size) => (width < 375 ? size : size * (width / 375));
-const largeScale = (size) => (width > 800 ? size * 1.5 : size);
 
 export default function UserMenuTask({ route, navigation }) {
-  const { studentId, idTarea, className, onComplete } = route.params || {};
-
+  const { idTarea, className, onComplete } = route.params || {};
   const [classData, setClassData] = useState(null);
-  
+  const [visualPreference, setVisualPreference] = useState('Por defecto');
+
   useEffect(() => {
     navigation.setOptions({
-        title: 'Tarea Menu',
-        headerStyle: { backgroundColor: '#1565C0', height: scale(70) }, // Color de fondo y tamaño del encabezado
-        headerTintColor: '#fff', // Color del texto
-        headerTitleStyle: { fontWeight: 'bold', fontSize: scale(20) }, // Estilo del título
-        headerTitleAlign: 'center', // Centrar el título
-        headerLeft: () => (
-            <TouchableOpacity style={{ marginLeft: scale(20) }} onPress={() => navigation.goBack()}>
-                <Icon name="arrow-back" size={scale(40)} color="#fff" />
-            </TouchableOpacity>
-        ),
+      title: 'Tarea Menu',
+      headerStyle: { backgroundColor: '#1565C0', height: scale(70) },
+      headerTintColor: '#fff',
+      headerTitleStyle: { fontWeight: 'bold', fontSize: scale(20) },
+      headerTitleAlign: 'center',
+      headerLeft: () => (
+        <TouchableOpacity style={{ marginLeft: scale(20) }} onPress={() => navigation.goBack()}>
+          <Icon name="arrow-back" size={scale(40)} color="#fff" />
+        </TouchableOpacity>
+      ),
     });
-  }, [navigation, className]);
+  }, [navigation]);
 
   useEffect(() => {
     if (!idTarea || !className) {
       alert('No se ha proporcionado la información necesaria.');
       return;
     }
+    fetchTaskPreferences();
     fetchClassData();
   }, [idTarea, className]);
+
+  const fetchTaskPreferences = async () => {
+    try {
+      const taskDocRef = doc(db, 'Tareas', idTarea);
+      const taskDoc = await getDoc(taskDocRef);
+      if (taskDoc.exists()) {
+        const taskData = taskDoc.data();
+        setVisualPreference(taskData.preferenciasVista?.[0]);
+      } else {
+        console.warn('No se encontraron datos de la tarea.');
+      }
+    } catch (error) {
+      console.error('Error al obtener las preferencias de la tarea:', error);
+    }
+  };
 
   const fetchClassData = async () => {
     try {
       const taskDocRef = doc(db, 'Tareas', idTarea);
       const taskDoc = await getDoc(taskDocRef);
-
       if (taskDoc.exists()) {
         const taskData = taskDoc.data();
         const menus = Object.entries(taskData.Clases[className] || {}).sort((a, b) => a[0].localeCompare(b[0]));
@@ -83,7 +98,7 @@ export default function UserMenuTask({ route, navigation }) {
         setClassData(null);
       }
     } catch (error) {
-      console.error('Error al obtener datos de la base de datos:', error);
+      console.error('Error al obtener datos de la clase:', error);
     }
   };
 
@@ -100,7 +115,6 @@ export default function UserMenuTask({ route, navigation }) {
     setClassData({ ...classData, menus: updatedMenus });
 
     const taskDocRef = doc(db, 'Tareas', idTarea);
-
     try {
       const menuToUpdate = updatedMenus.find(([key]) => key === menuKey);
       const updatedMenuData = menuToUpdate[1];
@@ -109,8 +123,44 @@ export default function UserMenuTask({ route, navigation }) {
         [`Clases.${className}.${menuKey}`]: updatedMenuData,
       });
     } catch (error) {
-      console.error('Error actualizando el contador en la base de datos:', error);
+      console.error('Error al actualizar el contador:', error);
     }
+  };
+
+  const renderMenuItem = ({ item }) => {
+    const [menuKey, menuData] = item;
+    const contador = menuData[2];
+    let imageSource = null;
+    let contadorImage = null;
+
+    // Configuración según la preferencia visual
+    if (visualPreference === 'Pictograma' || visualPreference === 'Imagenes reales') {
+      imageSource = visualPreference === 'Pictograma' ? pictogramas[menuKey] : imagenes_reales[menuKey];
+      contadorImage = dedos[contador];
+    } else if (visualPreference === 'Por defecto') {
+      imageSource = pictogramas[menuKey];
+    }
+
+    return (
+      <View style={styles.menuItem}>
+        {visualPreference !== 'Solo texto' && imageSource && (
+          <Image source={imageSource} style={styles.menuImage} resizeMode="contain" />
+        )}
+        <Text style={styles.menuDescription}>{menuData[1]}</Text>
+        <View style={styles.counterContainer}>
+          <TouchableOpacity style={styles.counterButton} onPress={() => handleCounterChange(menuKey, -1)}>
+            <Text style={styles.counterText}>-</Text>
+          </TouchableOpacity>
+          <Text style={styles.counterValue}>{menuData[2]}</Text>
+          {contadorImage && (
+            <Image source={contadorImage} style={styles.counterImage} resizeMode="contain" />
+          )}
+          <TouchableOpacity style={styles.counterButton} onPress={() => handleCounterChange(menuKey, 1)}>
+            <Text style={styles.counterText}>+</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
   };
 
   const handleComplete = () => {
@@ -118,38 +168,6 @@ export default function UserMenuTask({ route, navigation }) {
       onComplete(className);
     }
     navigation.goBack();
-  };
-
-  const renderMenuItem = ({ item }) => {
-    const [menuKey, menuData] = item;
-
-    const tipo1 = pictogramas[menuKey] || require('../../images/Menu.png');
-
-    return (
-      <View style={styles.menuItem}>
-        <Image
-          source={tipo1}
-          style={styles.menuImage}
-          resizeMode="contain"
-        />
-        <Text style={styles.menuDescription}>{menuData[1]}</Text>
-        <View style={styles.counterContainer}>
-          <TouchableOpacity
-            style={styles.counterButton}
-            onPress={() => handleCounterChange(menuKey, -1)}
-          >
-            <Text style={styles.counterText}>-</Text>
-          </TouchableOpacity>
-          <Text style={styles.counterValue}>{menuData[2]}</Text>
-          <TouchableOpacity
-            style={styles.counterButton}
-            onPress={() => handleCounterChange(menuKey, 1)}
-          >
-            <Text style={styles.counterText}>+</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    );
   };
 
   return (
@@ -163,10 +181,7 @@ export default function UserMenuTask({ route, navigation }) {
         style={styles.menuList}
       />
 
-      <TouchableOpacity
-        style={styles.completeButton}
-        onPress={handleComplete}
-      >
+      <TouchableOpacity style={styles.completeButton} onPress={handleComplete}>
         <Text style={styles.completeButtonText}>Aceptar</Text>
       </TouchableOpacity>
     </View>
@@ -230,41 +245,25 @@ const styles = StyleSheet.create({
     marginHorizontal: scale(10),
     color: '#424242',
   },
-  buttonExit: { 
-    position: 'absolute',
-    top: largeScale(20),
-    right: largeScale(20),
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'red',
-    padding: largeScale(10),
-    borderColor: 'black',
-    borderWidth: 1,
-    width: '30%',
-    height: '60%',
-  },
-  buttonExitText: {
-      color: '#fff',
-      fontSize: scale(15),
-      fontWeight: 'bold',
-      fontshadowColor: 'black',
-      textShadowOffset: { width: 3, height: 3 },
-      textShadowRadius: 3,
+  counterImage: {
+    width: scale(30),
+    height: scale(30),
+    marginLeft: scale(10),
   },
   completeButton: {
-    marginTop: scale(10), // Ajuste del margen superior
-    paddingVertical: scale(7), // Ajuste de altura
-    paddingHorizontal: scale(10), // Ajuste horizontal
-    backgroundColor: '#FFF59D', // Amarillo claro
-    borderRadius: scale(4), // Esquinas más pequeñas
+    marginTop: scale(10),
+    paddingVertical: scale(7),
+    paddingHorizontal: scale(10),
+    backgroundColor: '#FFF59D',
+    borderRadius: scale(4),
     alignItems: 'center',
     alignSelf: 'center',
-    width: scale(200), // Ancho similar al del botón Aceptar
-    borderWidth: 2, // Borde más grueso, similar al de las clases
-    borderColor: '#000', // Borde negro
+    width: scale(200),
+    borderWidth: 2,
+    borderColor: '#000',
   },
   completeButtonText: {
-    color: '#000', // Texto negro
+    color: '#000',
     fontSize: scale(18),
     fontWeight: 'bold',
   },
