@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, FlatList, Dimensions } from 'react-native';
+import Icon from 'react-native-vector-icons/Ionicons'; // Importa Icon para la flecha
 import { getFirestore, doc, getDoc, updateDoc } from 'firebase/firestore';
 import { initializeApp } from 'firebase/app';
 import { firebaseConfig } from '../../services/firebaseConfig';
@@ -9,7 +10,7 @@ initializeApp(firebaseConfig);
 const db = getFirestore();
 
 // Mapa estático de imágenes
-const imageMap = {
+const pictogramas = {
   Menu1: require('../../images/Menu.png'),
   Menu2: require('../../images/NoCarne.png'),
   Menu3: require('../../images/Triturado.png'),
@@ -17,6 +18,24 @@ const imageMap = {
   Menu5: require('../../images/yogur_natillas.png'),
   Menu6: require('../../images/Fruta.png'),
 };
+
+const imagenes_reales = {
+  Menu1: require('../../images/Menu.png'),
+  Menu2: require('../../images/NoCarne.png'),
+  Menu3: require('../../images/Triturado.png'),
+  Menu4: require('../../images/FrutaTriturada.png'),
+  Menu5: require('../../images/yogur_natillas.png'),
+  Menu6: require('../../images/Fruta.png'),
+};
+
+const dedos = {
+  1: require('../../images/Menu.png'),
+  2: require('../../images/NoCarne.png'),
+  3: require('../../images/Triturado.png'),
+  4: require('../../images/FrutaTriturada.png'),
+  5: require('../../images/yogur_natillas.png'),
+};
+
 
 // Dimensiones para escalado
 const { width } = Dimensions.get('window');
@@ -27,22 +46,19 @@ export default function UserMenuTask({ route, navigation }) {
   const { studentId, idTarea, className, onComplete } = route.params || {};
 
   const [classData, setClassData] = useState(null);
-
+  
   useEffect(() => {
     navigation.setOptions({
-      title: className || 'Clase',
-      headerStyle: { backgroundColor: '#1565C0', height: scale(60) },
-      headerTintColor: '#fff',
-      headerTitleStyle: { fontWeight: 'bold', fontSize: scale(20) },
-      headerLeft: () => null,
-      headerRight: () => (
-          <TouchableOpacity
-              style={styles.buttonExit}
-              onPress={() => navigation.navigate('Home')}
-          >
-              <Text style={styles.buttonExitText}>Salir</Text>
-          </TouchableOpacity>
-      )
+        title: 'Tarea Menu',
+        headerStyle: { backgroundColor: '#1565C0', height: scale(70) }, // Color de fondo y tamaño del encabezado
+        headerTintColor: '#fff', // Color del texto
+        headerTitleStyle: { fontWeight: 'bold', fontSize: scale(20) }, // Estilo del título
+        headerTitleAlign: 'center', // Centrar el título
+        headerLeft: () => (
+            <TouchableOpacity style={{ marginLeft: scale(20) }} onPress={() => navigation.goBack()}>
+                <Icon name="arrow-back" size={scale(40)} color="#fff" />
+            </TouchableOpacity>
+        ),
     });
   }, [navigation, className]);
 
@@ -99,7 +115,7 @@ export default function UserMenuTask({ route, navigation }) {
 
   const handleComplete = () => {
     if (onComplete) {
-      onComplete(className); // Pasa el nombre de la clase completada
+      onComplete(className);
     }
     navigation.goBack();
   };
@@ -107,12 +123,12 @@ export default function UserMenuTask({ route, navigation }) {
   const renderMenuItem = ({ item }) => {
     const [menuKey, menuData] = item;
 
-    const imageSource = imageMap[menuKey] || require('../../images/Menu.png');
+    const tipo1 = pictogramas[menuKey] || require('../../images/Menu.png');
 
     return (
       <View style={styles.menuItem}>
         <Image
-          source={imageSource}
+          source={tipo1}
           style={styles.menuImage}
           resizeMode="contain"
         />
@@ -164,7 +180,7 @@ const styles = StyleSheet.create({
     padding: scale(15),
   },
   title: {
-    fontSize: scale(30),
+    fontSize: scale(20),
     fontWeight: 'bold',
     color: '#424242',
     marginBottom: scale(10),

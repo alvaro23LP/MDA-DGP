@@ -195,13 +195,12 @@ export default function TaskAssignment({ navigation, route }) {
         <Text style={styles.label}>Preferencia visual</Text>
         <MultiSelect
           items={[
-            { id: 'Por defecto', name: 'Por defecto' },
             { id: 'Pictograma', name: 'Pictograma' },
-            { id: 'Sonido', name: 'Sonido' },
+            { id: 'Imagenes reales', name: 'Imagenes reales' },
             { id: 'Texto', name: 'Texto' },
           ]}
           uniqueKey="id"
-          onSelectedItemsChange={setPreferenciasVista}
+          onSelectedItemsChange={(selectedItems) => setPreferenciasVista(selectedItems.slice(-1))}
           selectedItems={preferenciasVista}
           selectText="Selecciona Preferencias de Vista"
           styleDropdownMenuSubsection={styles.MultiSelect}
@@ -209,6 +208,7 @@ export default function TaskAssignment({ navigation, route }) {
           styleTextDropdownSelected={{ color: '#000' }}
           submitButtonColor="#90EE90"
           submitButtonTextColor="#000"
+          fontSize={20}
         />
       </View>
 

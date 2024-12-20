@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList, Dimensions } from 'react-native';
+import Icon from 'react-native-vector-icons/Ionicons'; // Importa Icon para la flecha
 import { getFirestore, doc, getDoc } from 'firebase/firestore';
 import { initializeApp } from 'firebase/app';
 import { firebaseConfig } from '../../services/firebaseConfig';
+import AceptButton from '../../componentes/AceptButton'; // Importa el componente AceptButton
 
 // Inicializa Firebase
 initializeApp(firebaseConfig);
@@ -11,7 +13,6 @@ const db = getFirestore();
 // Dimensiones para escalado
 const { width } = Dimensions.get('window');
 const scale = (size) => (width < 375 ? size : size * (width / 375));
-const largeScale = (size) => (width > 800 ? size * 1.5 : size);
 
 export default function AssignmentMenuClass({ route, navigation }) {
   const { studentId, idTarea } = route.params || {};
@@ -20,22 +21,19 @@ export default function AssignmentMenuClass({ route, navigation }) {
   const [completedClasses, setCompletedClasses] = useState([]);
 
   useEffect(() => {
-    navigation.setOptions({
-      title: 'Selecciona una clase',
-      headerStyle: { backgroundColor: '#1565C0', height: scale(70) },
-      headerTintColor: '#fff',
-      headerTitleStyle: { fontWeight: 'bold', fontSize: scale(20) },
-      headerLeft: () => null,
-      headerRight: () => (
-          <TouchableOpacity
-              style={styles.buttonExit}
-              onPress={() => navigation.navigate('Home')}
-          >
-              <Text style={styles.buttonExitText}>Salir</Text>
-          </TouchableOpacity>
-      )
-    });
-  }, [navigation]);
+      navigation.setOptions({
+          title: 'Selecciona una Clase',
+          headerStyle: { backgroundColor: '#1565C0', height: scale(70) }, // Color de fondo y tamaño del encabezado
+          headerTintColor: '#fff', // Color del texto
+          headerTitleStyle: { fontWeight: 'bold', fontSize: scale(20) }, // Estilo del título
+          headerTitleAlign: 'center', // Centrar el título
+          headerLeft: () => (
+              <TouchableOpacity style={{ marginLeft: scale(20) }} onPress={() => navigation.goBack()}>
+                  <Icon name="arrow-back" size={scale(40)} color="#fff" />
+              </TouchableOpacity>
+          ),
+      });
+    }, [navigation]);
 
   useEffect(() => {
     if (!idTarea) {
@@ -98,12 +96,16 @@ export default function AssignmentMenuClass({ route, navigation }) {
         contentContainerStyle={styles.classList}
       />
 
-      <TouchableOpacity
-        style={styles.acceptButton}
-        onPress={() => navigation.goBack()}
-      >
-        <Text style={styles.acceptButtonText}>Completar Tarea</Text>
-      </TouchableOpacity>
+      <View style={styles.buttonContainer}>
+        <AceptButton
+          prefPictograma={false} // Si necesitas usar preferencias, ajusta este valor
+          navigate={navigation}
+          idStudent={studentId}
+          idTarea={idTarea}
+          buttonstyle={styles.acceptButton}
+          textStyle={styles.acceptButtonText}
+        />
+      </View>
     </View>
   );
 }
@@ -124,17 +126,15 @@ const styles = StyleSheet.create({
   classList: {
     alignItems: 'center',
   },
-  // Contenedor externo
   outerWrapper: {
-    marginBottom: scale(20), // Espaciado entre las clases
-    padding: scale(4), // Espaciado interno para separar el borde verde
+    marginBottom: scale(20),
+    padding: scale(4),
   },
   outerWrapperCompleted: {
-    borderWidth: 10, // Borde más grueso
-    borderColor: 'green', // Borde verde
+    borderWidth: 10,
+    borderColor: 'green',
     borderRadius: scale(15),
   },
-  // Contenido de la clase
   classItem: {
     width: scale(200),
     padding: scale(15),
@@ -150,42 +150,25 @@ const styles = StyleSheet.create({
     color: '#1565C0',
     textAlign: 'center',
   },
-  buttonExit: { 
-    position: 'absolute',
-    top: largeScale(20),
-    right: largeScale(20),
-    alignItems: 'center',
+  buttonContainer: {
     justifyContent: 'center',
-    backgroundColor: 'red',
-    padding: largeScale(10),
-    borderColor: 'black',
-    borderWidth: 1,
-    width: '30%',
-    height: '60%',
-  },
-  buttonExitText: {
-      color: '#fff',
-      fontSize: scale(15),
-      fontWeight: 'bold',
-      fontshadowColor: 'black',
-      textShadowOffset: { width: 3, height: 3 },
-      textShadowRadius: 3,
+    alignItems: 'center',
+    marginTop: scale(20),
   },
   acceptButton: {
-    marginTop: scale(20),
-    paddingVertical: scale(15), // Ajuste de altura
-    paddingHorizontal: scale(10), // Ajuste horizontal
-    backgroundColor: '#FFF59D', // Amarillo claro
-    borderRadius: scale(5), // Esquinas más pequeñas
+    flexDirection: 'row',
+    backgroundColor: '#9df4a5',
+    borderWidth: 3,
+    borderColor: '#424242',
+    borderRadius: 10,
     alignItems: 'center',
-    alignSelf: 'center',
-    width: scale(200), // Ancho similar a la imagen
-    borderWidth: 2, // Borde más grueso, similar al de las clases
-    borderColor: '#000', // Borde negro
+    justifyContent: 'center',
+    padding: scale(10),
+    width: scale(200),
   },
   acceptButtonText: {
-    color: '#000', // Texto negro
     fontSize: scale(18),
+    color: '#424242',
     fontWeight: 'bold',
-  },  
+  },
 });

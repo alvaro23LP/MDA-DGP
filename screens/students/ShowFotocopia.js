@@ -82,14 +82,11 @@ export default function ShowFotocopia({navigation,route}){
                     const data = studentDoc.data();
                     setStudentData(data);
                     
-                    if(data.preferenciasVista === 'Pictograma' || data.preferenciasVista === 'Por defecto'){
+                    if(data.preferenciasVista === 'Pictograma' || data.preferenciasVista === 'Por defecto' || data.preferenciasVista === 'Imagenes reales'){
                         setPrefPictograma(true);
                     }
                     else if(data.preferenciasVista === 'Texto'){
                         setPrefTexto(true);
-                    }
-                    else if(data.preferenciasVista === 'Imagenes reales'){
-                        setPrefImagenesReales(true);
                     }
 
                     
