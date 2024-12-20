@@ -41,19 +41,16 @@ export default function ShowFotocopia({navigation,route}){
     useEffect(() => {
         // Configura las opciones del encabezado
         navigation.setOptions({
-          title: 'Fotocopias',  // Cambia el título
-          headerStyle: { backgroundColor: '#1565C0',  height: scale(50) }, // Color de fondo y tamaño del encabezado
-          headerTintColor: '#fff', // Color del texto
-          headerTitleStyle: { fontWeight: 'bold', fontSize: scale(20) }, // Estilo del título
-          headerLeft: () => (
-            <TouchableOpacity
-                style={{ marginLeft: scale(20) }}
-                onPress={() => navigation.goBack()}
-            >
-                <Icon name="arrow-back" size={scale(20)} color="#fff" />
-            </TouchableOpacity>
+            title: 'Fotocopias',
+            headerStyle: { backgroundColor: '#1565C0', height: scale(70) }, // Color de fondo y tamaño del encabezado
+            headerTintColor: '#fff', // Color del texto
+            headerTitleStyle: { fontWeight: 'bold', fontSize: scale(20) }, // Estilo del título
+            headerTitleAlign: 'center', // Centrar el título
+            headerLeft: () => (
+                <TouchableOpacity style={{ marginLeft: scale(20) }} onPress={() => navigation.goBack()}>
+                    <Icon name="arrow-back" size={scale(40)} color="#fff" />
+                </TouchableOpacity>
             ),
-          
         });
 
         const getTaskData = async () => {

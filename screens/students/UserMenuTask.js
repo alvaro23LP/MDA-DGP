@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, FlatList, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, FlatList, Dimensions } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { getFirestore, doc, getDoc, updateDoc } from 'firebase/firestore';
 import { initializeApp } from 'firebase/app';
@@ -8,6 +8,10 @@ import { firebaseConfig } from '../../services/firebaseConfig';
 // Inicializa Firebase
 initializeApp(firebaseConfig);
 const db = getFirestore();
+
+// Dimensiones para escalado
+const { width } = Dimensions.get('window');
+const scale = (size) => (width < 375 ? size : size * (width / 375));
 
 // Mapas de imágenes
 const pictogramas = {
@@ -19,70 +23,76 @@ const pictogramas = {
   Menu6: require('../../images/Fruta.png'),
 };
 
-const imagenes_reales = {
-  Menu1: require('../../images/Menu.png'),
-  Menu2: require('../../images/NoCarne.png'),
-  Menu3: require('../../images/Triturado.png'),
-  Menu4: require('../../images/FrutaTriturada.png'),
-  Menu5: require('../../images/yogur_natillas.png'),
-  Menu6: require('../../images/Fruta.png'),
+const imagenesReales = {
+  Menu1_R: require('../../images/menu_imagenes_reales/Menu.png'),
+  Menu2_R: require('../../images/menu_imagenes_reales/NoCarne.png'),
+  Menu3_R: require('../../images/menu_imagenes_reales/Triturado.png'),
+  Menu4_R: require('../../images/menu_imagenes_reales/FrutaTriturada.png'),
+  Menu5_R: require('../../images/menu_imagenes_reales/yogur_natillas.png'),
+  Menu6_R: require('../../images/menu_imagenes_reales/Fruta.png'),
 };
 
 const dedos = {
-  1: require('../../images/pictograma_mano/uno.png'),
-  2: require('../../images/pictograma_mano/dos.png'),
-  3: require('../../images/pictograma_mano/tres.png'),
-  4: require('../../images/pictograma_mano/cuatro.png'),
-  5: require('../../images/pictograma_mano/cinco.png'),
-  6: require('../../images/pictograma_mano/seis.png'),
-  7: require('../../images/pictograma_mano/siete.png'),
+  dedo1: require('../../images/dedos/dedo1.png'),
+  dedo2: require('../../images/dedos/dedo2.png'),
+  dedo3: require('../../images/dedos/dedo3.png'),
+  dedo4: require('../../images/dedos/dedo4.png'),
+  dedo5: require('../../images/dedos/dedo5.png'),
+  dedo6: require('../../images/dedos/dedo6.png'),
 };
 
-// Escalado de diseño
-const { width } = Dimensions.get('window');
-const scale = (size) => (width < 375 ? size : size * (width / 375));
-
 export default function UserMenuTask({ route, navigation }) {
-  const { idTarea, className, onComplete } = route.params || {};
+  const { idTarea, className, studentId, onComplete } = route.params || {};
   const [classData, setClassData] = useState(null);
-  const [visualPreference, setVisualPreference] = useState('Por defecto');
+  const [prefTexto, setPrefTexto] = useState(false);
+  const [prefPictograma, setPrefPictograma] = useState(false);
+  const [prefImagenesReales, setPrefImagenesReales] = useState(false);
 
   useEffect(() => {
-    navigation.setOptions({
-      title: 'Tarea Menu',
-      headerStyle: { backgroundColor: '#1565C0', height: scale(70) },
-      headerTintColor: '#fff',
-      headerTitleStyle: { fontWeight: 'bold', fontSize: scale(20) },
-      headerTitleAlign: 'center',
-      headerLeft: () => (
-        <TouchableOpacity style={{ marginLeft: scale(20) }} onPress={() => navigation.goBack()}>
-          <Icon name="arrow-back" size={scale(40)} color="#fff" />
-        </TouchableOpacity>
-      ),
-    });
-  }, [navigation]);
+      navigation.setOptions({
+          title: 'Tarea Menu',
+          headerStyle: { backgroundColor: '#1565C0', height: scale(70) }, // Color de fondo y tamaño del encabezado
+          headerTintColor: '#fff', // Color del texto
+          headerTitleStyle: { fontWeight: 'bold', fontSize: scale(20) }, // Estilo del título
+          headerTitleAlign: 'center', // Centrar el título
+          headerLeft: () => (
+              <TouchableOpacity style={{ marginLeft: scale(20) }} onPress={() => navigation.goBack()}>
+                  <Icon name="arrow-back" size={scale(40)} color="#fff" />
+              </TouchableOpacity>
+          ),
+      });
+    }, [navigation]);
 
   useEffect(() => {
-    if (!idTarea || !className) {
+    if (!idTarea || !className || !studentId) {
       alert('No se ha proporcionado la información necesaria.');
       return;
     }
     fetchTaskPreferences();
     fetchClassData();
-  }, [idTarea, className]);
+  }, [idTarea, className, studentId]);
 
   const fetchTaskPreferences = async () => {
     try {
-      const taskDocRef = doc(db, 'Tareas', idTarea);
-      const taskDoc = await getDoc(taskDocRef);
-      if (taskDoc.exists()) {
-        const taskData = taskDoc.data();
-        setVisualPreference(taskData.preferenciasVista?.[0]);
+      const studentDoc = await getDoc(doc(db, 'Estudiantes', studentId));
+      if (studentDoc.exists()) {
+        const studentData = studentDoc.data();
+        const preference = studentData.preferenciasVista;
+
+        if (preference === 'Texto') {
+          setPrefTexto(true);
+        } else if (preference === 'Pictograma') {
+          setPrefPictograma(true);
+        } else if (preference === 'Imagenes reales') {
+          setPrefImagenesReales(true);
+        } else {
+          setPrefPictograma(true); // Por defecto
+        }
       } else {
-        console.warn('No se encontraron datos de la tarea.');
+        console.warn('No se encontraron datos del estudiante.');
       }
     } catch (error) {
-      console.error('Error al obtener las preferencias de la tarea:', error);
+      console.error('Error al obtener las preferencias del estudiante:', error);
     }
   };
 
@@ -129,46 +139,57 @@ export default function UserMenuTask({ route, navigation }) {
 
   const renderMenuItem = ({ item }) => {
     const [menuKey, menuData] = item;
-    const contador = menuData[2];
+    const contador = menuData[2]; // Valor actual del contador (0-6)
+    const dedoImage = contador > 0 ? dedos[`dedo${contador}`] : null; // Imagen según el contador
+  
     let imageSource = null;
-    let contadorImage = null;
-
-    // Configuración según la preferencia visual
-    if (visualPreference === 'Pictograma' || visualPreference === 'Imagenes reales') {
-      imageSource = visualPreference === 'Pictograma' ? pictogramas[menuKey] : imagenes_reales[menuKey];
-      contadorImage = dedos[contador];
-    } else if (visualPreference === 'Por defecto') {
+    if (prefPictograma) {
       imageSource = pictogramas[menuKey];
+    } else if (prefImagenesReales) {
+      imageSource = imagenesReales[`${menuKey}_R`];
     }
-
+  
     return (
       <View style={styles.menuItem}>
-        {visualPreference !== 'Solo texto' && imageSource && (
+        {!prefTexto && imageSource && (
           <Image source={imageSource} style={styles.menuImage} resizeMode="contain" />
         )}
         <Text style={styles.menuDescription}>{menuData[1]}</Text>
         <View style={styles.counterContainer}>
-          <TouchableOpacity style={styles.counterButton} onPress={() => handleCounterChange(menuKey, -1)}>
+          <TouchableOpacity
+            style={styles.counterButton}
+            onPress={() => {
+              if (contador > 0) {
+                handleCounterChange(menuKey, -1); // Reduce el contador
+              }
+            }}
+          >
             <Text style={styles.counterText}>-</Text>
           </TouchableOpacity>
-          <Text style={styles.counterValue}>{menuData[2]}</Text>
-          {contadorImage && (
-            <Image source={contadorImage} style={styles.counterImage} resizeMode="contain" />
+          {prefPictograma || prefImagenesReales ? (
+            <Image
+              source={dedoImage || require('../../images/dedos/dedo1.png')} // Imagen para 0
+              style={styles.dedoImage}
+              resizeMode="contain"
+            />
+          ) : (
+            <Text style={styles.counterValue}>{contador}</Text> // Fallback a números si es Texto
           )}
-          <TouchableOpacity style={styles.counterButton} onPress={() => handleCounterChange(menuKey, 1)}>
+          <TouchableOpacity
+            style={styles.counterButton}
+            onPress={() => {
+              if (contador < 6) {
+                handleCounterChange(menuKey, 1); // Aumenta el contador
+              }
+            }}
+          >
             <Text style={styles.counterText}>+</Text>
           </TouchableOpacity>
         </View>
       </View>
     );
   };
-
-  const handleComplete = () => {
-    if (onComplete) {
-      onComplete(className);
-    }
-    navigation.goBack();
-  };
+  
 
   return (
     <View style={styles.container}>
@@ -181,7 +202,15 @@ export default function UserMenuTask({ route, navigation }) {
         style={styles.menuList}
       />
 
-      <TouchableOpacity style={styles.completeButton} onPress={handleComplete}>
+      <TouchableOpacity
+        style={styles.completeButton}
+        onPress={() => {
+          if (onComplete) {
+            onComplete(className);
+          }
+          navigation.goBack();
+        }}
+      >
         <Text style={styles.completeButtonText}>Aceptar</Text>
       </TouchableOpacity>
     </View>
@@ -245,11 +274,6 @@ const styles = StyleSheet.create({
     marginHorizontal: scale(10),
     color: '#424242',
   },
-  counterImage: {
-    width: scale(30),
-    height: scale(30),
-    marginLeft: scale(10),
-  },
   completeButton: {
     marginTop: scale(10),
     paddingVertical: scale(7),
@@ -263,8 +287,13 @@ const styles = StyleSheet.create({
     borderColor: '#000',
   },
   completeButtonText: {
-    color: '#000',
     fontSize: scale(18),
+    color: '#000',
     fontWeight: 'bold',
+  },
+
+  dedoImage: {
+    width: scale(50),
+    height: scale(50),
   },
 });

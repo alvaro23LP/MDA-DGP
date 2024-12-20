@@ -12,7 +12,7 @@ import {
 import { getFirestore, collection, getDocs, doc, updateDoc } from 'firebase/firestore';
 import { initializeApp } from 'firebase/app';
 import { firebaseConfig } from '../../../services/firebaseConfig';
-import MultiSelect from 'react-native-multiple-select';
+
 
 // Inicializa Firebase
 initializeApp(firebaseConfig);
@@ -78,7 +78,7 @@ export default function TaskAssignment({ navigation, route }) {
   }, [taskId]);
 
   const assignTask = async () => {
-    if (!taskTitle || !selectedStudent || preferenciasVista.length === 0 || !manualDate) {
+    if (!taskTitle || !selectedStudent || !manualDate) {
       Alert.alert('Error', 'Todos los campos son obligatorios.');
       return;
     }
@@ -192,27 +192,6 @@ export default function TaskAssignment({ navigation, route }) {
       </Modal>
 
       <View style={styles.inputContainer}>
-        <Text style={styles.label}>Preferencia visual</Text>
-        <MultiSelect
-          items={[
-            { id: 'Pictograma', name: 'Pictograma' },
-            { id: 'Imagenes reales', name: 'Imagenes reales' },
-            { id: 'Texto', name: 'Texto' },
-          ]}
-          uniqueKey="id"
-          onSelectedItemsChange={(selectedItems) => setPreferenciasVista(selectedItems.slice(-1))}
-          selectedItems={preferenciasVista}
-          selectText="Selecciona Preferencias de Vista"
-          styleDropdownMenuSubsection={styles.MultiSelect}
-          styleTextDropdown={{ color: '#000' }}
-          styleTextDropdownSelected={{ color: '#000' }}
-          submitButtonColor="#90EE90"
-          submitButtonTextColor="#000"
-          fontSize={20}
-        />
-      </View>
-
-      <View style={styles.inputContainer}>
         <Text style={styles.label}>Fecha Límite</Text>
         <TextInput
           style={styles.input}
@@ -253,13 +232,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     fontSize: 22,
     marginBottom: 12,
-  },
-  MultiSelect: {
-    height: 60,
-    borderColor: 'gray',
-    borderWidth: 3,
-    paddingLeft: 8,
-    marginBottom: 20,
   },
   buttonContainer: {
     alignItems: 'center',
