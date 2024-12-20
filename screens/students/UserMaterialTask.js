@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Dimensions, Switch, Image } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-
 import { getFirestore, doc, getDoc, updateDoc } from 'firebase/firestore';
 import { initializeApp } from 'firebase/app';
 import { firebaseConfig } from '../../services/firebaseConfig';
-import { ImageStore } from 'react-native';
-import { max } from 'date-fns';
+import AceptButton from '../../componentes/AceptButton';
 
 // Inicializa Firebase
 initializeApp(firebaseConfig);
@@ -45,31 +43,29 @@ const materialPictograms = {
     Anillas: require('../../images/anillas.png'),
 };
 
+const completedImage = require('../../images/sí.png');
+
 export default function UserMaterialTask({ navigation, route }) {
-    const { studentId } = route.params; 
+    const { studentId, idTarea } = route.params; 
     const [tareas, setTareas] = useState([]);
     const [studentName, setStudentName] = useState('');
     const [showAllMaterials, setShowAllMaterials] = useState(false);
     const [buttonPosition, setButtonPosition] = useState('right'); // Definir buttonPosition en el estado
     const [preferenciasVista, setPreferenciasVista] = useState(null);
 
-
     useEffect(() => {
         navigation.setOptions({
             title: 'Recoger Material',
-            headerStyle: { backgroundColor: '#1565C0',  height: scale(70) }, // Color de fondo y tamaño del encabezado
+            headerStyle: { backgroundColor: '#1565C0', height: scale(70) }, // Color de fondo y tamaño del encabezado
             headerTintColor: '#fff', // Color del texto
             headerTitleStyle: { fontWeight: 'bold', fontSize: scale(20) }, // Estilo del título
-            headerLeft: () => null,
-            headerRight: () => (
-                <TouchableOpacity
-                    style={styles.buttonExit}
-                    onPress={() => navigation.navigate('Home')}
-                >
-                    <Text style={styles.buttonExitText}>Salir</Text>
+            headerTitleAlign: 'center', // Centrar el título
+            headerLeft: () => (
+                <TouchableOpacity style={{ marginLeft: scale(20) }} onPress={() => navigation.goBack()}>
+                    <Icon name="arrow-back" size={scale(40)} color="#fff" />
                 </TouchableOpacity>
-            )
-          });
+            ),
+        });
     }, [navigation]);
 
     useEffect(() => {
@@ -127,6 +123,9 @@ export default function UserMaterialTask({ navigation, route }) {
         setButtonPosition(buttonPosition === 'right' ? 'left' : 'right');
     };
 
+
+
+
     const preferencia = Array.isArray(preferenciasVista) ? preferenciasVista[0] : preferenciasVista;
     return (
         <View style={styles.container}>
@@ -137,7 +136,7 @@ export default function UserMaterialTask({ navigation, route }) {
                             <View key={index} style={styles.unidadMaterial}>
                                 <View style={styles.derechaMaterial}>
                                     <Image
-                                        source={preferencia === 'Pictograma' ? materialPictograms[materialKey] : materialImages[materialKey]}
+                                        source={tarea.materiales[materialKey].completada ? completedImage : (preferencia === 'Pictograma' ? materialPictograms[materialKey] : materialImages[materialKey])}
                                         style={preferencia === 'Texto' ? styles.hidden : styles.tareaImage}
                                     />
                                     <View style={styles.textoMaterial}>
@@ -173,6 +172,14 @@ export default function UserMaterialTask({ navigation, route }) {
                         <Icon name={showAllMaterials ? "chevron-back" : "chevron-forward"} size={largeScale(40)} color="#050500" />
                     </TouchableOpacity>
                 )}
+                <AceptButton
+                    prefPictograma={preferencia === 'Pictograma' ? true : false}
+                    prefTexto={true}
+                    navigate={navigation}
+                    buttonStyle={styles.aceptButton}
+                    textStyle={styles.aceptButtonText}
+                    imageStyle={styles.aceptButtonImage}
+                />
             </View>
         </View>
     );
@@ -192,14 +199,6 @@ const styles = StyleSheet.create({
         color: '#424242',
         marginTop: largeScale(30),
     },
-    buttonExitText: {
-        color: '#fff',
-        fontSize: scale(15),
-        fontWeight: 'bold',
-        fontshadowColor: 'black',
-        textShadowOffset: { width: 3, height: 3 },
-        textShadowRadius: 3,
-    },
     contenedorTarea: {
         flex: 1,
         justifyContent: 'center',
@@ -213,7 +212,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: largeScale(5),
         borderRadius: largeScale(10),
         width: width * 0.70,
-        height: height * 0.80,
+        height: height * 0.70,
     },
     unidadMaterial: {
         flexDirection: 'row',
@@ -235,8 +234,7 @@ const styles = StyleSheet.create({
     },
     tareaImage: {
         width: largeScale(80),
-        aspectRatio: 1, // Mantener la proporción de la imagen
-        //marginRight: largeScale(-100),
+        aspectRatio: 1, 
     },
     textoMaterial: {
         flexDirection: 'column',
@@ -269,7 +267,8 @@ const styles = StyleSheet.create({
         height: '60%',
     },
     materialSwitch: {
-        transform: [{ scaleX: 1.5 }, { scaleY: 1.5 }],
+        transform: [{ scaleX: 2.7 }, { scaleY: 2.7 }],
+        marginRight: 10
     },
     materialTextCompleted: {
         textDecorationLine: 'line-through',
@@ -292,5 +291,24 @@ const styles = StyleSheet.create({
     },
     hidden: {
         display: 'none',
+    },
+    aceptButton: {        
+        flexDirection: 'row',
+        backgroundColor: '#9df4a5',
+        borderWidth: 3,
+        borderColor: '#424242',
+        borderRadius: 10, 
+        alignItems: 'center'
+    },
+    aceptButtonText: {
+        marginHorizontal: scale(20),
+        fontSize: scale(17), 
+        color: '#424242', 
+        fontWeight: 'bold',
+    },
+    aceptButtonImage: {
+        width: scale(50),
+        height: scale(50),
+        marginVertical: scale(5),
     },
 });

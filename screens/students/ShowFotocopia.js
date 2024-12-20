@@ -34,25 +34,23 @@ export default function ShowFotocopia({navigation,route}){
     const [studentData, setStudentData] = useState({});
     const [prefTexto, setPrefTexto] = useState(false);
     const [prefPictograma, setPrefPictograma] = useState(false);
+    const [prefImagenesReales, setPrefImagenesReales] = useState(false);
     
     
 
     useEffect(() => {
         // Configura las opciones del encabezado
         navigation.setOptions({
-          title: 'Fotocopias',  // Cambia el título
-          headerStyle: { backgroundColor: '#1565C0',  height: scale(50) }, // Color de fondo y tamaño del encabezado
-          headerTintColor: '#fff', // Color del texto
-          headerTitleStyle: { fontWeight: 'bold', fontSize: scale(20) }, // Estilo del título
-          headerLeft: () => (
-            <TouchableOpacity
-                style={{ marginLeft: scale(20) }}
-                onPress={() => navigation.goBack()}
-            >
-                <Icon name="arrow-back" size={scale(20)} color="#fff" />
-            </TouchableOpacity>
+            title: 'Fotocopias',
+            headerStyle: { backgroundColor: '#1565C0', height: scale(70) }, // Color de fondo y tamaño del encabezado
+            headerTintColor: '#fff', // Color del texto
+            headerTitleStyle: { fontWeight: 'bold', fontSize: scale(20) }, // Estilo del título
+            headerTitleAlign: 'center', // Centrar el título
+            headerLeft: () => (
+                <TouchableOpacity style={{ marginLeft: scale(20) }} onPress={() => navigation.goBack()}>
+                    <Icon name="arrow-back" size={scale(40)} color="#fff" />
+                </TouchableOpacity>
             ),
-          
         });
 
         const getTaskData = async () => {
@@ -81,17 +79,13 @@ export default function ShowFotocopia({navigation,route}){
                     const data = studentDoc.data();
                     setStudentData(data);
                     
-                    for(let i=0; i <data.preferenciasVista.length; i++){
-                        
-                        if(data.preferenciasVista[i] === 'Texto'){
-                            setPrefTexto(true);
-                        }
-                
-                        if(data.preferenciasVista[i] === 'Pictograma'){
-                            setPrefPictograma(true);
-                        }
-                    
+                    if(data.preferenciasVista === 'Pictograma' || data.preferenciasVista === 'Por defecto' || data.preferenciasVista === 'Imagenes reales'){
+                        setPrefPictograma(true);
                     }
+                    else if(data.preferenciasVista === 'Texto'){
+                        setPrefTexto(true);
+                    }
+
                     
                 }else{
                     console.log('No se encontró al alumno');
@@ -129,9 +123,9 @@ export default function ShowFotocopia({navigation,route}){
                     {prefPictograma &&
                         <Image source={selectedImage} style={{width: scale(140), height: scale(140)}}/>
                     }
-                    {prefTexto &&
+                    
                     <View style={styles.textContainer}><Text style={styles.text}>{tipo}</Text></View>
-                    }
+                    
                 </View>
 
                 
@@ -142,17 +136,24 @@ export default function ShowFotocopia({navigation,route}){
                     {prefPictograma &&
                         <Image source={selectedColor} style={{width: scale(110), height: scale(110), marginHorizontal:scale(20)}}/>
                     }
-                    {prefTexto &&
+                    
                     <View style={styles.textContainer2}><Text style={styles.text}>{tipoColor}</Text></View>
-                    }
+                    
                 </View>
 
+                <View style={styles.containerButton}>
 
-                <AceptButton
-                    prefPictograma={prefPictograma}
-                    prefTexto={prefTexto}
-                    navigate={navigation}
-                />
+                    <AceptButton
+                        prefPictograma={prefPictograma}
+                        navigate={navigation}
+                        idStudent={studentId}
+                        idTarea={idTarea}
+                        buttonstyle={styles.aceptButton}
+                        imageStyle={styles.imageButton}
+                        textStyle={styles.textAceptButton}
+                    />
+
+                </View>
                 
 
             </View>
@@ -222,11 +223,16 @@ const styles = StyleSheet.create({
         fontSize: scale(15), 
         color: '#424242',
         fontWeight: 'bold'
+    }, 
+
+    containerButton: {
+        justifyContent: 'flex-end',
+        marginBottom: scale(20),
+        alignItems: 'center',
     },
 
-   
-
-    Button: {
+    aceptButton: {
+        
         flexDirection: 'row',
         backgroundColor: '#9df4a5',
         borderWidth: 3,
@@ -236,12 +242,18 @@ const styles = StyleSheet.create({
         
     },
 
-    textButton: {
+    textAceptButton: {
         marginHorizontal: scale(20),
         fontSize: scale(20), 
         color: '#424242', 
         fontWeight: 'bold'
         
+    },
+
+    imageButton: {
+        width: scale(100),
+        height: scale(100),
+        marginHorizontal: scale(5)
     }
 
     

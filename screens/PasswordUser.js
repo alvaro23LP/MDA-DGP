@@ -72,17 +72,19 @@ export default function PasswordUser() {
       title: 'Selecciona la contraseña',
       headerStyle: { backgroundColor: '#1565C0', height: scale(70) },
       headerTintColor: '#fff',
-      headerTitleStyle: { fontWeight: 'bold', fontSize: scale(20) },
+      headerTitleStyle: { 
+        fontWeight: 'bold', 
+        fontSize: scale(20), 
+        textShadowColor: '#000', 
+        textShadowOffset: { width: 3, height: 3 }, 
+        textShadowRadius: 7,
+      }, 
       headerTitleAlign: 'center',
-      headerLeft: () => null,
-      headerRight: () => (
-        <TouchableOpacity
-          style={styles.buttonExit}
-          onPress={() => navigation.navigate('Home')}
-        >
-          <Text style={styles.buttonExitText}>Salir</Text>
+      headerLeft: () => (
+        <TouchableOpacity style={{ marginLeft: scale(20) }} onPress={() => navigation.goBack()}>
+          <Icon name="arrow-back" size={scale(40)} color="#fff" />
         </TouchableOpacity>
-      )
+      ),
     });
   }, [navigation, studentId]);
 
