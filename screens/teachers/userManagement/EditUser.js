@@ -54,7 +54,6 @@ export default function EditUser({route, navigation }) {
   const [edad, setEdad] = useState('');
   const [contrasena1, setContrasena1] = useState('0');
   const [contrasena2, setContrasena2] = useState('0');
-  const [tipoDiscapacidad, setTipoDiscapacidad] = useState([]);
   const [preferenciasVista, setPreferenciasVista] = useState([]);
   const [fotoAvatar, setSelectedImage] = useState(null);
 
@@ -73,12 +72,7 @@ export default function EditUser({route, navigation }) {
           setNombre(userData.nombre);
           setEdad(userData.edad);
           setContrasena1(userData.contrasenaVisual[0]);
-          setContrasena2(userData.contrasenaVisual[1]);
-          setTipoDiscapacidad(
-            userData.tipoDiscapacidad 
-              ? userData.tipoDiscapacidad.split(',').map(item => item.trim()) 
-              : []
-          );
+          setContrasena2(userData.contrasenaVisual[1]);          
           setPreferenciasVista(
             userData.preferenciasVista 
               ? userData.preferenciasVista.split(',').map(item => item.trim()) 
@@ -112,7 +106,7 @@ export default function EditUser({route, navigation }) {
   
       // Abrir la galería para seleccionar una imagen
       const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images, // Solo imágenes
+        mediaTypes: ['images'], // Solo imágenes
         allowsEditing: true, // Permitir recortar la imagen
         aspect: [1, 1], // Relación de aspecto opcional
         quality: 1, // Calidad de la imagen (1 = máxima calidad)
@@ -128,7 +122,7 @@ export default function EditUser({route, navigation }) {
     };
 
   const handleUpdateUser = async () => {
-    if (nombre === '' || edad === '' || tipoDiscapacidad.length === 0 || preferenciasVista.length === 0) {
+    if (nombre === '' || edad === '' || preferenciasVista.length === 0) {
       Alert.alert('Error', 'Todos los campos son obligatorios');
       return;
     }
@@ -141,9 +135,7 @@ export default function EditUser({route, navigation }) {
 
     if (contrasena1 !== originalData.contrasenaVisual[0] || contrasena2 !== originalData.contrasenaVisual[1]) updatedData.contrasenaVisual = [contrasena1, contrasena2];
 
-    if (tipoDiscapacidad !== originalData.tipoDiscapacidad) 
-      updatedData.tipoDiscapacidad = Array.isArray(tipoDiscapacidad) ? tipoDiscapacidad.join(', ') : tipoDiscapacidad; // Convierte array a string  
-
+    
     if (preferenciasVista !== originalData.preferenciasVista) 
       updatedData.preferenciasVista = Array.isArray(preferenciasVista) ? preferenciasVista.join(', ') : preferenciasVista;
 
@@ -180,7 +172,6 @@ export default function EditUser({route, navigation }) {
   const handleSelectionChange2 = (selectedItems) => {
     // Solo mantenemos el último seleccionado
     selectedItems = selectedItems.slice(-1);
-    setTipoDiscapacidad(selectedItems);
   };
 
   return (
@@ -205,7 +196,7 @@ export default function EditUser({route, navigation }) {
         />
       </View>
       
-      <Text style={styles.labelS1}>Diversidad funcional</Text>
+      {/* <Text style={styles.labelS1}>Diversidad funcional</Text>
       <MultiSelect
         items={[
           { id: 'Por defecto', name: 'Por defecto' },
@@ -224,15 +215,14 @@ export default function EditUser({route, navigation }) {
         submitButtonColor="#90EE90"
         submitButtonTextColor="#000"
         fontSize={20}
-      />
+      /> */}
 
       <Text style={styles.labelS2}>Preferencia de vista</Text>
       <MultiSelect
         items={[
-          { id: 'Por defecto', name: 'Por defecto' },
+          { id: 'Texto', name: 'Texto' },
           { id: 'Pictograma', name: 'Pictograma' },
           { id: 'Imagenes reales', name: 'Imagenes reales' },
-          { id: 'Texto', name: 'Texto' },
         ]}
         uniqueKey="id"
         onSelectedItemsChange={selectedItems => handleSelectionChange(selectedItems)}
@@ -248,7 +238,7 @@ export default function EditUser({route, navigation }) {
 
     <View style={{ flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center'}}>
             <View style={{ marginRight: 50 }}>
-              <Text style={styles.label}>Foto Avatar</Text>
+              <Text style={{...styles.label, marginTop: 20}}>Foto Avatar</Text>
               <Button title="Seleccionar Imagen" onPress={pickImage} />
             </View>
             {fotoAvatar && (
@@ -350,7 +340,7 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: 'bold',
     marginBottom: 25,
-    marginTop: 30,
+    marginTop: 0,
   },
   inputContainer: {
     marginBottom: 30,

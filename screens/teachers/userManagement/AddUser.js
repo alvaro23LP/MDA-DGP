@@ -28,8 +28,8 @@ export default function AddUser({ navigation }) {
   const [edad, setEdad] = useState('');
   const [contrasena1, setContrasena1] = useState('0');
   const [contrasena2, setContrasena2] = useState('0');
-  const [tipoDiscapacidad, setTipoDiscapacidad] = useState(['Por defecto']);
-  const [preferenciasVista, setPreferenciasVista] = useState(['Por defecto']);
+  // const [tipoDiscapacidad, setTipoDiscapacidad] = useState(['Por defecto']);
+  const [preferenciasVista, setPreferenciasVista] = useState(['Pictograma']);
   const [fotoAvatar, setFotoAvatar] = useState(null);
   const [selectedImage, setSelectedImage] = useState(null);
   const [tareasCompletadas, setTareasCompletadas] = useState(0);
@@ -42,10 +42,9 @@ export default function AddUser({ navigation }) {
   ];
 
   const preferenciasItems = [
-    { id: 'Por defecto', name: 'Por defecto' },
+    { id: 'Texto', name: 'Texto' },
     { id: 'Pictograma', name: 'Pictograma' },
     { id: 'Imagenes reales', name: 'Imagenes reales' },
-    { id: 'Texto', name: 'Texto' },
   ];
   
   useEffect(() => {
@@ -121,9 +120,6 @@ export default function AddUser({ navigation }) {
     } else if (edad === '') {
       alert('La edad no puede estar vacía', '');
       return;
-    } else if (tipoDiscapacidad.length === 0) {
-      alert('Debes seleccionar al menos un tipo de diversidad funcional', '');
-      return;
     } else if (preferenciasVista.length === 0) {
       alert('Debes seleccionar al menos una preferencia de vista', '');
       return;
@@ -151,10 +147,10 @@ export default function AddUser({ navigation }) {
       await addDoc(collection(getFirestore(), 'Estudiantes'), {
         nombre,
         edad,
-        tipoDiscapacidad: Array.isArray(tipoDiscapacidad) ? tipoDiscapacidad.join(', ') : tipoDiscapacidad, // Convierte array a string  
+        // tipoDiscapacidad: Array.isArray(tipoDiscapacidad) ? tipoDiscapacidad.join(', ') : tipoDiscapacidad, // Convierte array a string  
         preferenciasVista: Array.isArray(preferenciasVista) ? preferenciasVista.join(', ') : preferenciasVista, // Convierte array a string  
         fotoAvatar: fotoAvatarUrl,
-        historialTareas: [],
+        // historialTareas: [],
         tareasCompletadas: Number(tareasCompletadas),
         contrasenaVisual,
       });
@@ -162,7 +158,7 @@ export default function AddUser({ navigation }) {
       // Limpiar el formulario después de agregar el usuario
       setNombre('');
       setEdad('');
-      setTipoDiscapacidad('');
+      // setTipoDiscapacidad('');
       setPreferenciasVista(['Por defecto']);
       setContrasena1('0');
       setContrasena2('0');
@@ -186,7 +182,7 @@ export default function AddUser({ navigation }) {
   const handleSelectionChange2 = (selectedItems) => {
     // Solo mantenemos el último seleccionado
     selectedItems = selectedItems.slice(-1);
-    setTipoDiscapacidad(selectedItems);
+    // setTipoDiscapacidad(selectedItems);
   };
 
   return (
@@ -212,7 +208,7 @@ export default function AddUser({ navigation }) {
         />
       </View>
 
-      <Text style={styles.labelS1}>Diversidad funcional</Text> 
+      {/* <Text style={styles.labelS1}>Diversidad funcional</Text> 
       <MultiSelect 
         items={diversidadItems} 
         uniqueKey="id" 
@@ -226,7 +222,7 @@ export default function AddUser({ navigation }) {
         submitButtonColor="#90EE90" 
         submitButtonTextColor="#000" 
         fontSize={20} 
-      />
+      /> */}
       
       <Text style={styles.labelS2}>Preferencia de vista</Text>
       <MultiSelect
@@ -246,7 +242,7 @@ export default function AddUser({ navigation }) {
 
       <View style={{ flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center'}}>
         <View style={{ marginRight: 50 }}>
-          <Text style={styles.label}>Foto Avatar</Text>
+          <Text style={{...styles.label, marginTop: 20}}>Foto Avatar</Text>
           <Button title="Seleccionar Imagen" onPress={pickImage} />
         </View>
         {selectedImage && (
@@ -352,7 +348,7 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: 'bold',
     marginBottom: 25,
-    marginTop: 30,
+    marginTop: 0,
   },
   inputContainer: {
     marginBottom: 30,

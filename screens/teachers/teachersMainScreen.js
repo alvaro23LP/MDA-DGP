@@ -41,8 +41,8 @@ export default function TeachersMainScreen({navigation})
         <View style={{backgroundColor:'#D9EFFF', flex:1 }}>
             <View style={styles.container}>
 
-                <TouchableOpacity style={styles.button}>
-                    <Text style={styles.textButton} onPress={() => navigation.navigate('UsersManagement')}> Gestión de usuarios </Text>
+                <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('UsersManagement')}>
+                    <Text style={styles.textButton} > Gestión de usuarios </Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('ShowTasks')}>

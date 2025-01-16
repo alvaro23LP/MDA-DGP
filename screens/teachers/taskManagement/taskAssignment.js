@@ -8,11 +8,17 @@ import {
   Modal,
   FlatList,
   Alert,
+  Dimensions,
 } from 'react-native';
 import { getFirestore, collection, getDocs, doc, updateDoc } from 'firebase/firestore';
+import Icon from 'react-native-vector-icons/Ionicons';
 import { initializeApp } from 'firebase/app';
 import { firebaseConfig } from '../../../services/firebaseConfig';
 
+
+// Obtener el ancho de la pantalla
+const { width } = Dimensions.get('window');
+const scale = (size) => (width < 375 ? size : size * (width / 375));
 
 // Inicializa Firebase
 initializeApp(firebaseConfig);
@@ -38,10 +44,18 @@ export default function TaskAssignment({ navigation, route }) {
 
   useEffect(() => {
     navigation.setOptions({
-      title: 'Asignar Tarea',
-      headerStyle: { backgroundColor: '#1565C0', height: 80 },
+      title: 'Asignar tareas',
+      headerStyle: { backgroundColor: '#1565C0', height: scale(60) },
       headerTintColor: '#fff',
-      headerTitleStyle: { fontWeight: 'bold', fontSize: 35 },
+      headerTitleStyle: { fontWeight: 'bold', fontSize: scale(20) },
+      headerLeft: () => (
+        <TouchableOpacity
+          style={{ marginLeft: scale(20) }}
+          onPress={() => navigation.goBack()}
+        >
+          <Icon name="arrow-back" size={scale(20)} color="#fff" />
+        </TouchableOpacity>
+      ),
     });
   }, [navigation]);
 
@@ -120,7 +134,7 @@ export default function TaskAssignment({ navigation, route }) {
       <View style={styles.inputContainer}>
         <Text style={styles.label}>Tarea a asignar</Text>
         <TouchableOpacity onPress={() => setTaskModalVisible(true)} style={styles.input}>
-          <Text>{searchTask || 'Buscar tarea'}</Text>
+          <Text style={styles.placeholder_}>{searchTask || 'Buscar tarea'}</Text>
         </TouchableOpacity>
       </View>
 
@@ -157,7 +171,7 @@ export default function TaskAssignment({ navigation, route }) {
       <View style={styles.inputContainer}>
         <Text style={styles.label}>Alumno asignado</Text>
         <TouchableOpacity onPress={() => setStudentModalVisible(true)} style={styles.input}>
-          <Text>{searchStudent || 'Buscar alumno'}</Text>
+          <Text style={styles.placeholder_}>{searchStudent || 'Buscar alumno'}</Text>
         </TouchableOpacity>
       </View>
 
@@ -223,6 +237,11 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: 'bold',
     marginBottom: 10,
+  },
+  placeholder_: {
+    fontSize: 24,
+    color: 'gray',
+    paddingTop: 9,
   },
   input: {
     height: 60,

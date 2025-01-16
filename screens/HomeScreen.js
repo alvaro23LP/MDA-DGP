@@ -73,11 +73,11 @@ export default function HomeScreen({ navigation}) {
 
   const getFontSize = (name) => { //Funcion para ajustar nombre en funcion de su longitud
     if (name.length > 20) {       // para que no se salga del cuadro
-        return scale(9);
-    } else if (name.length > 10) {
-        return scale(11);
-    } else {
         return scale(12);
+    } else if (name.length > 10) {
+        return scale(14);
+    } else {
+        return scale(15);
     }
 };
 
@@ -124,12 +124,15 @@ export default function HomeScreen({ navigation}) {
         })}
       >
         <Text style={styles.buttonText}>Pantalla Menús</Text>
-      </TouchableOpacity>
+      </TouchableOpacity>*/}
       
 
       
-      <TouchableOpacity style={styles.ExtraButton4} onPress={() => navigation.navigate('StepsTask', { idAlumno: 'JNPHNDw2nCF9vbqVdcEN', idTarea: 'OReKtR3EGKxb8oWSBKwc' })}> 
+      {/* <TouchableOpacity style={styles.ExtraButton4} onPress={() => navigation.navigate('StepsTask', { idAlumno: 'JNPHNDw2nCF9vbqVdcEN', idTarea: 'OReKtR3EGKxb8oWSBKwc' })}> 
         <Text style={styles.buttonText}>AÑADIR TAREA PASOS</Text>
+      </TouchableOpacity>  */}
+      {/* <TouchableOpacity style={styles.ExtraButton2} onPress={() => navigation.navigate('ShowTasks')}> 
+        <Text style={styles.buttonText}>MOSTRAR TAREAS</Text>
       </TouchableOpacity> */}
 
     </View>
@@ -142,7 +145,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#D9EFFF',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 40,
+    padding: 20,
     paddingTop: largeScale(200),
   },
   selectUserText: {
@@ -161,8 +164,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   userIcon: {
-    width: scale(75),
-    height: scale(90),
+    width: scale(100),
+    height: scale(130),
     backgroundColor: '#fff',
     padding: 4,
     borderRadius: 15,
@@ -177,8 +180,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   userImage: {
-    width: scale(50),
-    height: scale(50),  
+    width: scale(80),
+    height: scale(80),  
     borderRadius: 10,
     borderColor: '#1565C0',
     borderWidth: 1,
@@ -186,7 +189,7 @@ const styles = StyleSheet.create({
   userName: {
     fontWeight: 'bold',
     color: '#000',
-    marginTop: 10,
+    marginTop: 5,
   },
   loginButton: {
     position: 'absolute',

@@ -46,7 +46,7 @@ const materialPictograms = {
 const completedImage = require('../../images/sí.png');
 
 export default function UserMaterialTask({ navigation, route }) {
-    const { studentId, idTarea } = route.params; 
+    const { studentId, idTarea, preferenciaVista } = route.params; 
     const [tareas, setTareas] = useState([]);
     const [studentName, setStudentName] = useState('');
     const [showAllMaterials, setShowAllMaterials] = useState(false);
@@ -173,12 +173,13 @@ export default function UserMaterialTask({ navigation, route }) {
                     </TouchableOpacity>
                 )}
                 <AceptButton
-                    prefPictograma={preferencia === 'Pictograma' ? true : false}
-                    prefTexto={true}
+                    prefPictograma={preferenciaVista === 'Texto' ? false : true}
                     navigate={navigation}
-                    buttonStyle={styles.aceptButton}
-                    textStyle={styles.aceptButtonText}
-                    imageStyle={styles.aceptButtonImage}
+                    idStudent={studentId}
+                    idTarea={idTarea}
+                    buttonstyle={styles.aceptButton}
+                    imageStyle={styles.imageButton}
+                    textStyle={styles.textAceptButton}
                 />
             </View>
         </View>
@@ -311,4 +312,15 @@ const styles = StyleSheet.create({
         height: scale(50),
         marginVertical: scale(5),
     },
+    textAceptButton: {
+        marginHorizontal: scale(20),
+        fontSize: scale(20),
+        color: '#424242',
+        fontWeight: 'bold'
+    },
+    imageButton: {
+        width: scale(100),
+        height: scale(100),
+        marginHorizontal: scale(5)
+    }
 });

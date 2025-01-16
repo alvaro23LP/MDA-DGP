@@ -171,7 +171,7 @@ export default function UserScreen({ navigation, route }) {
 
                 return (
                     <View style={styles.listaTareas}>
-                        <TouchableOpacity key={index} style={styles.tareaContainer} onPress={() => navigation.navigate(navigationRoute, { studentId: studentId, idTarea: tarea.id })}>
+                        <TouchableOpacity key={index} style={styles.tareaContainer} onPress={() => navigation.navigate(navigationRoute, { studentId: studentId, idTarea: tarea.id, preferenciaVista: preferencia })}>
                             {(getImageForTaskType(tarea.tipoTarea) != null) ? (
                                 <Image
                                     source={getImageForTaskType(tarea.tipoTarea)}

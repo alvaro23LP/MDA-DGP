@@ -21,7 +21,7 @@ export default function UserStepsTask({ navigation, route }) {
   const { studentId, idTarea } = route.params; 
   const [taskData, setTaskData] = useState(null);
   const [currentStep, setCurrentStep] = useState(1);
-  const [prefPictograma, setPrefPictograma] = useState(false);
+  const [preferenciasVista, setPreferenciasVista] = useState(route.params.preferenciaVista);
 
   useEffect(() => {
     navigation.setOptions({
@@ -58,34 +58,34 @@ export default function UserStepsTask({ navigation, route }) {
       setTaskData(data);
     };
 
-    const getStudentData = async () => {
-      try {
-        const studentDoc = await getDoc(doc(db, 'Estudiantes', studentId));
-        if (studentDoc.exists()) {
-          const data = studentDoc.data();
+    // const getStudentData = async () => {
+    //   try {
+    //     const studentDoc = await getDoc(doc(db, 'Estudiantes', studentId));
+    //     if (studentDoc.exists()) {
+    //       const data = studentDoc.data();
 
-          if (data.preferenciasVista === 'Pictograma' || data.preferenciasVista === 'Por defecto' || data.preferenciasVista === 'Imagenes reales') {
-            setPrefPictograma(true);
-          }
-          else if (data.preferenciasVista === 'Texto') {
-            setPrefTexto(true);
-          }
-
-
-        } else {
-          console.log('No se encontró al alumno');
-          Alert.alert('Error', 'No se encontró al alumno con el ID proporcionado.');
-        }
-
-      } catch (error) {
-        console.error('Error al obtener los datos del alumno:', error);
-        Alert.alert('Error', 'Hubo un problema al obtener los datos del alumno. Inténtalo de nuevo.');
-      }
-
-    };
+    //       if (data.preferenciasVista === 'Pictograma' || data.preferenciasVista === 'Por defecto' || data.preferenciasVista === 'Imagenes reales') {
+    //         setPrefPictograma(true);
+    //       }
+    //       else if (data.preferenciasVista === 'Texto') {
+    //         setPrefTexto(true);
+    //       }
 
 
-    getStudentData();
+    //     } else {
+    //       console.log('No se encontró al alumno');
+    //       Alert.alert('Error', 'No se encontró al alumno con el ID proporcionado.');
+    //     }
+
+    //   } catch (error) {
+    //     console.error('Error al obtener los datos del alumno:', error);
+    //     Alert.alert('Error', 'Hubo un problema al obtener los datos del alumno. Inténtalo de nuevo.');
+    //   }
+
+    // };
+
+
+    // getSktudentData();
     loadTaskData();
   }, [navigation]);
 
@@ -112,7 +112,14 @@ export default function UserStepsTask({ navigation, route }) {
   const currentStepData = taskData.pasos[currentStep] || {};
   const stepTitle = currentStepData.Titulo || 'Paso sin título';
   const stepDescription = currentStepData.Instrucciones || 'No hay descripción disponible';
-  const stepImage = currentStepData.Imagen || require('../../images/no-image-icon.png');
+  let stepImage = null;
+  if (preferenciasVista === 'Texto') {
+    stepImage = null;
+  }else if (preferenciasVista === 'Pictograma' || preferenciasVista === 'Por defecto') {
+    stepImage = currentStepData.Pictograma || require('../../images/no-image-icon.png');
+  }else if (preferenciasVista === 'Imagenes reales') {
+    stepImage = currentStepData.Imagen || require('../../images/no-image-icon.png');
+  }
 
   return (
     <View style={styles.container}>
@@ -130,7 +137,9 @@ export default function UserStepsTask({ navigation, route }) {
               color="#1565C0"
             />
           </TouchableOpacity>
-          <Image source={typeof stepImage === 'string' ? { uri: stepImage } : stepImage} style={styles.stepImage} />
+          {stepImage && (
+            <Image source={typeof stepImage === 'string' ? { uri: stepImage } : stepImage} style={styles.stepImage} />
+          )}
           <TouchableOpacity
             style={currentStep === Object.keys(taskData.pasos).length ? styles.hidden : styles.arrowRight}
             onPress={showNextStep}
@@ -148,7 +157,7 @@ export default function UserStepsTask({ navigation, route }) {
       </View>
       {currentStep === Object.keys(taskData.pasos).length && (
         <AceptButton
-          prefPictograma={prefPictograma}
+          prefPictograma={preferenciasVista === 'Texto' ? false : true}
           navigate={navigation}
           idStudent={studentId}
           idTarea={idTarea}
@@ -173,7 +182,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#fff',
-    padding: scale(0),
+    paddingVertical: scale(15),
     borderRadius: scale(10),
     borderWidth: 2,
     borderColor: '#1565C0',
@@ -188,7 +197,8 @@ const styles = StyleSheet.create({
     fontSize: scale(14),
     color: '#424242',
     textAlign: 'center',
-    marginBottom: scale(20),
+    marginBottom: scale(0),
+    paddingHorizontal: scale(30),
   },
   stepTitle: {
     fontSize: scale(18),

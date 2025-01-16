@@ -197,7 +197,8 @@ const styles = StyleSheet.create({
   },
   selectedFruitIcon: {
     backgroundColor: '#88dd99',
-    borderColor: 'lightgreen',
+    borderColor: 'black',
+    borderWidth: 7,
   },
   fruitIcon: {
     width: scale(100),

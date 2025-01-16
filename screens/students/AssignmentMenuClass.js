@@ -15,7 +15,7 @@ const { width } = Dimensions.get('window');
 const scale = (size) => (width < 375 ? size : size * (width / 375));
 
 export default function AssignmentMenuClass({ route, navigation }) {
-  const { studentId, idTarea } = route.params || {};
+  const { studentId, idTarea, preferenciaVista } = route.params || {};
 
   const [classes, setClasses] = useState([]);
   const [completedClasses, setCompletedClasses] = useState([]);
@@ -98,12 +98,13 @@ export default function AssignmentMenuClass({ route, navigation }) {
 
       <View style={styles.buttonContainer}>
         <AceptButton
-          prefPictograma={false} // Si necesitas usar preferencias, ajusta este valor
+          prefPictograma={preferenciaVista === 'Texto' ? false : true}
           navigate={navigation}
           idStudent={studentId}
           idTarea={idTarea}
-          buttonstyle={styles.acceptButton}
-          textStyle={styles.acceptButtonText}
+          buttonstyle={styles.aceptButton}
+          imageStyle={styles.imageButton}
+          textStyle={styles.textAceptButton}
         />
       </View>
     </View>
@@ -170,5 +171,24 @@ const styles = StyleSheet.create({
     fontSize: scale(18),
     color: '#424242',
     fontWeight: 'bold',
+  },
+  aceptButton: {        
+    flexDirection: 'row',
+    backgroundColor: '#9df4a5',
+    borderWidth: 3,
+    borderColor: '#424242',
+    borderRadius: 10,
+    alignItems: 'center'
+  },
+  textAceptButton: {
+    marginHorizontal: scale(20),
+    fontSize: scale(20),
+    color: '#424242',
+    fontWeight: 'bold'
+  },
+  imageButton: {
+    width: scale(100),
+    height: scale(100),
+    marginHorizontal: scale(5)
   },
 });

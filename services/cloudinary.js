@@ -61,3 +61,38 @@ export const uploadStepImageToCloudinary = async (imageUri) => {
     throw error;
   }
 };
+
+
+export const deleteImageFromCloudinary = async (publicId) => {
+  if (!publicId) {
+    throw new Error('No image ID provided');
+  }
+
+  const apiKey = 'xxx'; 
+  const apiSecret = 'xxx'; 
+  const cloudName = cloudinaryConfig.cloudName;
+
+  const url = `https://api.cloudinary.com/v1_1/${cloudName}/image/destroy`;
+
+  const data = new URLSearchParams();
+  data.append('public_id', publicId);
+
+  try {
+    console.log('Deleting image from Cloudinary...');
+    const response = await axios.post(url, data, {
+      auth: {
+        username: apiKey,
+        password: apiSecret,
+      },
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+    });
+    console.log('Image deleted successfully:', response.data);
+    return response.data; // Contiene el resultado de la eliminación
+  } catch (error) {
+    console.error('Error deleting image:', error);
+    throw error;
+  }
+};
+
